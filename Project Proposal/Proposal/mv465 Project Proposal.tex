@@ -1,0 +1,183 @@
+\documentclass[12pt]{article}
+\usepackage{a4wide}
+\usepackage{sectsty}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{pdfpages}
+
+\parindent 0pt
+\parskip 6pt
+
+\begin{document}
+\includepdf{coversheet.pdf}
+\thispagestyle{empty}
+
+\center{\huge\bf Kin Recognition using Weighted Graph Embeddings}
+\center{\Large Computer Science - Part II Project Proposal}
+\center{\large Manu Varma}
+
+\flushleft
+
+\vspace{0.2in}
+
+
+\section{Introduction and Background}
+
+
+Kin recognition is the way of recognizing whether two people are related or not based on their faces and, if they are related, how are they related. It is advantageous to inclusive fitness for an organism to be able to recognize which of their neighbors were close relatives \cite{HamiltonGenetic}. Thus, it stands to reason that the ability to recognize kin relationships has evolved in humans. In humans, facial resemblance is expected to serve as an indicator of kinship. Strangers are able to match photographs of mothers to their infants without any prior contact with the family \cite{mateo2015}. 
+
+In the field of creating computational models of kin recognition, there are multiple types of problems that are being solved. The first and most common kind is kinship verification which is what will be explored in this project. The task is to determine whether a pair of faces are blood relatives or not and what type of relatives they are. The next type of task is family classification which is the task of determining which family a single member belongs to. The next type of task is tri-subject verification where it is determined whether a child is related to a pair of parents. Finally, there is the search and retrieval task where a child is checked against all of the faces in a database to see if there is anyone they are related to. This has applications in helping find missing children specifically \cite{robinson2020visual}. 
+
+\section{Starting Point}
+
+\subsection{Personal Starting Point}
+
+Currently, I have minimal experience with Tensorflow and Keras. I have also worked with facial recognition a few years ago. I am very familiar with Python, overall, however. The main courses that could be helpful would be Machine Learning and Bayesian Inference and Deep Neural Networks in which I will be attending both in Lent Term and I will try to read ahead in before I start my implementation. 
+
+\subsection{Current Existing Literature}
+
+One of the earliest approaches to kinship recognition \cite{fang2010} obtained the main facial features from each person using a pictorial structure model which then got the features and then a feature vector was created from that. Using the feature vectors, the differences between the corresponding feature vectors were calculated before applying K-nearest neighbors and Support Vector Machine methods to train the model. 
+
+Another method used in 2012 was to first partition the face into regions in 5 layers by slowly breaking down the face in each layer \cite{xia2012kinrelationships}. This analyzes the facial features and compares the features between two people. However, due to aging, these features can be deformed a bit so this is mitigated using transfer subspace learning. They do this transfer learning on child-old parent and child-young parent pairs in order to create a new problem. This way, the old and young parents can be operating on the same distribution of features rather than different distributions. This allows the feature difference that young and old parents might have to decrease and establishes a new standard for getting the features of the face from each person. After this, they use the gender relation, age difference and the distance between the two people in the photo along with the results of the transfer learning to get a kinship score and pick the relationship that has the highest score.  
+
+Lastly, a more recent method from 2019 uses Weighted Graph Embedding-Based Metric Learning \cite{liang2019graphembeddings} to obtain the classification. Instead of obtaining a single feature vector, four types of feature descriptors are obtained. These descriptors are feature vectors obtained from Local Binary Patterns, a Histogram of Gradients, a scale-invariant feature transform vector and a 4096-dimensional VGG-Face CNN descriptor using the VGG-Very-Deep-16 CNN architecture. Once these descriptors are obtained, for each type of relationship (father-son, mother-daughter, etc.), an intrinsic graph and two penalty graphs are created. K-nearest neighbors is used on these graphs to construct a set of matrices which are subsequently used to figure out whether the inputted people have the relationship the graph was testing. When the method was evaluated on KinFaceW-I and KinFaceW-II, the mean verification accuracy was about 78\% and 83\% respectively. 
+
+\section{Substance and Structure of the Project}
+
+\subsection{Aims of the Project}
+
+% Part of what I aim to do is to create a classifier that doesn't partially rely on the fact that the faces come from the same image. Part of what makes it easier to run kin recognition when they come from the same image is that the physical distance between people can help factor into how close they are. I aim to create my own model that should be able to take in any pair of pictures and figures out how the pair of people are related, even if the images didn't originate from the same image. 
+
+I aim to replicate the kin recognition results using the Weighted Graph Embedding Based method \cite{liang2019graphembeddings}. Once that is done, I aim to extend the model with the following extensions:
+\begin{itemize}
+\item Many current implementations of kin recognition use the fact that they faces came from the same image which makes kin recognition easier \cite{dawson2018photo}. We can try to extend the current implementation and create our own model for this problem to better account for this. 
+\item The functionality can be extended to also include video rather than just images.
+\item Extend the functionality beyond kin recognition to relationship recognition to also identify if people are friends as well or if they are strangers
+\item Add on a system where you can search for all of the people in a database that you might be related to in general or to find pictures of a specific family member. 
+\end{itemize}
+
+\subsection{Dataset}
+
+% Do you have access to a database of images and videos? Do you propose to build one? Will it be biased one way or another? Would an evaluation based on it be trustworthy?
+
+I will be using a combination of the KinFaceW-I \cite{KinFaceCitation1} and Family101 \cite{Family101Citation} datasets. The KinFaceW-I dataset contains pairs of faces collected from the internet which are labeled with one of four kin relations: Father-Son (F-S), Father-Daughter (F-D), Mother-Son (M-S), and Mother-Daughter (M-D). For each pair of faces, each face comes from a different photo than the other face in the pair. The photos are taken from uncontrolled environments where there was no restriction in the pose, lighting, background, expression, age, ethnicity, and partial occlusion which would mean that the dataset is not very biased. 
+
+The Family101 dataset contains 101 different families with 607 individuals and 14,816 images composed of renowned public families. 
+
+For the potential extension of including videos, a variant of the KinFaceW dataset can be used called Kinship Face Videos in the Wild \cite{KinFaceVideoCitation}. This is similar to the KinFaceW-I dataset except the resolution of each frame is 900 $\times$ 500 pixels and each video contains 100-500 frames each. 
+
+All of these datasets are public so long as they are cited as done above. In addition to being cited, the video dataset requires the creators to be emailed as well and the Family101 dataset requires them to be informed about the accuracies obtained. 
+
+\subsection{Structure of the Project}
+
+% What methods would you be using? What foundation are they based on?
+
+To achieve this goal, a similar method to what is used in the weighted graph embedding approach \cite{liang2019graphembeddings}. The main components are as follows:
+\begin{itemize}
+\item I will require face recognition first in order to get the person's face from a given image into the format that will be used by the rest of the system. 
+\item From the face that is a standardized size, the necessary feature descriptors need to be taken from the face image. 
+\item The next component is the intrinsic graph and penalty graphs that are created for each kin relationship. 
+\item Finally, the needed matrices that are obtained from said graphs are created to figure out whether the pair of faces has the relationship that is being tested. 
+\end{itemize}
+
+\subsection{Evaluation}
+
+% How will you quantify and compare your results, what are the benchmarks? How are you going to evaluate the goodness of your results? 
+
+One method of evaluation is to use the training/testing data split that the datasets already provide and use that as a benchmark for accuracy. We can use the KinFaceW-I and II datasets to benchmark the implementation with the paper and the Family101 dataset to see how it extends to other data. We can use currently existing models as a benchmark and compare our accuracy that was obtained with existing accuracies. We can also create a confusion matrix and calculate the $F_1$-score of the model based on the results of using the test data. Furthermore, the validation and learning curves can be analyzed in order to figure out if the model is underfitting or overfitting. 
+
+\section{Success Criterion}
+
+% Add error in case of random seeds, training split, etc. 
+
+The project can be considered a success if it can successfully replicate the accuracies that the Weighted Graph Embedding-Based methodology towards kin recognition \cite{liang2019graphembeddings} obtained in their evaluation with an error range of $\pm 15\%$ due to factors such as the training/testing split being different from that used, using a different random number seed and using a different framework than was used in the paper or if I can invalidate the results of the paper. 
+
+\section{Timeline and Milestones}
+
+\begin{enumerate}
+	\item \textbf{Oct 23 - Nov 06}: \\ 
+	This time will be mainly used for research and getting familiar with everything I need to know about the subject such as:
+	\begin{itemize}
+		\item Reading up more in depth on existing literature 
+		\item Getting a more in depth idea of what architecture I should be using
+		\item Figuring out which libraries are necessary to be used
+		\item Getting an understanding of the libraries to be used by doing small quick projects in either Tensorflow or PyTorch. 
+	\end{itemize} \ \\
+	\item \textbf{Nov 06 - Nov 20}: \\
+	Basic face recognition will be implemented so that generic images can be given and not just images of a specific size of just their face. 
+	\begin{itemize}
+		\item Using Dlib or OpenCV, create basic facial recognition software that outputs the image of the person's face in the required format. 
+	\end{itemize}
+	\textbf{Deliverable}: A basic, usable facial recognition model that can be used for the rest of the project. 
+	\item \textbf{Nov 20 - Dec 04}: \\
+	Create the ability to get the necessary feature vectors like local binary patterns and the histogram of gradients. 
+	\begin{itemize}
+		\item Given the input of the pictures of the faces, get the local binary patterns and histogram of gradients out from them. 
+	\end{itemize}
+	\item \textbf{Dec 04 - Dec 18}: \\
+	The VGG-Face CNN descriptors and SIFT face descriptors will be obtained in this time which would then be fed into the graphs. If this is done before the sprint is up, work will be started on implementing the graphs. \\
+	\textbf{Deliverable}: The face descriptor methods are all created. 
+	\item \textbf{Dec 18 - Jan 01}: \\
+	The implementation of the intrinsic graph would be created in this sprint. This should create the graph based on the class information. 
+	\item \textbf{Jan 01 - Jan 15}: \\
+	The penalty graphs should be created in this sprint and thus get the calculations necessary to figure out the kin relationship. This overall model that is created should be able to fulfill the success criterion. \\
+	\textbf{Deliverable}: A model that can predict kin relationships between pairs of images. 
+	\item \textbf{Jan 15 - Jan 29}: \\
+	
+	At this point, ablation studies will be done to help to evaluate the network by seeing which inputs are necessary for the network to work with more focus being given to the progress report and presentation:
+	\begin{itemize}
+		\item Start work on an ablation study. 
+		\item Write up the Progress Report and create a presentation for it to be handed in on February 5th. 
+	\end{itemize}
+	\textbf{Deliverable}: Progress Report
+	\item \textbf{Jan 29 - Feb 12}: \\
+	Finish work on the ablation studies and start work on the first extension:
+	\begin{itemize}
+		\item Finish up ablation studies for evaluation and finish model
+		\item Start working on extending the model to work for videos as well.  
+	\end{itemize}
+	\textbf{Deliverable}: A finalized model that reports the kin relation between a people in a pair of images. 
+	\item \textbf{Feb 12 - Feb 26}: \\
+	Finish work on the first extension and start doing work on a second extension to try and improve on the model for images. 
+	
+	\textbf{Deliverable}: A new model which is the model implemented which is extended to work on videos 
+	\item \textbf{Feb 26 - Mar 12}: \\
+	At this point, the first draft of the dissertation starts to be written alongside some work on improving the model, with priority given to the draft:
+	\begin{itemize}
+		\item Write out a draft of the Introduction and Preparation Chapters
+		\item Work on second extension for improving the existing model. 
+	\end{itemize}
+	\item \textbf{Mar 12 - Mar 26}: \\
+	Continue working on writing the dissertation and extension with the same priority:
+	\begin{itemize}
+		\item Write out a draft of the Implementation chapter
+		\item Work on second extension for improving the existing model. If it is finished, then this will be included in the implementation chapter. If not, it will be abandoned in favor of finishing up the draft of the dissertation. 
+	\end{itemize}
+	\textbf{Deliverable}: A draft of the Introduction, Preparation and Implementation chapters to be given to supervisor for feedback
+	\item \textbf{Mar 26 - Apr 09}: \\
+	Continue working on writing the dissertation:
+	\begin{itemize}
+		\item Write out a draft of the Evaluation chapter
+		\item Revise the Introduction, Preparation and Implementation chapter based on supervisor feedback
+	\end{itemize}
+	
+	\item \textbf{Apr 09 - Apr 23}: \\
+	Continue working on writing the dissertation:
+	\begin{itemize}
+		\item Write out a draft of the Conclusion chapter
+	\end{itemize}
+	\textbf{Deliverable}: A draft dissertation to be given to supervisor for feedback
+	
+	\item \textbf{Apr 23 - May 14}:\\
+	If everything has gone well, this should be where final touches are applied. 
+	\textbf{Deliverable}: The completed dissertation 
+\end{enumerate}
+
+\section{Resources Declaration}
+
+I plan to use my current laptop which is a Windows laptop with an Intel i7 at 2.8GHz, 16GB RAM, an NVIDIA GTX 1060 graphics card, 1TB of HDD space and 256GB of SSD space. I accept full responsibility for this machine and I have made contingency plans to protect myself against hardware and/or software failure. Such contingencies include backing up my files to Github, Google Drive and an external 1TB hard drive. The Github repository will be updated fairly often as I work on my project and the Google Drive and hard drive will be updated every 1-2 weeks. Should my machine encounter software failures, I would buy a new laptop and work on the MCS machines until the new laptop arrives. Furthermore, I will utilize GPUs provided by the Computer Laboratory when I need to train any models. 
+
+\bibliographystyle{plain}
+\bibliography{citations.bib}
+
+\end{document}

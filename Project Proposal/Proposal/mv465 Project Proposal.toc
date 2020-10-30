@@ -1,0 +1,12 @@
+\contentsline {section}{\numberline {1}Introduction and Background}{2}%
+\contentsline {section}{\numberline {2}Starting Point}{3}%
+\contentsline {subsection}{\numberline {2.1}Personal Starting Point}{3}%
+\contentsline {subsection}{\numberline {2.2}Current Existing Literature}{3}%
+\contentsline {section}{\numberline {3}Substance and Structure of the Project}{4}%
+\contentsline {subsection}{\numberline {3.1}Aims of the Project}{4}%
+\contentsline {subsection}{\numberline {3.2}Dataset}{4}%
+\contentsline {subsection}{\numberline {3.3}Structure of the Project}{5}%
+\contentsline {subsection}{\numberline {3.4}Evaluation}{5}%
+\contentsline {section}{\numberline {4}Success Criterion}{5}%
+\contentsline {section}{\numberline {5}Timeline and Milestones}{5}%
+\contentsline {section}{\numberline {6}Resources Declaration}{8}%

@@ -1,0 +1,57 @@
+\begin{thebibliography}{10}
+
+\bibitem{dawson2018photo}
+Mitchell Dawson, Andrew Zisserman, and Christoffer Nell{\aa}ker.
+\newblock From same photo: Cheating on visual kinship challenges.
+\newblock {\em CoRR}, abs/1809.06200, 2018.
+
+\bibitem{Family101Citation}
+R.~{Fang}, A.~C. {Gallagher}, T.~{Chen}, and A.~{Loui}.
+\newblock Kinship classification by modeling facial feature heredity.
+\newblock In {\em 2013 IEEE International Conference on Image Processing},
+  pages 2983--2987, 2013.
+
+\bibitem{fang2010}
+R.~{Fang}, K.~D. {Tang}, N.~{Snavely}, and T.~{Chen}.
+\newblock Towards computational models of kinship verification.
+\newblock In {\em 2010 IEEE International Conference on Image Processing},
+  pages 1577--1580, 2010.
+
+\bibitem{HamiltonGenetic}
+W.D. Hamilton.
+\newblock The genetical evolution of social behaviour. ii.
+\newblock {\em Journal of Theoretical Biology}, 7(1):17 -- 52, 1964.
+
+\bibitem{liang2019graphembeddings}
+J.~{Liang}, Q.~{Hu}, C.~{Dang}, and W.~{Zuo}.
+\newblock Weighted graph embedding-based metric learning for kinship
+  verification.
+\newblock {\em IEEE Transactions on Image Processing}, 28(3):1149--1162, 2019.
+
+\bibitem{KinFaceCitation1}
+J.~{Lu}, X.~{Zhou}, Y.~{Tan}, Y.~{Shang}, and J.~{Zhou}.
+\newblock Neighborhood repulsed metric learning for kinship verification.
+\newblock {\em IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  36(2):331--345, 2014.
+
+\bibitem{mateo2015}
+Jill~M. Mateo.
+\newblock Perspectives: Hamilton's legacy: Mechanisms of kin recognition in
+  humans.
+\newblock {\em Ethology}, 121(5):419--427, 2015.
+
+\bibitem{robinson2020visual}
+Joseph~P Robinson, Ming Shao, and Yun Fu.
+\newblock Visual kinship recognition: A decade in the making, 2020.
+
+\bibitem{xia2012kinrelationships}
+S.~{Xia}, M.~{Shao}, J.~{Luo}, and Y.~{Fu}.
+\newblock Understanding kin relationships in a photo.
+\newblock {\em IEEE Transactions on Multimedia}, 14(4):1046--1056, 2012.
+
+\bibitem{KinFaceVideoCitation}
+Haibin Yan and Junlin Hu.
+\newblock Video-based kinship verification using distance metric learning.
+\newblock {\em Pattern Recogn.}, 75(C):15–24, March 2018.
+
+\end{thebibliography}

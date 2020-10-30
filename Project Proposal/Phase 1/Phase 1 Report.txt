@@ -1,0 +1,35 @@
+Subject: Phase 1 - Varma: Kin Recognition on 
+
+Phase 1 Project Selection Status Report
+
+Name: Manu Varma                                                
+
+College: St. John's College
+
+User Identifier: mv465                                      
+
+Director of Studies: Robert Mullins
+
+Please complete 1, 2 and 3 below.
+
+1. Please write 100 words on your current project ideas.
+
+My project will work with kin recognition where, given an image with two people in it, their relationship will be returned. In current implementations, the two people come from the same image which makes the task simpler. My project should take in an image of two people, not necessarily originating from the same image, and return their relationship. The core part of the project will only return whether they are father and son, mother and daughter, siblings, etc. However, this can be extended to return whether they are cousins or not even related and to also work with videos.
+
+2. Please list names of potential project supervisors.
+
+Daniel Bates
+
+3. Is there any chance that your project will involve any
+computing resources other than the Computing Service's MCS and
+software that is already installed there, for example: your own
+machine, machines in College, special peripherals, imported
+software packages, special hardware, network access, substantial
+extra disc space on the MCS.
+
+If so indicate below what, and what it is needed for.
+
+
+I will be using my machine, a Windows laptop with an Intel i7 at 2.8GHz, 16GB RAM and an NVIDIA GTX 1060 card.
+I will also need an external computation machine for when I end up training my model. 
+In terms of software packages, I'll probably end up using Tensorflow in Python and potentially Docker as well on my machine. 
