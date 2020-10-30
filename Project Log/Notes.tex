@@ -18,7 +18,7 @@
 \subsection{Main Paper - WGEML}
 
 \begin{itemize}
-	\item 
+	\item The main parts of the paper are the face detection, the four face descriptors: LBP, HOG, SIFT, VGG, the penalty graphs and intrinsic graph and then using the graphs to figure out how the faces in the images are related. 
 \end{itemize}
 
 \section{Implementation Notes}
@@ -26,7 +26,7 @@
 
 \subsection{Face Detection}
 \begin{itemize}
-	\item Firstly, OpenCV2 was used to create a base implementation to draw a rectangle around a person's face in an image. This was done using the pre-trained classifier in "haarcascade\_frontalface\_default.xml". 
+	\item Firstly, OpenCV2 was used to create a base implementation to draw a rectangle around a person's face in an image. This was done using the pre-trained classifier in "haarcascade\_frontalface\_default.xml". This allowed us to take a file image and output another saved file image which was the original picture with a rectangle around each face. 
 \end{itemize}
 
 
