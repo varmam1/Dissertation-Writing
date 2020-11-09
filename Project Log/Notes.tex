@@ -23,11 +23,27 @@
 
 \section{Implementation Notes}
 
-
+\subsection{Testing}
+\begin{itemize}
+	\item A folder for unit tests is made to correspond to each of the modules of the source code. 
+\end{itemize}
 \subsection{Face Detection}
 \begin{itemize}
 	\item Firstly, OpenCV2 was used to create a base implementation to draw a rectangle around a person's face in an image. This was done using the pre-trained classifier in "haarcascade\_frontalface\_default.xml". This allowed us to take a file image and output another saved file image which was the original picture with a rectangle around each face. The next step is to output an image of just the face and nothing else with the same dimensions. 
+	\item We were able to save the face on its own to an external image and change the dimensions of the outputted picture as needed. The current dimensions of the output is $64 \times 64$ as that is what the paper specified. 
 \end{itemize}
+
+\subsection{Feature Vectors}
+\subsubsection{LBPs}
+
+\begin{itemize}
+	\item First, it was necessary to read the original paper on LBPs (Face Description with Local Binary Patterns: Application to Face Recognition). 
+\end{itemize}
+\subsubsection{Histogram of Gradients}
+
+\subsubsection{SIFT}
+
+\subsubsection{VGG}
 
 
 \end{document}
