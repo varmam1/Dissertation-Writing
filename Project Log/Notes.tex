@@ -5,6 +5,9 @@
 \usepackage{alltt}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{adjustbox}
+\graphicspath{ {./images/} }
 \setlength{\droptitle}{-8em}
 \newcommand\tab[1][1cm]{\hspace*{#1}}
 
@@ -25,11 +28,12 @@
 
 \subsection{Testing}
 \begin{itemize}
-	\item A folder for unit tests is made to correspond to each of the modules of the source code. 
+	\item A folder for unit tests is made to correspond to each of the modules of the source code. This folder is under the src file and the test file is further subdivided into each source folder. 
+	\item Unit testing is done using a combination of pytest and coverage. A make command is used to run the coverage command which references a .coveragerc file which makes sure that none of the \_\_init\_\_.py files, the venv or test files are included in the coverage report. 
 \end{itemize}
 \subsection{Face Detection}
 \begin{itemize}
-	\item Firstly, OpenCV2 was used to create a base implementation to draw a rectangle around a person's face in an image. This was done using the pre-trained classifier in "haarcascade\_frontalface\_default.xml". This allowed us to take a file image and output another saved file image which was the original picture with a rectangle around each face. The next step is to output an image of just the face and nothing else with the same dimensions. 
+	\item Firstly, OpenCV2 was used to create a base implementation to draw a rectangle around a person's face in an image. This was done using the pre-trained classifier in ``haarcascade\_frontalface\_default.xml". This allowed us to take a file image and output another saved file image which was the original picture with a rectangle around each face. The next step is to output an image of just the face and nothing else with the same dimensions. 
 	\item We were able to save the face on its own to an external image and change the dimensions of the outputted picture as needed. The current dimensions of the output is $64 \times 64$ as that is what the paper specified. 
 \end{itemize}
 
@@ -37,7 +41,21 @@
 \subsubsection{LBPs}
 
 \begin{itemize}
-	\item First, it was necessary to read the original paper on LBPs (Face Description with Local Binary Patterns: Application to Face Recognition). 
+	\item First, it was necessary to read a paper on LBPs applied to faces (Face Description with Local Binary Patterns: Application to Face Recognition). 
+	\item From the paper, it was found that there were 59 labels that each pixel can belong to. It can either be uniform or non-uniform and we only cared about the uniform labels. These were values where there were only at most 2 bit transitions circularly. For example, 10000001 (2 transitions) was uniform but 10101000 (6 transitions) isn't. 
+	\item It was necessary to first get the LBP value for each pixel in the image. This was done by looking at the direct neighbors of the pixel and determining if they are greater than or less than the pixel. If they were greater than the pixel, the value of that cell would be 1, otherwise it would be 0. Then, the value of the pixel in question was determined by looking at the pixel to the left and going counterclockwise and creating the bit string. In the following example:\\
+	
+	\adjustbox{center}{
+	\includegraphics[scale=0.3]{LBP_help}
+	}
+	
+	And so the value for the pixel becomes $01011100_2 = 92$. This value isn't uniform so this would have been marked as $-1$ in the process to mark it as non-uniform. This is done with every pixel in the image. For the pixels on the border, a neighborhood of size $3 \times 3 $ was still taken but any ``neighbors" that weren't in the image were assumed to be 0. So, for the top pixels, the 3 pixels above it were assumed to be 0, for example. 
+	\item After getting the LBP value for each pixel, the face image is split into $8 \times 8$ rectangular blocks and the vector is computed in each block. The vector is just a histogram of the values that each pixel could have been. Since there are 58 uniform values and 1 for any non-uniform values, there were 59 values that the pixels could have taken so the vector for each block would correspond to:
+	\[[\text{count}(-1), \text{count}(0), ..., \text{count}(255)]\]
+	Where the uniform values are ordered in ascending order. 
+	
+	The vectors for each block are then concatenated to each other where the top left block is first and then the block to the right of it and so on going row by row. This outputs the 3776 dimensional vector for each face image for a $64 \times 64$ image. 
+	
 \end{itemize}
 \subsubsection{Histogram of Gradients}
 
