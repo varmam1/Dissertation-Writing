@@ -6,6 +6,7 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{graphicx}
+\usepackage{commath}
 \usepackage{adjustbox}
 \graphicspath{ {./images/} }
 \setlength{\droptitle}{-8em}
@@ -57,10 +58,37 @@
 	The vectors for each block are then concatenated to each other where the top left block is first and then the block to the right of it and so on going row by row. This outputs the 3776 dimensional vector for each face image for a $64 \times 64$ image. 
 	
 \end{itemize}
+
 \subsubsection{Histogram of Gradients}
 
-\subsubsection{SIFT}
+\begin{itemize}
+	\item First, to compute the gradients of the image, the Sobel operator was used. To approximate the gradient in the $x$ direction, first the kernel:
+	\[G_x = \begin{bmatrix}
+	    -1 & 0 & 1  \\
+	    -2 & 0 & 2  \\
+	    -1 & 0 & 1
+	\end{bmatrix}
+	\]
+	Was convolved on the image and then to get the gradient in the $y$ direction, the kernel:
+	\[G_y = \begin{bmatrix}
+	  -1 & -2 & -1  \\
+	  0 & 0 & 0  \\
+	  1 & 2 & 1
+	\end{bmatrix}
+	\]
+	Was convolved on the image. This let us get the gradients in both the $x$ and $y$ direction for each pixel and then that was converted into magnitude and angle. For each pixel, the maximum magnitude and maximum angle for the 3 channels was taken to be the magnitude and angle for that pixel. For example, if a pixel had magnitudes $(1, 2, 3)$ for the $(R, G, B)$ channels, then $3$ would be the magnitude of that pixel. We also required that the angles be unsigned, so they must be between $0^\circ$ and $180^\circ$. 
+	\item Once the magnitudes and the unsigned angles are obtained for the image, the image is split up into blocks of size $n \times n$, in which in our case, it is first $16 \times 16$ then $8 \times 8$. For each block, a 9-dimensional vector is obtained which is the histogram of angles for that block. The labels of the histogram are the angles:
+	\[[0, 20, 40, 60, 80, 100, 120, 140, 160]\]
+	So if a gradient has angle $0^\circ$, then it would count towards the first bin. Given a pixel with gradient with magnitude $m$ and angle $\theta$, if $\theta$ is one of the labels, then you would add $m$ to the bar with label $\theta$. For example, if $\theta = 0$, then vec[0] += $m$. If $\theta$ is between labels $\phi_1$ and $\phi_2$, then vec[$\phi_1$] += $\displaystyle \frac{\phi_2 - \theta}{20} \cdot m$ and vec[$\phi_2$] += $\displaystyle \frac{\theta - \phi_1}{20} \cdot m$. In other words, the amount that goes to each label is weighted with respect to the magnitude of the gradient and how close to the labels the angle of the gradient is. 
+	\item The vectors for each of the 256 blocks are created for when there are $16 \times 16$ blocks and then for the 64 blocks for when there are $8 \times 8$ blocks. The paper then doesn't seem to normalize the vectors so \textbf{that is a potential improvement on the algorithm} as normalization tends to improve performance. 
+	\item For a $64 \times 64$ face image, the vector that will come out of it will be a 2880-dimensional vector. The vectors for the $16 \times 16$ blocks are concatenated first and then the ones for the $8 \times 8$ blocks.
+	\item Much of the information from this comes from the paper ``Histograms of Oriented Gradients for Human Detection"
+\end{itemize}
 
+\subsubsection{SIFT}
+\begin{itemize}
+	\item Read the paper "Distinctive Image Features from Scale-Invariant Keypoints" which was what introduced the SIFT algorithm. 
+\end{itemize}
 \subsubsection{VGG}
 
 
