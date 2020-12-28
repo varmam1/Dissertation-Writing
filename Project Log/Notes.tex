@@ -126,10 +126,34 @@
 	\end{enumerate}
 \subsubsection{VGG}
 \begin{itemize}
-\item Firstly, the original VGG16 architecture was looked at before looking at the one used for faces specifically. The main differences were in the number of neurons in the softmax layer and that there was a Dropout layer after the first 2 Dense layers.
+\item Firstly, the original VGG16 architecture was looked at before looking at the one used for faces specifically. The main differences were in the number of neurons in the softmax layer and that there was a Dropout layer after the first 2 Dense layers. The paper used was (Parkhi et. al, ``Deep Face Recognition"). 
 \item At first, I was going to train the network using the data but then was informed that this could take days and is very time-consuming. 
 \item The alternatives that came from this were to either fine tune the network using Keras's built-in VGG function which was already trained on ImageNet and fine tune it to the needed dataset or to take the weights from \url{https://www.robots.ox.ac.uk/~vgg/software/vgg_face/}.
 \item The weights in the url were only in the forms of a matconvnet, torch, or caffe formats so if this was to be used, it would need to be transformed into something usable by Keras. This was done with the matconvnet format and using loadmat from scipy. The main difference from this and my version of the architecture, however, was that they had Convolutional layers instead of Dense layers but this was easily solved by reshaping the weights from the Convolutional layers to what was required for the Dense layers. 
+\item In the end, the VGG face descriptor is obtained by creating the VGG network, downloading the weights if it isn't already available, loading the weights into the network after reshaping it, removing the last softmax layer and then using this model to ``predict" the face descriptor of the image. 
+\end{itemize}
+
+\subsection{Main Algorithm of The Paper}
+\subsubsection{Notes on the Paper}
+\begin{itemize}
+	\item The paper does this algorithm for each relationship. 
+	\item They construct an intrinsic graph to characterize intraclass compactness and 2 penalty graphs to characterize interclass separability. 
+	\item ``In the intrinsic graph, each pair with kinship relation is connected. In the penalty graphs, pairs without kinship relation and the K-nearest neighbors of their matching samples are connected accordingly." (The Paper, 2019)
+	\item They aim to deal with the problem of high intraclass variance and low interclass variance. They also extract multiple features and fuse them together using the weighted graph embedding framework. 
+\end{itemize}
+
+\subsubsection{Notes on the Implementation}
+\begin{itemize}
+	\item Overall is a fairly straightforward algorithm in terms of the calculations needed to be done. The first steps were to create a function that would return $w_p$ and $U_p$ for each face descriptor $p$. 
+	\item The values of $K$ and $r$ and $\beta$ were taken from the paper where they said that it was set as $5$, 5 and $0.5$ respectively. 
+	\item A few decisions were to be made. The first of which was whether I should implement k-nearest neighbors by myself or just use the sklearn version. I opted to use the sklearn version since implementing KNN isn't too interesting anyway and it's better to use the more optimized version anyway. 
+	
+	The second thing I needed to figure out was how to solve the generalized eigenvalue problem:
+	\[(\frac{1}{2}(D_{1p} + D_{2p}) + D_p)u = \lambda S_pu\]
+	Since the top $d$, where $d \ll D$ and where $D$ is the dimension of the feature vector, eigenvectors need to be obtained to get $U_p$. $U_p = [u_1, u_2, ..., u_d]$ where the corresponding eigenvalues follow $\lambda_1 \geq \lambda_2 \geq ... \geq \lambda_d$. 
+	In the end, I went with using scipy's version of finding eigenvalues and vectors as it had a function to solve the problem. The main problem currently is that I'm getting all of the vectors and values and then sorting the values list to get the top $d$ vectors. 
+	\item There is, at this point in the notes, confusion on what $d$ actually will end up being when the entire algorithm is run. 
+	\item Unit tests were difficult to run on the function getting $w_p$ and $U_p$ since calculating these values by hand prove to be fairly tedious so I ended up using the functions I wrote to generate the outputs and unit tested them in depth. In these unit tests, $d = 2$ and $D = 4$ which meant that $d$ wasn't much less than $D$ and since I found that $U^T_pU_p \neq I$, I chalked it up to this reason as it seemed very close but a few entries in the resulting matrix were wrong. 
 \end{itemize}
 
 

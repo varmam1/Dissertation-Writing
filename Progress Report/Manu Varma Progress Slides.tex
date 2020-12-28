@@ -1,29 +1,86 @@
 \documentclass[a4paper,12pt]{beamer}
+\usepackage{graphicx}
+\usepackage{adjustbox}
+\graphicspath{ {./images/} }
 
-\title{My Presentation}
-\subtitle{Using Beamer}
-\author{Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa}
-\date{\today}
-
+\title{Kin Recognition Using Weighted Graph Embeddings}
+\author{Manu Varma}
+\date{\vspace{-5ex}}
+% Just 3-4 slides perhaps, I would be v. keen to hear how things are going, what the next steps are etc.
+% Probably want to have an intro reminder of wtf is my project, what's been done with respect to the face descriptors, the next steps for the core and then extensions
 
 \begin{document}
 \begin{frame}
 \titlepage
 \end{frame}
 
-%\begin{frame}
-%\frametitle{Outline}
-%\tableofcontents
-%\end{frame}
-%
-%\section{Section 1}
-%\subsection{sub a}
-%
 \begin{frame}
-\frametitle{Title}
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-\[\bigsqcup d_n\]
+\frametitle{Recap: Problem Statement and Solution}
+
+Given two images of people's faces, we want to be able to say how the people in the pictures they are related. For example, given the following pair of images:
+\vspace{5mm}
+
+\adjustbox{center}{
+	\includegraphics[scale=0.75]{face_example}
+}
+
+\vspace{5mm}
+We want to be able to tell that they are mother and daughter. 
+
+To do this, we are implementing the paper ``Weighted Graph Embedding-Based Metric
+Learning for Kinship Verification" and verifying their results. 
 \end{frame}
 
 
+%An indication of what work has been completed and how this relates to the timetable and work plan in the original proposal. The progress report should answer the following questions:
+	% Is the project on schedule and if not, how many weeks behind or ahead?
+	% What unexpected difficulties have arisen?
+	% Briefly, what has been accomplished?
+
+
+
+\begin{frame}
+\frametitle{What's Been Accomplished}
+We are exactly on schedule as the basic experimental settings have been implemented:
+\begin{itemize}
+	\item \textbf{Face Detection}: The ability to detect faces and save them as $64 \times 64$ images
+	\item \textbf{LBP}: A 3776-dimensional vector for each face using Local Binary Patterns
+	\item \textbf{HOG}: A 2880-dimensional vector is obtained based off of Histogram of Gradients
+	\item \textbf{SIFT-variant}: A 6272-dimensional vector is obtained 
+	\item \textbf{VGG}: Using the VGG architecture and weights from Oxford's Visual Geometry Group, obtains the 4096-dimensional feature vector. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Metrics - Unit Test Coverage}
+\adjustbox{center}{
+	\includegraphics[scale=0.75]{coverage}
+}
+\end{frame}
+
+\begin{frame}
+\frametitle{Core Functionality Left} % Change to be something like future efforts?
+\begin{itemize}
+	\item Main Algorithm of the Paper
+	\begin{itemize}
+		\item There are 2 different algorithms used, WGEML and a kernelized version. For now, we will only look at the base algorithm as those are the results they put in the paper
+	\end{itemize}
+	\item Do the experiments with WGEML and the corresponding vectors of each face in the dataset
+	\item Experiment with SIFT and HOG vectors
+	\begin{itemize}
+		\item SIFT uses keypoints but the paper does it differently
+		\item HOG requires normalization of the vectors in a specific way which the paper doesn't mention doing
+	\end{itemize}
+\end{itemize}
+\end{frame}
+
+%\begin{frame}
+%\frametitle{Immediate Next Steps}
+%\begin{itemize}
+%	\item Read the main part of the paper in more detail
+%	\item Collect the dataset and fully understanding the structure
+%	\item Start to build the intrinsic and penalty graphs as described in the paper
+%\end{itemize}
+%
+%\end{frame}
 \end{document}
