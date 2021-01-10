@@ -156,5 +156,23 @@
 	\item Unit tests were difficult to run on the function getting $w_p$ and $U_p$ since calculating these values by hand prove to be fairly tedious so I ended up using the functions I wrote to generate the outputs and unit tested them in depth. In these unit tests, $d = 2$ and $D = 4$ which meant that $d$ wasn't much less than $D$ and since I found that $U^T_pU_p \neq I$, I chalked it up to this reason as it seemed very close but a few entries in the resulting matrix were wrong. 
 \end{itemize}
 
+\subsection{Data Preparation}
+\begin{itemize}
+	\item It was at this point that the data started to be obtained from KinFaceW-I and KinFaceW-II. As we are using the datasets, \textbf{it is necessary to cite the original authors} ``Citation
+	Jiwen Lu, Junlin Hu, Xiuzhuang Zhou, Yuanyuan Shang, Yap-Peng Tan and Gang Wang. Neighborhood Repulsed Metric Learning for Kinship Verification, IEEE International Conference on Computer Vision and Pattern Recognition (CVPR'12), 2012." \textbf{in the final dissertation}. 
+	\item Functions were written to split up the data into their specified folds and to separate the positive pairs from the negative pairs. 
+	\item Next, a script was written that would take the name of the dataset and create maps of the path to each image in the dataset to the corresponding face descriptor. So, an LBP, HOG, SIFT, and VGG map was created for the dataset and then, using pickle, this was saved on disk for use later. 
+	\item Another script was then written which would take in the dataset, relationship and whether we were using the image-restricted or unrestricted setting. The restricted setting is just a setting as to whether or not we should give the algorithm negative pairs of the relationship to learn on, where unrestricted gives it to the algorithm and restricted doesn't. This script would then create the 5 training sets using the splits in the dataset and then create the $w$ vector and $U$ matrices for the training set and save it on disk.
+	\item A problem that was obtained with this was that my implementation of WGEML was very slow when it had to calculate $D_{1p}$ and $D_{2p}$ and when it had to calculate the eigenvalues and eigenvectors. While not much could be done with the eigenvalue problem, to calculate the matrices, numpy was used more instead of 2 nested for loops. For the eigenvalue problem, I ended up using the scipy function for getting eigenvalues but instead of having it solve:
+	\[A\mathbf{x} = \lambda B\mathbf{x}\]
+	I had it solve:
+	\[(B^{-1}A)\mathbf{x} = \lambda \mathbf{x}\]
+	
+	Which made the function run faster, although it did give slightly different results and it wasn't as fast as I had hoped. 
+	
+	\item Next, I was able to find the TSKinFace Dataset with help from my supervisor which was a different format than the KinFaceW datasets were so I had to do extra work to integrate it into my scripts which just involved creating the pairs arrays myself along with using sklearn to do get the splits.
+	
+	
+\end{itemize}
 
 \end{document}
