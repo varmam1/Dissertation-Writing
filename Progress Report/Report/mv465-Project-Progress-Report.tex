@@ -1,0 +1,49 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{a4wide}
+\usepackage{enumitem}
+\usepackage{titling}
+\usepackage{textcomp}
+\usepackage{amsmath}
+\usepackage{dsfont}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{hyperref}
+\usepackage{indentfirst}
+
+\setlength{\droptitle}{-8em}
+\newcommand\tab[1][1cm]{\hspace*{#1}}
+
+
+
+\begin{document}
+	\title{Kin Recognition Using Weighted Graph Embeddings - Progress Report}
+	\author{Manu Varma : \href{mailto:mv465@cam.ac.uk}{mv465@cam.ac.uk} \\ Supervisor : Daniel Bates \\ Director of Studies : Robert Mullins \\ Overseers : Frank Stajano and Amanda Prorok}
+	\date{\vspace{-10ex}}
+	\maketitle	\ 
+
+% An indication of what work has been completed and how this relates to the timetable and work plan in the  original proposal. The progress report should answer the following questions:
+% Is the project on schedule and if not, how many weeks behind or ahead?
+% What unexpected difficulties have arisen?
+% If the project is behind, what actions have been taken to address this and when will progress be back on track?
+% Briefly, what has been accomplished?
+% It should be possible to understand the progress report independently of the original proposal, thus ‘I have completed implementing the wombat module’ rather than ‘I have completed points 1 and 3 in the proposal but not point 2’.
+% In straightforward cases (entirely on schedule), one side of A4 could suffice. If the project is in difficulties, a new work plan should be included.
+
+\section{Work Accomplished}
+
+I was able to implement the main algorithm, WGEML, from the paper, ``Weighted Graph Embedding-Based Metric
+Learning for Kinship Verification". This included creating the functions that would get the necessary face descriptors, Local Binary Patterns, Histogram of Gradients, Scale-Invariant Feature Transform and a VGG face descriptor, from each image. 
+
+Furthermore, I implemented unit tests along the way to make sure that my functions were running as I expected them to run. I managed to get a code coverage of $97\%$ for my unit tests, which excludes any scripts that were written. 
+
+\section{Schedule}
+
+The project is currently on schedule. At this point in my schedule, I am supposed to be working on ablation studies which is what is currently happening. However, the original schedule had a few problems where I overestimated the amount of time to implement the penalty and intrinsic graphs but I also didn't schedule any time to write the scripts needed to run it end-to-end or any of the necessary data preparation functions to get the data into a format that is consistent with how I wrote my functions. Furthermore, I also didn't schedule any time to obtain any of the results. However, in the end, the amount of work I didn't schedule was done in the amount of time I overestimated in my schedule which means that I am still on track, even though the schedule partially changed in the contents. 
+
+\section{Unexpected Difficulties}
+
+The main unexpected difficulties came from taking the data in the form that was downloaded and transforming it into the way I wanted it to be. % TODO: Explain which parts
+
+Other unexpected difficulties occurred from the paper I was implementing being vague on certain parts of the project. % TODO: Explain which parts
+
+\end{document}
