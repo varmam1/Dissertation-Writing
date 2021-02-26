@@ -44,6 +44,7 @@ Learning for Kinship Verification" and verifying their results.
 	\item All of the face descriptors were implemented: \textbf{LBP}, \textbf{HOG}, \textbf{SIFT-variant}, \textbf{VGG}
 	\item The main algorithm, \textbf{WGEML}, was implemented
 	\item Scripts to run the \textbf{training and testing} end to end were written
+	\item Ablation study of changing the inputted face descriptors
 \end{itemize}
 \end{frame}
 
@@ -52,13 +53,14 @@ Learning for Kinship Verification" and verifying their results.
 The actual accuracies obtained were as follows:
 \vspace{0.25cm}
 
-\scalebox{0.7}{\begin{tabular}{|c|c|c|c|c|c|c|c|c|} \hline
-	Dataset & Restricted & FS & FD & MS & MD & FMS & FMD & avg\\ \hline
+\scalebox{0.65}{\begin{tabular}{|c|c|c|c|c|c|c|c|c|} \hline
+	Dataset & Setting & FS & FD & MS & MD & FMS & FMD & avg\\ \hline
 	KinFaceW-I & Unrestricted & 0.8015 & 0.7166 & 0.7628 & 0.7921 &&& 0.76825 \\ 
 	KinFaceW-I & Restricted & 0.811 & 0.7391 & 0.7405 & 0.769 &&& 0.7649\\ 
 	KinFaceW-II & Unrestricted & 0.846 & 0.764 & 0.814 & 0.8		 &&& 0.806 \\ 
 	KinFaceW-II & Restricted & 0.838 & 0.768 & 0.802 & 0.8	&&& 0.802 \\ 
-	TSKinFace & - &0.9201 & 0.8826 & 0.9162 & 0.9182 & 0.9571 & 0.9343 &0.9214 \\ \hline
+	TSKinFace & Only Pos Pairs &0.9201 & 0.8826 & 0.9162 & 0.9182 & 0.9571 & 0.9343 &0.9214 \\
+	TSKInFace & Neg In Test/Train & 0.8409 & 0.8203 & 0.8242 & 0.8362 & 0.8664 & 0.843 & 0.839 \\ \hline
 \end{tabular}}
 \vspace{0.25cm}
 
@@ -67,13 +69,14 @@ These differ from the paper's results as follows, in terms of percentage:
 \vspace{0.25cm}
 
 \centering
-\scalebox{0.7}{\begin{tabular}{|c|c|c|c|c|c|c|c|} \hline
-	Dataset & Restricted & FS & FD & MS & MD & FMS & FMD\\ \hline
-	KinFaceW-I & Unrestricted & 1.65 & 2.24 & 4.32 & 2.69 && \\ 
-	KinFaceW-I & Restricted & 2.2 & 0.71 & 5.35 & 3.8 &&\\ 
-	KinFaceW-II & Unrestricted & 4 & 1 & 2 & 1.6		 && \\ 
-	KinFaceW-II & Restricted & 4.4 & 0.6 & 3 & 2.4	&& \\ 
-	TSKinFace & - & 1.71 & 1.54 & 0.22 & 1.42 & 2.21 & 0.43 \\ \hline
+\scalebox{0.65}{\begin{tabular}{|c|c|c|c|c|c|c|c|} \hline
+	Dataset & Setting & FS & FD & MS & MD & FMS & FMD\\ \hline
+	KinFaceW-I & Unrestricted & 1.65 & -2.24 & -4.32 & -2.69 &      &     \\ 
+	KinFaceW-I & Restricted & 2.2  & 0.71  & -5.35 & -3.8  &      &      \\ 
+	KinFaceW-II & Unrestricted & -4   & -1    & -2    & -1.6  &      &    \\ 
+	KinFaceW-II & Restricted & -4.4 & -0.6  & -3    & -2.4  &      &      \\ 
+	TSKinFace & Only Pos Pairs & 1.71 & -1.54 & 0.22  & 1.42  & 2.21 & 0.43 \\
+	TSKinFace & Neg In Test/Train & -6.21 & -7.77 & -8.98 & -6.78 & -6.86 & -8.69\\ \hline
 \end{tabular}}
 
 \end{frame}
@@ -88,11 +91,9 @@ These differ from the paper's results as follows, in terms of percentage:
 \begin{frame}
 \frametitle{Next Steps} % Change to be something like future efforts?
 \begin{itemize}
-	\item Ablation studies
 	\item Extending the functionality to work with videos
-	\item Testing how adding different face descriptors affects it
-	\item Experimenting slight modifications in some existing face descriptors to see how it impacts performance
 	\item Using a different, smaller network than VGG for one of the face descriptors
+	\item Another ablation study to hide parts of the input image and see how that affects the results
 \end{itemize}
 \end{frame}
 
