@@ -1,0 +1,169 @@
+Outline:
+
+- Intro:
+	- Biological evidence that people can do this
+    - Problem Overview:
+        - Pair of images and kin and recognize if they are kin
+        - Can extend to Tri-kin relationships as well
+        - Search and retrieval (Haven't done though so not sure if I should include)
+    - Motivation
+        - Missing children
+    - Related Work
+        - SVM Methods
+        - CNN Methods
+        - Siamese Network Methods
+    - Project Overview
+        - Implement the WGEML paper for Kin Recognition and affirm results as well as expand on experiments done with it. 
+
+- Prep
+    - Starting Point
+        - Python Knowledge and worked with face recognition is all
+    // Background Knowledge
+    - Neural Networks
+        - Explanation of how neural networks work 
+    - Face Detection
+        - Give basic idea about what face detection is and potentially distinction between detection and recognition
+        - Cascade Classifier explanation (Face Detection used by OpenCV)
+    - Face Descriptors
+        - Need to convert face images into something more usable
+        - Explain what they are in general
+        
+        // Would the descriptions of the face descriptors used go under Implementation?
+        - LBP 
+            - Explanation of how it works
+        - HOG
+            - Explanation of how it works
+        - SIFT
+            - Explanation of regular SIFT
+            - Talk about how out use differs slightly
+        - VGG
+            - Define the architecture
+            - Explain how it is used usually
+            - Explain how it is used in face detection 
+            - Explain how it is used here 
+        - CifarNet (?)
+            - Define the architecture 
+            - Explain how used here
+    - K-Nearest Neighbors
+        - Explain goal of it
+        - Explain how works
+    - Metric Learning
+        - Explain the general approach of what metric learning is
+    - PCA
+        - Explain PCA in general
+        - Explain Dimension Reduction 
+    
+    // Req Analysis
+    - Requirements Analysis
+        - Needed to Implement WGEML algorithm
+        - In order to do so, required to create face descriptor modules, 
+            data preparation modules, actual algorithm module and prediction module
+        - Talk about why split it up this way (?)
+    
+    // Methods and Tools
+    - Software Engineering Practices
+        - Tools Used
+            - GitHub to backup and branch/version control
+            - Keras/TF for VGG and CifarNet
+            - OpenCV for Face Detection
+            - General Python and Numpy for the rest
+        - Datasets
+            - KFW
+                - Describe KFW in general
+                - Describe the differences between KFW-I and II
+            - TSKinFace
+                - Describe in general
+            - Used 5-fold Cross Validation on all of the datasets
+        - Testing
+            - Unit tests
+            - Integration Tests in the form of scripts
+            - E2E tests
+        - Licensing
+            - SIFT
+            - VGG
+            - Datasets (KFW, TSKinFace)
+
+- Implementation
+    - Repository Overview
+        - Give tree structure of the repository
+        - Explain how it was modularized 
+        - Explain that it was written from scratch and most 
+            modules just use base functionality of numpy
+            (with exceptions of VGG and face detection)
+
+    - General Overview of Pipeline
+        - Put datasets into proper format
+        - Get Face Descriptors for each image and save
+        - Run WGEML on each fold of the dataset
+        - Get predictions for each test fold of dataset
+        - Output accuracies
+
+    // The next 4 sections are working titles and prob not actual section titles
+
+    - Face Descriptor Modules 
+        // Do I explain what they are here or in Prep?
+        - LBP
+        - HOG
+        - SIFT
+        - VGG
+    
+    - WGEML Module
+        - Using the Metric Learning approach, walk through the steps
+            of WGEML in general
+        - Talk about how it was implemented
+        - Talk about vagueness of theta and dim_of_U
+
+    - Prediction Module
+        - Talk about how prediction is done
+        - Talk about decision to use this instead of what was in the paper
+    
+    - Data Prep Module
+        - Cross-Validation
+            - Talk about need to split into folds which was done already with KFW but not TSKinFace
+        - Negative Pairs
+            - Talk about how needed to have negative pairs into the input of WGEML
+            - KFW had them pre-done but TSKinFace didn't 
+            - Talk about how made TSKinFace neg pairs (ie. Randomly)
+        - PCA
+            - Need to use PCA to reduce dimensions for sake of efficiency
+            - extra dimensions add marginally more information
+        - Saving to Disk (Disc?)
+            - Talk about what information was saved and why
+                - Face Descripors, WGEML results, folds, etc.
+
+    - CifarNet Extension (When Finished)
+        - Architecture
+        - Method of getting hyperparams
+        - Trained on Cifar-10
+        - How to create "face" descriptor with it
+
+
+- Evaluation
+    - Success Criterion
+        - Did it
+    - General Results
+        - Talk about the results in replicating the accuracies
+        - Talk about difference in TSKinFace when included and excluded neg pairs from test
+    - Potential Biases in Datasets
+        - Talk about differences in accuracy when use a different test for KFW-II and TSKinFace but not present in KFW-I as significantly
+    - Ablation Studies
+        - Face Descriptors
+            - Talk about how choosing different face descriptors changed things
+            - VGG is important in conjunction with others analysis 
+            - More FDs => Better accuracy
+            - Diminishing returns on accuracy as add FDs
+        - Blocking parts of the image (If End up doing this extension)
+            - (Specifics to be added when done)
+    - Using non-VGG face descriptor
+        - (Specifics to be added when done)
+    - Unit Tests
+        - Might be worth to put a SS of the things unit tested and coverage
+
+- Conclusion
+    - Achievements
+    - Lessons Learnt
+    - Future Work
+
+- Appendicies
+    // Not sure what appendices to put here aside from Proposal
+    - Project Proposal

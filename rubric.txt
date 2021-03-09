@@ -1,0 +1,87 @@
+Requirements:
+	Rubric:
+	- Intro + Prep:	
+		- Clear motivation, justifying potential benefits of success.
+		- Good or excellent requirements analysis; justified and documented
+		  selection of suitable tools; good engineering approach.
+		- Clear presentation of challenging background material covering a
+		  range of computer science topics beyond Part IB.
+		  
+	- Implementation:
+		- Contribution to the field.
+		- Application of extra-curricular reading and original interpretation of
+		  previous work from academia or industry.
+		- Challenging goals and substantial deliverables with excellent
+		  selection and application of appropriate mathematical, scientific
+		  and/or engineering techniques.
+		- Clear and justified repository overview.
+		- At most minor faults in execution or understanding.
+		
+	- Evaluation and Conclusion:
+		- Clearly presented argument demonstrating success criteria met.
+		- Good or excellent evidence of critical thought and interpretation of
+		  the results which substantiate any claims of success, improvements
+		  or novelty.
+		- Conclusions provide an effective summary of work completed along
+		  with good future work.
+		- Personal reflection on the lessons learned.
+
+	What they say:
+	- Intro:
+		What is the problem, anyway?
+			• Explain your problem clearly
+			• Explain why this problem is interesting
+			• What does the solution enable?
+		What is your project, anyway?
+			• Describe the thing you built
+			• Explain how it solves the problem
+			• Not too much detail
+	- Prep:
+		Background Knowledge
+			1. Explain any theory that you needed to use
+			2. Rule of thumb: anything outside of 1B should be explained
+			3. Rule of thumb: anything needed to make sense of your later
+			choices
+			4. Consult your supervisor!
+		Requirements Analysis
+			1. Which techniques and tools could you use?
+			2. What did you actually decided use?
+			3. Which factors led you to your decision?
+		Methods and Tools
+			1. What are the engineering practices your project followed?
+			2. How do they arise from the nature of your project?
+				• Software: testing and source control
+				• Datasets: validation and cleanup
+				• Experiments: Ethics reviews, etc
+			3. How does this compare to good engineering practice? (For
+			better and worse!)
+	- Implementation:
+		- candidates are required to draw attention 
+		  to the parts of the work which are not their own, 
+		  in accordance with the Implementation section
+		  
+		What is the project?
+			• Describe the repository layout
+			• This should be a description of the project design and
+			methodology
+			• What does the project actually do?
+		Methods
+			1. How do the methods from Chapter 2 apply to this project?
+			2. What worked?
+			3. What did you try that didn’t work?
+			4. How did your approach change throughout the project?
+		Project Result
+			• Explain the functionality of the project
+			• Explain the limitations of this approach
+	
+	- Evaluation
+		1. Explain your evaluation methods
+		2. Give your results
+		3. Compare the results of your project to your success criteria
+		4. Interpret what the results teach you
+	
+	- Conclusion
+		• Key question: what have you learned?
+		• What would you do differently if you wanted to do this again?
+		• What is your advice to other people who want to do this?
+
