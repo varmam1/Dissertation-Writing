@@ -34,7 +34,7 @@ St John's College \\[5mm]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Proforma, table of contents and list of figures
-
+\let\cleardoublepage\clearpage
 \pagestyle{plain}
 
 \newpage
@@ -77,22 +77,71 @@ Supervisor:         & \bf Daniel Bates                    \\
 % \listoffigures
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \pagestyle{headings}
 
-\chapter{Introduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%% Introduction %%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\chapter{Introduction}
+% TODO: A stronger hook sentence is definitely needed here. 
+
+Kinship recognition is the way of recognizing whether two given people are related to each other or not based on how they look. This is an evolutionary trait in humans as it is advantageous to inclusive fitness for an organism to be able to recognize which of their neighbors were close relatives \cite{HamiltonGenetic}. Thus, it stands to reason that the ability to recognize kinship relationships has evolved in humans. 
+In humans, specifically, facial resemblance is expected to serve as an indicator of kinship as we have seen that strangers are able to match photographs of mothers to their infants without any prior contact with any of the family \cite{mateo2015}. 
+
+Computational kinship recognition is the field of computationally figuring out kinship relationships between people without any prior knowledge of the family. 
 
 \section{Problem Overview}
 
+There are multiple problems in the field of computational kin recognition, in which case I will focus on one of them. The first of which takes as input a pair of images and a proposed kinship relationship, for example father-daughter, and recognizes whether the relationship exists. 
+These relationships tend to be more commonly parent-child relationships as opposed to sibling-sibling relationships, for example, which are less commonly used. A further extension of the main kin recognition problem is Tri-Subject Kinship which takes 3 images, two parents and a child, and determines if they are related 
+or not. These problems are the ones that are being looked at in this dissertation. 
+
+However, some other major problems in the field include search-and-retrieval and family classification. Search-and-retrieval is the problem which takes an image of a person as input and searches through a database to find people with whom they are most likely to be related to. This outputs a list of these people that they could be related to. 
+Family classification deals with a similar task of taking an image of a person as input and figuring out which family they may belong to. 
+
 \section{Motivation}
 
+Accurate kinship recognition software has multiple applications in humanitarian issues. 
+With regards to humanitarian issues, by using kin recognition, we can better recognize missing children and match them with their parents \cite{robinson2020visual}.
+It can also be used for stopping human traffickers from claiming they are family members of the victim or to reunite familes across refugee camps. 
+
+Furthermore, there are potential use-cases in social media and also poses privacy protections. 
+% TODO: Strengthen up the motivations here 
 \section{Related Work}     
+
+One of the first papers in the field of computational kinship recognition used color, facial parts, facial distances and a Histogram of Gradients vector as the features for each image. 
+Using these features, K-Nearest-Neighbors and an SVM were used in order to classify the image pairs into true and false parent-child pairs \cite{fang2010}. A classification accuracy of $70.67\%$ was obtained overall and an SVM with a radial basis kernel obtained an accuracy of $68.6\%$. 
+
+Other approaches include using deep learning to solve the problem. One paper used a Siamese CNN approach by putting both of the face images in the pair through a SqueezeNet network which was trained on VGGFace2 which creates a feature vector for each image \cite{DeepSiameseCNN}. Using a similarity criterion a new feature vector is created using the two feature vectors and a fully connected layer and a sigmoid activation function creates the predicted similarity score. This approach yielded an average test accuracy of $67.66\%$ over all of the relationships that were in the dataset. 
+Another paper that used a Siamese approach aimed to solve both the standard kinship verification problem and the Tri-Subject problem \cite{DeepFusion}. Both networks for the problems had three stages, a feature extraction stage, which used the ResNet50 or SENet50 models pretrained on VGGFace2 to extract the features from each face into a vector, a feature fusion stage which combines the feature vectors together, and a similarity quantization stage to get the similarity score. 
+They then use a jury system to fuse together models which allows them to achieve an accuracy of $75.9\%$. 
+
+However, a prominent approach that is taken includes using metric learning to solve the problem. For example, the paper on Neighborhood Repulsed Metric Learning \cite{KinFaceCitation1} uses a supervised metric learning approach. Using the approach, they aim to find a metric which minimizes the distance between the vectors of images that have a kinship relationship and maximize the distances between the vectors of pairs of images that don't have a kinship relationship. 
+Furthermore, the paper that will be implemented in this dissertation, using Weighted Graph Embedding-Based Metric Learning, involves a metric learning approach to the problem \cite{WGEML}. 
 
 \section{Project Overview}
 
-\chapter{Preparation}
+The project deals with a 2019 method using Weighted Graph Embedding-Based Metric Learning \cite{WGEML}, or WGEML for short, and aims to implement the paper and verify the accuracies that were obtained. 
+The following is shown in the dissertation:
+
+\begin{enumerate}
+    \item The algorithm, WGEML, is implemented and accuracies that are within an acceptable range are obtained, as shown in section \ref{MainResults}.
+    \item Ablation studies on the face descriptors are performed and the results are in section \ref{FDAbStudies}.
+    % \item Ablation studies are done on the image by blocking certain sections of the image, the results of which are in section \ref{ImageAbStudies}
+    \item We use the models that were created to discover biases in the datasets that were used and find out the impact that has overall in section \ref{Biases}. 
+    \item We further test the face descriptors by replacing VGG with a smaller CNN in which the implementation is discussed in section \ref{CFNExt}. 
+\end{enumerate}
+
+Chapter \ref{Background} explains much of the needed technical background for the implementation, from what a Neural Network is and what metric learning is to each of the face descriptors used and what face descriptors are. 
+Chapter \ref{Impl} will then discuss the specifics of how WGEML and the extension that used a different network than VGG was implemented. 
+Chapter \ref{Results} then discusses all of the results that were obtained from experimentation with WGEML and the implications of the results. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%% Preparation %%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Preparation} \label{Background}
 
 \section{Starting Point}
 
@@ -130,7 +179,11 @@ Supervisor:         & \bf Daniel Bates                    \\
 
 \subsection{Licensing}
 
-\chapter{Implementation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%% Implementation %%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Implementation} \label{Impl}
 
 Pain Peko
 
@@ -154,25 +207,34 @@ Pain Peko
 
 \subsection{Saving Results to Disc}
 
-\section{CifarNet Extension}
+\section{CifarNet Extension} \label{CFNExt}
 
-\chapter{Evaluation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%% Evaluation %%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\chapter{Evaluation} \label{Results}
 
 \section{Success Criterion}
 
-\section{Original Results}
+\section{Original Results} \label{MainResults}
 
-\section{Potential Biases in Datasets}
+\section{Potential Biases in Datasets} \label{Biases}
 
 \section{Ablation Studies}
 
-\subsection{Blocking Face Descriptors}
+\subsection{Blocking Face Descriptors} \label{FDAbStudies}
 
-\subsection{Blocking Parts of Images}
+\subsection{Blocking Parts of Images} \label{ImageAbStudies}
 
 \section{Replacing VGG}
 
 \section{Unit Tests}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%% Conclusion %%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Conclusion}
 
