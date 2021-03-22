@@ -27,8 +27,6 @@ Outline:
     - Face Descriptors
         - Need to convert face images into something more usable
         - Explain what they are in general
-        
-        // Would the descriptions of the face descriptors used go under Implementation?
         - LBP 
             - Explanation of how it works
         - HOG
@@ -101,7 +99,6 @@ Outline:
     // The next 4 sections are working titles and prob not actual section titles
 
     - Face Descriptor Modules 
-        // Do I explain what they are here or in Prep?
         - LBP
         - HOG
         - SIFT

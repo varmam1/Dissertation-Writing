@@ -1,7 +1,7 @@
 
-\documentclass[12pt,a4paper,twoside,openright]{report}
+\documentclass[11pt,a4paper,twoside]{report}
 \usepackage[pdfborder={0 0 0}]{hyperref}    % turns references into hyperlinks
-\usepackage[margin=25mm]{geometry}  % adjusts page layout
+\usepackage[margin=20mm]{geometry}  % adjusts page layout
 \usepackage{graphicx}  % allows inclusion of PDF, PNG and JPG images
 \usepackage{verbatim}
 % \usepackage{docmute}   % only needed to allow inclusion of proposal.tex
@@ -83,6 +83,10 @@ Supervisor:         & \bf Daniel Bates                    \\
 %%%%%%%%%%% Introduction %%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Intro comments:
+% * It might be useful to have a diagram to illustrate the problem. e.g. [image, image, "father-daughter"] -> ✓
+% * You will probably need to define terms like CNN and SVM the first time you use them
+
 \chapter{Introduction}
 % TODO: A stronger hook sentence is definitely needed here. 
 
@@ -104,7 +108,7 @@ Family classification deals with a similar task of taking an image of a person a
 
 Accurate kinship recognition software has multiple applications in humanitarian issues. 
 With regards to humanitarian issues, by using kin recognition, we can better recognize missing children and match them with their parents \cite{robinson2020visual}.
-It can also be used for stopping human traffickers from claiming they are family members of the victim or to reunite familes across refugee camps. 
+It can also be used for stopping human traffickers from claiming they are family members of the victim or to reunite families across refugee camps. 
 
 Furthermore, there are potential use-cases in social media and also poses privacy protections. 
 % TODO: Strengthen up the motivations here 
@@ -113,7 +117,7 @@ Furthermore, there are potential use-cases in social media and also poses privac
 One of the first papers in the field of computational kinship recognition used color, facial parts, facial distances and a Histogram of Gradients vector as the features for each image. 
 Using these features, K-Nearest-Neighbors and an SVM were used in order to classify the image pairs into true and false parent-child pairs \cite{fang2010}. A classification accuracy of $70.67\%$ was obtained overall and an SVM with a radial basis kernel obtained an accuracy of $68.6\%$. 
 
-Other approaches include using deep learning to solve the problem. One paper used a Siamese CNN approach by putting both of the face images in the pair through a SqueezeNet network which was trained on VGGFace2 which creates a feature vector for each image \cite{DeepSiameseCNN}. Using a similarity criterion a new feature vector is created using the two feature vectors and a fully connected layer and a sigmoid activation function creates the predicted similarity score. This approach yielded an average test accuracy of $67.66\%$ over all of the relationships that were in the dataset. 
+Other approaches include using deep learning to solve the problem. One paper used a Siamese CNN approach by putting both of the face images in the pair through a SqueezeNet network which was trained on VGGFace2 which creates a feature vector for each image \cite{DeepSiameseCNN}. Using a similarity criterion, a new feature vector is created using the two feature vectors and a fully connected layer and a sigmoid activation function creates the predicted similarity score. This approach yielded an average test accuracy of $67.66\%$ over all of the relationships that were in the dataset. 
 Another paper that used a Siamese approach aimed to solve both the standard kinship verification problem and the Tri-Subject problem \cite{DeepFusion}. Both networks for the problems had three stages, a feature extraction stage, which used the ResNet50 or SENet50 models pretrained on VGGFace2 to extract the features from each face into a vector, a feature fusion stage which combines the feature vectors together, and a similarity quantization stage to get the similarity score. 
 They then use a jury system to fuse together models which allows them to achieve an accuracy of $75.9\%$. 
 
@@ -143,15 +147,21 @@ Chapter \ref{Results} then discusses all of the results that were obtained from 
 
 \chapter{Preparation} \label{Background}
 
-\section{Starting Point}
+\section{Convolutional Neural Networks}
 
-\section{Neural Networks}
+We must first 
 
 \section{Face Detection}
 
 \section{Face Descriptors}
 
+We wish to be able to create a mapping from a colored image into a vector to make computations easier and to be able to determine similarity between images, which we do using the distance. These are called image descriptors for general images. When we try and map face images to vectors, we call these face descriptors. 
+We want these face descriptor mappings to be able to match the same person in different poses and illuminant geometries to face descriptors that are close to each other in distance. Thus, these mappings try and capture color, texture, and shapes,
+for example. There are multiple face descriptors that can be made of a face image, each of which extracts different features from the face. We use the Local Binary Patterns, Histogram of Gradients, Scale-Invariant Feature Transform and VGG face descriptors to extract features from each face.
+
 \subsection{Local Binary Patterns}
+
+The Local Binary Patterns (LBP) face descriptor takes an image 
 
 \subsection{Histogram of Gradients}
 
@@ -165,27 +175,64 @@ Chapter \ref{Results} then discusses all of the results that were obtained from 
 
 \section{Metric Learning}
 
-\section{PCA}
+\section{Principle Component Analysis}
 
 \section{Requirements Analysis}
 
 \section{Software Engineering Practices}
 
+\subsection{Starting Point}
+
+Before I started my project, I had knowledge in Python and surface-level knowledge of Keras and Tensorflow. I had also worked with face recognition before. Furthermore, I had used Numpy many times before, so I had 
+enough knowledge about it to use it comfortably in my project. However, I hadn't ventured into computer vision before the project aside from knowing very generally what a face descriptor is. 
+
 \subsection{Tools Used}
+
+The project was written in Python 3.6. In order to separate the environment that the project needs with my local environment, I used a virtual environment to contain the installations of the required libraries. I also had a requirements.txt file to contain the names and versions of the packages that were used. 
+I also used the following libraries:
+\begin{enumerate}
+    \item \textbf{Numpy}: Using numpy helped increase performance of many parallel computations, such as matrix multiplication, and provided a simple interface to do these with. 
+    \item \textbf{Keras and Tensorflow}: I used Keras to create the VGG model and the CifarNet model. We then use it to train the CifarNet model and then make predictions for both models. The weights of VGG were already pre-computed so no training was necessary for VGG.
+    \item \textbf{OpenCV}: I used OpenCV for general image processing, such as converting an image into grayscale or loading in images, and for face detection. 
+    \item \textbf{Sklearn}: This library provided an implementation for K-Nearest Neighbors and PCA. 
+    \item \textbf{Scipy}: This library provided a function that solved the general eigenvalue problem, given two numpy arrays which was used in the main WGEML algorithm. 
+\end{enumerate}
+
+Finally, Git and Github were used for version control and backups. Branches were created for each feature that was to be added to the project and I merged them into the master branch once enough testing was done, whether it was unit testing or integration testing.
 
 \subsection{Datasets}
 
+I used the KinFaceW-I, KinFaceW-II, and TSKinFace datasets to train the model. 
+
+The KinFaceW datasets \cite{KinFaceCitation2} \cite{KinFaceCitation1} are composed of face images from the internet which include public figures as well as their parents or children. Both datasets contain no restriction on pose, lighting background, expression, age, ethnicity, or partial occlusion. 
+The main difference between the datasets is that the pairs of face images that have a kin relationship in KinFaceW-I are from different images whereas, in KinFaceW-II, they are from the same image. 
+In terms of the specifics of the datasets, they both support four kin relationships, Father-Son (FS), Father-Daughter (FD), Mother-Son (MS), and Mother-Daughter (MD). Each face image are images of size $64 \times 64$. The datasets also pre-computed 5 folds for cross-validation for each relationship which contained the names of the pairs of images that had the relationship and those that didn't, henceforth positive and negative pairs respectively. 
+Finally, the dataset has 2 main settings which are used: the restricted setting in which only positive pairs of images are used and the unrestricted setting in which negative pairs of images are used. 
+
+The TSKinFace dataset \cite{TSKinFace} contains images for the relationships, Father-Mother-Son (FMS), Father-Mother-Daughter (FMD), and Father-Mother-Son-Daughter (FMSD). 
+The dataset contained folders for each relationship and a positive set comprised of the images in which the names of the images had the form ``[relationship]-N-[member].jpg'' in which ``relationship" was the relationship, $N$ was a consistent number and ``member" refers to which member of the relationship they were. For example, ``FMS-10-F.jpg'', ``FMS-10-M.jpg'', and ``FMS-10-S.jpg'' would form a positive triplet. 
+The dataset only contained the images in this form so negative pairs of images and the folds for cross-validation had to be computed in the project. 
+
+I examine the effects of the WGEML algorithm on the FS, FD, MS, MD, FMS and FMD relationships, as defined above. 
 \subsection{Testing}
 
+Throughout the project, I created unit tests for any modules and for each function in the module. I would only end up merging a feature branch into the master branch if all of the unit tests passed for that feature. 
+
+Along with this, I did integration tests in the form of feeding the scripts small, controlled inputs to see if the scripts would output what was expected. These scripts each used functions from different modules and did a part of the workflow. 
+
+Finally, an end-to-end test was done once each script was tested individually which came in the form of trying the small, controlled input for the first script and then running it through each of the scripts successively. 
+
 \subsection{Licensing}
+
+The SIFT algorithm had been patented in the US. However, the patent expired last year, and the patent was only to protect stop commercial use of the algorithm, whereas this is an academic use of the algorithm.
+
+Furthermore, I am able to use VGG for non-commercial purposes under the Creative Commons Attribution License. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%% Implementation %%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Implementation} \label{Impl}
-
-Pain Peko
 
 \section{Repository Overview}
 
@@ -205,7 +252,7 @@ Pain Peko
 
 \subsection{PCA}
 
-\subsection{Saving Results to Disc}
+\subsection{Saving Results to Disk}
 
 \section{CifarNet Extension} \label{CFNExt}
 
@@ -238,7 +285,6 @@ Pain Peko
 
 \chapter{Conclusion}
 
-Pain Humu Humu
 
 \section{Achievements}
 
