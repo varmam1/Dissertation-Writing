@@ -209,16 +209,28 @@
 \end{itemize}
 
 \section{Extension 1: Videos}
-\begin{enumerate}
+\begin{itemize}
 	\item The way to get face descriptors from a video is taken from here \url{https://www.kinfacew.com/papers/KFVW.pdf} in which 100 random frames are taken from a person's video feed and the average of the face descriptors of that is used. 
 	\item I needed to request the dataset via email but so far, I haven't obtained it. In the meanwhile, I went to the second extension.
-\end{enumerate}
+\end{itemize}
 
 \section{Extension 2: Messing around with this shit}
-\begin{enumerate}
+\begin{itemize}
 	\item KinFaceW-II results were wrong since I used a 200-dimensional vector instead of a truncated 100-dimensional one, which was used for the rest of the datasets. For consistency, I recalculated the results and the accuracies stayed similar but changed by about 1-2\%. 
 	\item I started using different datasets for the training and testing sets, for example using KinFaceW-I for training and KinFaceW-II for testing. 
-\end{enumerate}
-
+\end{itemize}
+\subsection{Replacing VGG with a different Network}
+\begin{itemize}
+	\item I replaced the VGG Face Descriptor with the network described here \url{https://github.com/deep-fry/mayo/blob/master/models/cifarnet.yaml}. 
+	\item This network was implemented with Keras and trained on the CIFAR-10 dataset. At first the learning rate was constant but it would only hit an accuracy of around 86\%. However, by making the learning rate a bit more adaptive, I was able to train the model to a 91\% accuracy. The model then takes about 30 minutes to train on the CIFAR-10 dataset. 
+	\item Then, the softmax layer is taken out, just like in VGG, and this allows us to create a 192-dimensional vector for each image, which is then PCA'd to 100-dimensions. The images have to be downsampled to 32 $\times $ 32 since that's what the network takes. 
+	\item The results are in the spreadsheet. 
+	\item I essentially found that replacing VGG with CFN does worse in the KinFaceW-I dataset, it does better in the KinFaceW-II dataset and it doesn’t have a huge effect on the TSKinFace dataset (with the biggest difference being a 1\% difference in accuracy). When grouped by relationship, I found that the father-son relationship had the least change in accuracy with an average 0.092\% accuracy difference.
+	This is the original face descriptor accuracies minus the LBP, HOG, SIFT and CFN face descriptor accuracies (so a positive number implies that the original face descriptors did better). We see that there is more variation in the other relationships, ignoring fms and fmd as there’s only one dataset for this, than there is in the father-son relationship, and this is reflected in the standard deviations for each relationship. 
+	Generally, VGG did better than CFN for KinFaceW-I and did worse for KFW-II. In terms of any other things I thought might be interesting to note, the maximum difference in accuracies was 5.4\% which occurred in the KFW-II unrestricted setting with the mother-daughter relationship in which CFN made the accuracy increase by 5.4\%. The maximum decrease in accuracy was 4.7\% with the KFW-I Restricted dataset for the mother-son relationship. We also got that the KFW-II Unrestricted setting with the mother-son relationship had no difference whatsoever in accuracies between the face descriptors, though I think this is more likely to have happened by chance than having any underlying reason. 
+	
+	With respect to why KFW-II did better with the CFN face descriptor, I’m not entirely sure but I think it goes back to the fact that the pairs of images are taken from the same image in KFW-II but not in KFW-I. My guess is that, since the input to the CFN network is a 32 x 32 image, potentially it could be generalizing the lighting and other non-face related features more which could be exacerbating the problem we saw earlier with the bias. The main reason I’m unsure about this is since I would’ve imagined something similar would have occurred with TSKinFace if this was the case but it doesn’t seem to have happened, or at least not with the same magnitude of effect. 
+	
+\end{itemize}
 
 \end{document}
