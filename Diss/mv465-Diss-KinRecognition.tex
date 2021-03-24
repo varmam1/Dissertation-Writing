@@ -3,13 +3,23 @@
 \usepackage[pdfborder={0 0 0}]{hyperref}    % turns references into hyperlinks
 \usepackage[margin=20mm]{geometry}  % adjusts page layout
 \usepackage{graphicx}  % allows inclusion of PDF, PNG and JPG images
+\graphicspath{ {./images/} }
 \usepackage{verbatim}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{dirtree}
+\usepackage{mathtools}
+\DeclarePairedDelimiter\paren{\lparen}{\rparen}
+\DeclarePairedDelimiter\bracks{\lbrack}{\rbrack}
+\usepackage{xcolor}
 % \usepackage{docmute}   % only needed to allow inclusion of proposal.tex
 
 \raggedbottom                           % try to avoid widows and orphans
 \sloppy
 \clubpenalty1000%
 \widowpenalty1000%
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{4}
 
 \renewcommand{\baselinestretch}{1.1}    % adjust line spacing to make
                                         % more readable
@@ -74,7 +84,7 @@ Supervisor:         & \bf Daniel Bates                    \\
 
 \tableofcontents
 
-% \listoffigures
+\listoffigures
 
 
 \pagestyle{headings}
@@ -151,6 +161,8 @@ Chapter \ref{Results} then discusses all of the results that were obtained from 
 
 We must first 
 
+\subsection{Convolutional Layers}
+
 \section{Face Detection}
 
 \section{Face Descriptors}
@@ -161,23 +173,117 @@ for example. There are multiple face descriptors that can be made of a face imag
 
 \subsection{Local Binary Patterns}
 
-The Local Binary Patterns (LBP) face descriptor takes an image 
+One such face descriptor is the Local Binary Patterns (LBP) visual descriptor which is adapted for faces. LBP is a texture descriptor \cite{LBPFace} which means that the algorithm attempts to describe the texture of the image, rather than anything to do with the color. 
+As such, given an image we want the descriptor of, we must first convert it to grayscale. Then, for each pixel in the image, a neighborhood of pixels is obtained from it. There are multiple ways to define this neighborhood, as shown in figure \ref{LBPNeighborhood}. 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.2]{Lbp_neighbors.png}
+    \caption{Potential neighborhoods of the pixel}
+    \label{LBPNeighborhood}
+\end{figure}
+
+The simplest neighborhood, which is the neighborhood used in this project, is the direct neighbors of the pixel, which is the first neighborhood in figure \ref{LBPNeighborhood}. 
+However, on the edges, some of the neighbors won't exist, due to the fact that it's on the edge of the image. To mitigate this, in the implementation, I pad the grayscale image with 0s on the outside of the image such that each pixel in the image has the same number of neighbors. 
+Once we have our neighborhood of the pixel, we compare the grayscale value of the main pixel with each of the grayscale values in the neighborhood. For each neighboring value, if it is greater than the main pixel, we make it a $1$, otherwise we make it a $0$. 
+We are then able to create a binary number from the neighboring values. In practice, where the number is started from doesn't matter but in my implementation, the number starts from the left cell and goes counterclockwise. 
+Applying this to figure \ref{LBPExample}, we get that our LBP value for this pixel would be $01111000_2$ which, in decimal, is $120$. 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.75]{LBPExample.png}
+    \caption{Example of LBP operator on a pixel}
+    \label{LBPExample}
+\end{figure}
+
+To summarize the LBP operator mathematically, given a coordinate in the image, $(x, y)$ which has grayscale value $g$, a neighborhood of $P$ points with radius $R$ enumerated by $g_p$ where $p \in \{0, P - 1\}$, we have that, \cite{textureSurvey}:
+\[LBP_{P, R}(x, y) = \sum_{p = 0}^{P - 1} s(g_p - g)2^p\]
+Where:
+\[s(x) = \begin{cases} 1 & \text{if } x > 0 \\ 0 & \text{else} \end{cases}\]
+
+Once we get the values of the pixel, an added extension, which we do for face description, is to check whether it is a \textit{uniform value} which we define as a value such that, in binary, there are only, at most, 2 bitwise transitions when traversed circularly. For example, 11000111 is a uniform value since it only transitions from 1 to 0 and 0 to 1 but 11001000 isn't since it has 4 bitwise transitions. 
+With this extension, we have 58 possible uniform values that a pixel's LBP value can be and an extra value for the LBP value not being uniform. In other words, there are 59 LBP values that a pixel in an image can take. 
+
+Once each pixel in the image has an associated LBP value, we can split up the image into blocks. For our implementation, since our input images have size $64 \times 64$, we split it up into non-overlapping blocks of size $8 \times 8$, of which there are $8 \times 8$ of. 
+For each block, we obtain a histogram of the LBP values that were in the block, which gives us a $59$-dimensional vector. To obtain the vector for the entire image, each of these vectors are appended together and a 3776-dimensional LBP face descriptor is obtained for our case. 
 
 \subsection{Histogram of Gradients}
+
+Another face descriptor is Histogram of Gradients (HOG). Given a colored image, we can think of the image as a function, $I: \mathbb{N}_m \times \mathbb{N}_n \to \mathbb{R}^3$, which takes a coordinate in the image and returns a vector of values, which correspond to the red, green and blue values of the pixel.
+
+\subsubsection{Calculating the Gradients}
+
+This then means that we are able to calculate the gradient of the image. This 
+
+\subsubsection{Weighted Vote into Histogram}
+
 
 \subsection{Scale-Invariant Feature Transform}
 
 \subsection{VGG}
 
-\subsection{CifarNet}
+Another way of getting face descriptors for an image is to use the VGG network. The original VGG network \cite{VGG} is a CNN which takes in a $224 \times 224$ colored image and outputs a probability vector of size 1000 for the ImageNet classes. In other words, if \texttt{out} is the output of the model, \texttt{out[i]} corresponds with the probability that the \texttt{i}$^{\text{th}}$ ImageNet class is the class of the input image. 
+There are 5 configurations of the network, which have varying depth and, as a result, more parameters. The architecture of the second deepest configuration, which is used in this project, is as follows:
 
-\section{K-Nearest Neighbors}
+\begin{figure}[h]
+    \centering
+    T O D O 
+    \caption{The Architecture of VGG}
+    \label{VGGArch}
+\end{figure}
+
+By training this model on the ImageNet dataset, the model is able to get a top-5 classification error of 7.5\%, which means that for 7.4\% of the entries in the test set, none of the top 5 classes that the image could be were the actual image. 
+
+However, in order to use the model for face description, we must change the output layer and the training dataset \cite{VGGFace}. Instead of training on general objects in an image, we train the model on faces, specifically celebrity faces. 
+The celebrities are curated to a list of 2622 people in which 2000 images are obtained for each celebrity and the images are then curated. The curated set of images constitutes the training set for the VGG model for faces. 
+
+The VGG model for faces is then the model described above with the softmax layer having dimension of 2622. The model is then trained with the dataset we described which allows us to get rid of the softmax layer and use the output of the last fully-connected layer as our 4096-dimensional face descriptor for the image. 
+
+% \subsection{CifarNet}
 
 \section{Metric Learning}
+% Have section on what metric learning is and another paragraph or so to tie it in with the project
 
-\section{Principle Component Analysis}
+We wish to measure the similarity between a pair of faces in order to determine whether they are related or not. One way to approach this is to use imilarity learning, which is a type of approach to the problem in which the goal is to learn a similarity function in order to measure how similar two objects are. 
+However, we often use distance to help measure the similarity between data points. By learning what this distance function ought to be, we would be able to find a better similarity function so finding this distance function is the goal of metric learning \cite{metricLearningPrimer}. To go more in depth, we must first define a few concepts.
+
+Given a non-empty set $A$, we define a \textit{distance} over $A$ as a function $d: A \times A \to \mathbb{R}$ such that the following holds:
+\begin{enumerate}
+    \item $\forall x, y \in A$, $d(x, y) \geq 0$ and $d(x, y) = 0$ if and only if $x = y$. 
+    \item \textbf{Symmetry}: $\forall x, y \in A$, $d(x, y) = d(y, x)$
+    \item \textbf{Triangle Inequality}: The triangle inequality must hold. That is, $\forall x, y, z \in A$: 
+    \[d(x, y) + d(y, z) \geq d(x, z)\]
+\end{enumerate}
+
+Given the definition of a distance, we define a \textit{Mahalanobis distance} that corresponds to the matrix $M$ to be a distance function, $d_M: \mathbb{R}^d \times \mathbb{R}^d \to \mathbb{R}$, where $d$ is the amount of dimensions the input vector has, which is defined as:
+\[d_M(x, y) = \sqrt{(x - y)^TM(x - y)}\]
+
+In other words, in metric learning, the Mahalanobis distance is used to calculate the distance between data points and the goal of metric learning is to find out what the matrix $M$ should be defined as in order to make data points of the same class closer together and data points of different classes further away. 
+We can visualize this as such:
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.75]{MetricLearning.png}
+    \caption{How metric learning works at a high-level view}
+    \label{MetricLearning}
+\end{figure}
+
+% TODO: Change name
+\section{Side Algorithms Used (Temp Name)}
+
+Aside from the main algorithms that will be used which were described earlier, a couple of high-profile algorithms were used that deserve to be explained, although they are used only a few times at most in very specific places. 
+
+\subsection{K-Nearest Neighbors}
+
+K-Nearest Neighbors is an algorithm that finds the $K$ nearest neighbors for each datum in a given set of data. Given a list of datapoints in Euclidean space, we wish to find, for each datapoint, the $K$ closest datapoints to it. 
+
+\subsection{Principle Component Analysis}
+
+Principle Component Analysis (PCA) is a statistical tool that we can use to reduce the dimension of a vector. Firstly, 
 
 \section{Requirements Analysis}
+
+
 
 \section{Software Engineering Practices}
 
@@ -206,7 +312,7 @@ I used the KinFaceW-I, KinFaceW-II, and TSKinFace datasets to train the model.
 
 The KinFaceW datasets \cite{KinFaceCitation2} \cite{KinFaceCitation1} are composed of face images from the internet which include public figures as well as their parents or children. Both datasets contain no restriction on pose, lighting background, expression, age, ethnicity, or partial occlusion. 
 The main difference between the datasets is that the pairs of face images that have a kin relationship in KinFaceW-I are from different images whereas, in KinFaceW-II, they are from the same image. 
-In terms of the specifics of the datasets, they both support four kin relationships, Father-Son (FS), Father-Daughter (FD), Mother-Son (MS), and Mother-Daughter (MD). Each face image are images of size $64 \times 64$. The datasets also pre-computed 5 folds for cross-validation for each relationship which contained the names of the pairs of images that had the relationship and those that didn't, henceforth positive and negative pairs respectively. 
+In terms of the specifics of the datasets, they both support four kin relationships, Father-Son (FS), Father-Daughter (FD), Mother-Son (MS), and Mother-Daughter (MD). Each face image are images of size $64 \times 64$. The datasets also contain pre-computed 5 folds for cross-validation for each relationship which contained the names of the pairs of images that had the relationship and those that didn't, henceforth positive and negative pairs respectively. 
 Finally, the dataset has 2 main settings which are used: the restricted setting in which only positive pairs of images are used and the unrestricted setting in which negative pairs of images are used. 
 
 The TSKinFace dataset \cite{TSKinFace} contains images for the relationships, Father-Mother-Son (FMS), Father-Mother-Daughter (FMD), and Father-Mother-Son-Daughter (FMSD). 
