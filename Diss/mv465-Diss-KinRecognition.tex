@@ -1,5 +1,5 @@
 
-\documentclass[11pt,a4paper,twoside]{report}
+\documentclass[12pt,a4paper,twoside]{report}
 \usepackage[pdfborder={0 0 0}]{hyperref}    % turns references into hyperlinks
 \usepackage[margin=20mm]{geometry}  % adjusts page layout
 \usepackage{graphicx}  % allows inclusion of PDF, PNG and JPG images
@@ -209,14 +209,111 @@ For each block, we obtain a histogram of the LBP values that were in the block, 
 
 \subsection{Histogram of Gradients}
 
-Another face descriptor is Histogram of Gradients (HOG). Given a colored image, we can think of the image as a function, $I: \mathbb{N}_m \times \mathbb{N}_n \to \mathbb{R}^3$, which takes a coordinate in the image and returns a vector of values, which correspond to the red, green and blue values of the pixel.
+Another face descriptor is Histogram of Gradients (HOG) \cite{HOG}. Given a colored image, we can think of the image as a function, $I: \mathbb{N}_m \times \mathbb{N}_n \to \mathbb{R}^3$, which takes a coordinate in the image and returns a vector of values, which correspond to the red, green and blue values of the pixel.
+This then means that we are able to calculate the gradient of the image. The gradient of an image can characterize local object appearance and shape due to the fact that the gradient of the image can be used to help find edges in the image. As such, it is useful to obtain such a histogram of gradients. 
 
 \subsubsection{Calculating the Gradients}
 
-This then means that we are able to calculate the gradient of the image. This 
+First, we need to calculate the gradients of the image. As the image function is discrete, in other words we cannot analytically find the gradients, we must find approximations to do so. This is done by convolving specific kernels on the image. 
+What this means is that the kernel, $K$ which is a matrix, is applied to each pixel in the image and its neighbors and the values are multiplied with the corresponding value in the kernel and all of the values are then summed up to create the new value for the convolved image. 
+For example, if we had the kernel:
+
+\[K = \begin{bmatrix}
+    1 & 2 & 1
+\end{bmatrix}\]
+
+And the image:
+\[I = \begin{bmatrix}
+    0 & 5 & 4 \\ 3 & 3 & 3 \\ 2 & 1 & 2
+\end{bmatrix}\]
+
+We get that the kernel convolved on the image is:
+\[K * I = \begin{bmatrix}
+    0\times 1 + 5\times 2 + 4\times 1 \\
+    3\times 1 + 3\times 2 + 3\times 1 \\
+    2\times 1 + 1\times 2 + 2\times 1 
+\end{bmatrix} = \begin{bmatrix}
+    14 \\
+    12 \\
+    6
+\end{bmatrix}\]
+
+We can then approximate the derivative of an image as a kernel being convolved on the image. To do so, we use the kernels:
+\begin{align*}
+    G_x &= \begin{bmatrix} -1 & 0 & 1\end{bmatrix} \\
+    G_y &= \begin{bmatrix} -1 & 0 & 1\end{bmatrix}^T
+\end{align*}
+
+By convolving these kernels on the image, we are able to get an estimate for the derivative in the $x$ direction and in the $y$ direction, respectively. 
+Abusing notation slightly where here the square of the matrix just means an element-wise square and division just means element-wise division, we get that the magnitude of the gradient is:
+
+\[\sqrt{(G_x * I)^2 + (G_y * I)^2}\]
+
+And that the angles at each point are:
+
+\[\tan^{-1}((G_y * I)/(G_x * I))\]
+
+However, there are two things that need to be addressed before we move on to the rest of the algorithm. Firstly, there are still 3 channels for the image so we have obtained the gradient in the $x$ and $y$ direction for each pixel and each channel. As such, 
+we define the gradient of each pixel to be the gradient which has the maximum magnitude among the 3 channels and the corresponding angle is used as well. 
+
+Furthermore, the angles returned range between $0^{\circ}$ and $360^{\circ}$. However, we require that the angles be unsigned, so the angle at each pixel, $\theta_{(x, y)}$, becomes:
+
+\begin{center}
+\texttt{$\theta_{(x, y)}$ := $\theta_{(x, y)}\mod{180}$}
+\end{center}
 
 \subsubsection{Weighted Vote into Histogram}
 
+At this point, we have the magnitude of the gradient at each point in the image as well as the angle of the gradient. Now, similarly to LBP, we break up the image into blocks. 
+We create a histogram for each of these blocks and append them together to make the face descriptor for the entire image. 
+Unlike LBP however, we don't have a finite set of labels that each pixel can neatly fall into however, since neither the magnitude nor the angles are discrete. Thus, first, the labels of the histogram are going to be the angles of the gradients. 
+The labels will then be:
+\[[0, 20, 40, 60, 80, 100, 120, 140, 160]\]
+However, these aren't blocks ranges of $[0, 20)$, for example. Instead, for each pixel in the block, we distribute the magnitude of the gradient of the pixel between the angles that the angle falls between. 
+Given a pixel with magnitude $m$ and angle $\theta$, if $0 \equiv \theta \mod{20}$ then:
+
+\begin{center}
+    \texttt{histogram[$\theta/20$] += $m$}    
+\end{center}
+
+Otherwise, we have it that $\theta$ is between two angles, $\phi_1$ and $\phi_2$, both of which are divisible by $20$, where $\phi_1 < \theta < \phi_2$. 
+In this case, we weight the amount that we add to each label based on how far away $\theta$ is to the label. So, for the label $\phi_1$, we have that we add to the label associated with $\phi_1$ the value:
+
+\[\frac{\phi_2 - \theta}{20} \times m\]
+
+% \begin{center}
+%     \texttt{histogram[$\phi_1/20$] += $\frac{\phi_2 - \theta}{20} \times m$}    
+% \end{center}
+
+And, similarly for $\phi_2$:
+
+\[\frac{\theta - \phi_1}{20} \times m\]
+
+We can see an example of this in figure \ref{HOGHistoVisual}.
+
+% \begin{center}
+%     \texttt{histogram[$\phi_2/20$] += $\frac{\theta - \phi_1}{20} \times m$}    
+% \end{center}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.5]{HOGHisto.png}
+    \caption{Creating a histogram for a block of the image}
+    \label{HOGHistoVisual}
+\end{figure}
+
+In other words, the closer the angle is to the label, the more of the magnitude is contributed to the label's histogram value. As a caveat, if $\phi_2 = 180^{\circ}$, we treat $\phi_2$ as $180^{\circ}$ for the sake of this calculation but we add the value to the label $0$ since $0 \equiv 180 \mod{180}$. An example of this can be seen in figure \ref{HOGHistoVisualCirc}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.5]{HOGHistoCirc.png}
+    \caption{What happens in the case where $\phi_1 = 160$ and $\phi_2 = 180$}
+    \label{HOGHistoVisualCirc}
+\end{figure}
+
+We can do this for each pixel in the block and, thus, we are able to get a $9$-dimensional vector for each block. 
+In the project, the image is split up into $16 \times 16$ blocks of size $4 \times 4$ first and then $8 \times 8$ blocks of size $8 \times 8$ next and each of these blocks contributes a histogram to the overall vector which leads us with a face descriptor with dimension:
+\[16 \times 16 \times 9 + 8 \times 8 \times 9 = 2880\]
 
 \subsection{Scale-Invariant Feature Transform}
 
