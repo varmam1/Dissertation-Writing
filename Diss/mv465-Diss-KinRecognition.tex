@@ -140,30 +140,40 @@ The project deals with a 2019 method using Weighted Graph Embedding-Based Metric
 The following is shown in the dissertation:
 
 \begin{enumerate}
-    \item The algorithm, WGEML, is implemented and accuracies that are within an acceptable range are obtained, as shown in section \ref{MainResults}.
-    \item Ablation studies on the face descriptors are performed and the results are in section \ref{FDAbStudies}.
-    % \item Ablation studies are done on the image by blocking certain sections of the image, the results of which are in section \ref{ImageAbStudies}
-    \item We use the models that were created to discover biases in the datasets that were used and find out the impact that has overall in section \ref{Biases}. 
-    \item We further test the face descriptors by replacing VGG with a smaller CNN in which the implementation is discussed in section \ref{CFNExt}. 
+    \item The algorithm, WGEML, is implemented and accuracies that are within an acceptable range are obtained, as shown in section \ref{sec:MainResults}.
+    \item Ablation studies on the face descriptors are performed and the results are in section \ref{sec:FDAbStudies}.
+    % \item Ablation studies are done on the image by blocking certain sections of the image, the results of which are in section \ref{sec:ImageAbStudies}
+    \item We use the models that were created to discover biases in the datasets that were used and find out the impact that has overall in section \ref{sec:Biases}. 
+    \item We further test the face descriptors by replacing VGG with a smaller CNN in which the implementation is discussed in section \ref{sec:CFNExt}. 
 \end{enumerate}
 
-Chapter \ref{Background} explains much of the needed technical background for the implementation, from what a Neural Network is and what metric learning is to each of the face descriptors used and what face descriptors are. 
-Chapter \ref{Impl} will then discuss the specifics of how WGEML and the extension that used a different network than VGG was implemented. 
-Chapter \ref{Results} then discusses all of the results that were obtained from experimentation with WGEML and the implications of the results. 
+Chapter \ref{chapter:Prep} explains much of the needed technical background for the implementation, from what a Neural Network is and what metric learning is to each of the face descriptors used and what face descriptors are. 
+Chapter \ref{chapter:Implementation} will then discuss the specifics of how WGEML and the extension that used a different network than VGG was implemented. 
+Chapter \ref{chapter:Evaluation} then discusses all of the results that were obtained from experimentation with WGEML and the implications of the results. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%% Preparation %%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Preparation} \label{Background}
+\chapter{Preparation} \label{chapter:Prep}
 
-\section{Convolutional Neural Networks}
+In this chapter, I discuss the necessary technical background information needed for the project in sections \ref{sec:CNN} through \ref{sec:PCAandKNN}, then the requirements of the project are elaborated on in section \ref{sec:ReqAnal} before the starting point and Software Engineering practices are discussed in section \ref{sec:SEPractices}. 
+
+\section{Convolutional Neural Networks} \label{sec:CNN}
 
 We must first 
 
 \subsection{Convolutional Layers}
 
 \section{Face Detection}
+
+Face detection is the task of finding a face within a given image and returning the set of faces found as seen in Figure \ref{fig:FaceDetEx}. This differs from face recognition since the task is only to find the faces and not to recognize who the faces belong to. 
+
+\begin{figure}[h]
+    \centering
+    \label{fig:FaceDetEx}
+    \caption{Face detection example}
+\end{figure}
 
 \section{Face Descriptors}
 
@@ -174,26 +184,26 @@ for example. There are multiple face descriptors that can be made of a face imag
 \subsection{Local Binary Patterns}
 
 One such face descriptor is the Local Binary Patterns (LBP) visual descriptor which is adapted for faces. LBP is a texture descriptor \cite{LBPFace} which means that the algorithm attempts to describe the texture of the image, rather than anything to do with the color. 
-As such, given an image we want the descriptor of, we must first convert it to grayscale. Then, for each pixel in the image, a neighborhood of pixels is obtained from it. There are multiple ways to define this neighborhood, as shown in figure \ref{LBPNeighborhood}. 
+As such, given an image we want the descriptor of, we must first convert it to grayscale. Then, for each pixel in the image, a neighborhood of pixels is obtained from it. There are multiple ways to define this neighborhood, as shown in figure \ref{fig:LBPNeighborhood}. 
 
 \begin{figure}[h]
     \centering
     \includegraphics[scale=0.2]{Lbp_neighbors.png}
     \caption{Potential neighborhoods of the pixel}
-    \label{LBPNeighborhood}
+    \label{fig:LBPNeighborhood}
 \end{figure}
 
-The simplest neighborhood, which is the neighborhood used in this project, is the direct neighbors of the pixel, which is the first neighborhood in figure \ref{LBPNeighborhood}. 
+The simplest neighborhood, which is the neighborhood used in this project, is the direct neighbors of the pixel, which is the first neighborhood in figure \ref{fig:LBPNeighborhood}. 
 However, on the edges, some of the neighbors won't exist, due to the fact that it's on the edge of the image. To mitigate this, in the implementation, I pad the grayscale image with 0s on the outside of the image such that each pixel in the image has the same number of neighbors. 
 Once we have our neighborhood of the pixel, we compare the grayscale value of the main pixel with each of the grayscale values in the neighborhood. For each neighboring value, if it is greater than the main pixel, we make it a $1$, otherwise we make it a $0$. 
 We are then able to create a binary number from the neighboring values. In practice, where the number is started from doesn't matter but in my implementation, the number starts from the left cell and goes counterclockwise. 
-Applying this to figure \ref{LBPExample}, we get that our LBP value for this pixel would be $01111000_2$ which, in decimal, is $120$. 
+Applying this to figure \ref{fig:LBPExample}, we get that our LBP value for this pixel would be $01111000_2$ which, in decimal, is $120$. 
 
 \begin{figure}[h]
     \centering
     \includegraphics[scale=0.75]{LBPExample.png}
     \caption{Example of LBP operator on a pixel}
-    \label{LBPExample}
+    \label{fig:LBPExample}
 \end{figure}
 
 To summarize the LBP operator mathematically, given a coordinate in the image, $(x, y)$ which has grayscale value $g$, a neighborhood of $P$ points with radius $R$ enumerated by $g_p$ where $p \in \{0, P - 1\}$, we have that, \cite{textureSurvey}:
@@ -209,7 +219,7 @@ For each block, we obtain a histogram of the LBP values that were in the block, 
 
 \subsection{Histogram of Gradients}
 
-Another face descriptor is Histogram of Gradients (HOG) \cite{HOG}. Given a colored image, we can think of the image as a function, $I: \mathbb{N}_m \times \mathbb{N}_n \to \mathbb{R}^3$, which takes a coordinate in the image and returns a vector of values, which correspond to the red, green and blue values of the pixel.
+Another face descriptor is Histogram of Gradients (HOG) \cite{HOG}. Given a colored image, we can think of the image as a function, $I: \mathbb{N}_m \times \mathbb{N}_n \to \mathbb{R}^3$, which takes a coordinate in the image and returns a vector of values, which correspond to the red, green, and blue values of the pixel.
 This then means that we are able to calculate the gradient of the image. The gradient of an image can characterize local object appearance and shape due to the fact that the gradient of the image can be used to help find edges in the image. As such, it is useful to obtain such a histogram of gradients. 
 
 \subsubsection{Calculating the Gradients}
@@ -253,7 +263,7 @@ And that the angles at each point are:
 
 \[\tan^{-1}((G_y * I)/(G_x * I))\]
 
-However, there are two things that need to be addressed before we move on to the rest of the algorithm. Firstly, there are still 3 channels for the image so we have obtained the gradient in the $x$ and $y$ direction for each pixel and each channel. As such, 
+However, there are two things that need to be addressed before we move on to the rest of the algorithm. Firstly, there are still 3 channels for the image, so we have obtained the gradient in the $x$ and $y$ direction for each pixel and each channel. As such, 
 we define the gradient of each pixel to be the gradient which has the maximum magnitude among the 3 channels and the corresponding angle is used as well. 
 
 Furthermore, the angles returned range between $0^{\circ}$ and $360^{\circ}$. However, we require that the angles be unsigned, so the angle at each pixel, $\theta_{(x, y)}$, becomes:
@@ -281,34 +291,26 @@ In this case, we weight the amount that we add to each label based on how far aw
 
 \[\frac{\phi_2 - \theta}{20} \times m\]
 
-% \begin{center}
-%     \texttt{histogram[$\phi_1/20$] += $\frac{\phi_2 - \theta}{20} \times m$}    
-% \end{center}
-
 And, similarly for $\phi_2$:
 
 \[\frac{\theta - \phi_1}{20} \times m\]
 
-We can see an example of this in figure \ref{HOGHistoVisual}.
-
-% \begin{center}
-%     \texttt{histogram[$\phi_2/20$] += $\frac{\theta - \phi_1}{20} \times m$}    
-% \end{center}
+We can see an example of this in figure \ref{fig:HOGHistoVisual}.
 
 \begin{figure}[h]
     \centering
     \includegraphics[scale=0.5]{HOGHisto.png}
     \caption{Creating a histogram for a block of the image}
-    \label{HOGHistoVisual}
+    \label{fig:HOGHistoVisual}
 \end{figure}
 
-In other words, the closer the angle is to the label, the more of the magnitude is contributed to the label's histogram value. As a caveat, if $\phi_2 = 180^{\circ}$, we treat $\phi_2$ as $180^{\circ}$ for the sake of this calculation but we add the value to the label $0$ since $0 \equiv 180 \mod{180}$. An example of this can be seen in figure \ref{HOGHistoVisualCirc}.
+In other words, the closer the angle is to the label, the more of the magnitude is contributed to the label's histogram value. As a caveat, if $\phi_2 = 180^{\circ}$, we treat $\phi_2$ as $180^{\circ}$ for the sake of this calculation but we add the value to the label $0$ since $0 \equiv 180 \mod{180}$. An example of this can be seen in figure \ref{fig:HOGHistoVisualCirc}.
 
 \begin{figure}[h]
     \centering
     \includegraphics[scale=0.5]{HOGHistoCirc.png}
     \caption{What happens in the case where $\phi_1 = 160$ and $\phi_2 = 180$}
-    \label{HOGHistoVisualCirc}
+    \label{fig:HOGHistoVisualCirc}
 \end{figure}
 
 We can do this for each pixel in the block and, thus, we are able to get a $9$-dimensional vector for each block. 
@@ -317,16 +319,22 @@ In the project, the image is split up into $16 \times 16$ blocks of size $4 \tim
 
 \subsection{Scale-Invariant Feature Transform}
 
+SIFT \cite{SIFT} is another way of obtaining face descriptors, although the original SIFT algorithm differs from how it is used in the project, though it is still important to briefly go over. 
+
+% Talk about the difference between actual implementation in Implementation 
+
+The actual implementation of SIFT that is used differs from the original version which is talked about in section \ref{sec:SIFTImpl}.
+
 \subsection{VGG}
 
 Another way of getting face descriptors for an image is to use the VGG network. The original VGG network \cite{VGG} is a CNN which takes in a $224 \times 224$ colored image and outputs a probability vector of size 1000 for the ImageNet classes. In other words, if \texttt{out} is the output of the model, \texttt{out[i]} corresponds with the probability that the \texttt{i}$^{\text{th}}$ ImageNet class is the class of the input image. 
-There are 5 configurations of the network, which have varying depth and, as a result, more parameters. The architecture of the second deepest configuration, which is used in this project, is as follows:
+There are 5 configurations of the network, which have varying depth and, as a result, more parameters. The architecture of the second deepest configuration is configuration D in Figure \ref{fig:VGGArch}.
 
 \begin{figure}[h]
     \centering
-    T O D O 
-    \caption{The Architecture of VGG}
-    \label{VGGArch}
+    \includegraphics[scale=0.5]{VGGArch.png} 
+    \caption{The different configurations that VGG can have}
+    \label{fig:VGGArch}
 \end{figure}
 
 By training this model on the ImageNet dataset, the model is able to get a top-5 classification error of 7.5\%, which means that for 7.4\% of the entries in the test set, none of the top 5 classes that the image could be were the actual image. 
@@ -341,7 +349,7 @@ The VGG model for faces is then the model described above with the softmax layer
 \section{Metric Learning}
 % Have section on what metric learning is and another paragraph or so to tie it in with the project
 
-We wish to measure the similarity between a pair of faces in order to determine whether they are related or not. One way to approach this is to use imilarity learning, which is a type of approach to the problem in which the goal is to learn a similarity function in order to measure how similar two objects are. 
+We wish to measure the similarity between a pair of faces in order to determine whether they are related or not. One way to approach this is to use similarity learning, which is a type of approach to the problem in which the goal is to learn a similarity function in order to measure how similar two objects are. 
 However, we often use distance to help measure the similarity between data points. By learning what this distance function ought to be, we would be able to find a better similarity function so finding this distance function is the goal of metric learning \cite{metricLearningPrimer}. To go more in depth, we must first define a few concepts.
 
 Given a non-empty set $A$, we define a \textit{distance} over $A$ as a function $d: A \times A \to \mathbb{R}$ such that the following holds:
@@ -352,21 +360,32 @@ Given a non-empty set $A$, we define a \textit{distance} over $A$ as a function 
     \[d(x, y) + d(y, z) \geq d(x, z)\]
 \end{enumerate}
 
-Given the definition of a distance, we define a \textit{Mahalanobis distance} that corresponds to the matrix $M$ to be a distance function, $d_M: \mathbb{R}^d \times \mathbb{R}^d \to \mathbb{R}$, where $d$ is the amount of dimensions the input vector has, which is defined as:
+Given the definition of a distance, we define a \textit{Mahalanobis distance} that corresponds to the positive semidefinite matrix $M$ to be a distance function, $d_M: \mathbb{R}^d \times \mathbb{R}^d \to \mathbb{R}$, where $d$ is the number of dimensions the input vector has, which is defined as:
 \[d_M(x, y) = \sqrt{(x - y)^TM(x - y)}\]
 
-In other words, in metric learning, the Mahalanobis distance is used to calculate the distance between data points and the goal of metric learning is to find out what the matrix $M$ should be defined as in order to make data points of the same class closer together and data points of different classes further away. 
-We can visualize this as such:
+If $M$ is positive semidefinite, then $M$ must be decomposable into $B^TB$ where $B$ is a real matrix. Thus, we can also write the Mahalanobis distance as:
+\[d_M(x, y) = \sqrt{(x - y)^TM(x - y)} = \sqrt{(x - y)^TB^TB(x - y)} = \sqrt{(Bx - By)^T(Bx - By)}\]
+
+Thus, given a dataset $\mathcal{X} = \{x_1, ..., x_n\} \subset \mathbb{R}^d$ which has the sets:
+
+\[S = \{(x_i, x_j) \in \mathcal{X} \times \mathcal{X} \mid x_i \text{ and } x_j \text{ are similar}\}\]
+\[D = \{(x_i, x_j) \in \mathcal{X} \times \mathcal{X} \mid x_i \text{ and } x_j \text{ are not similar}\}\]
+
+We wish to find the distance metric $M$ such that we can minimize some loss function, $l$:
+\[\min_{M} l(d_M, S, D)\]
+
+In other words, in metric learning, we wish to find out what the matrix $M$ should be defined as in order to make data points which are similar closer together and data points which aren't similar further away, which is encapsulated by the loss function. 
+We can visualize this in figure \ref{fig:MetricLearning}.
 
 \begin{figure}[ht]
     \centering
     \includegraphics[scale=0.75]{MetricLearning.png}
     \caption{How metric learning works at a high-level view}
-    \label{MetricLearning}
+    \label{fig:MetricLearning}
 \end{figure}
 
 % TODO: Change name
-\section{Side Algorithms Used (Temp Name)}
+\section{Side Algorithms Used (Temp Name)} \label{sec:PCAandKNN}
 
 Aside from the main algorithms that will be used which were described earlier, a couple of high-profile algorithms were used that deserve to be explained, although they are used only a few times at most in very specific places. 
 
@@ -378,11 +397,11 @@ K-Nearest Neighbors is an algorithm that finds the $K$ nearest neighbors for eac
 
 Principle Component Analysis (PCA) is a statistical tool that we can use to reduce the dimension of a vector. Firstly, 
 
-\section{Requirements Analysis}
+\section{Requirements Analysis} \label{sec:ReqAnal}
 
 
 
-\section{Software Engineering Practices}
+\section{Software Engineering Practices} \label{sec:SEPractices}
 
 \subsection{Starting Point}
 
@@ -435,13 +454,13 @@ Furthermore, I am able to use VGG for non-commercial purposes under the Creative
 %%%%%%%%%%% Implementation %%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Implementation} \label{Impl}
+\chapter{Implementation} \label{chapter:Implementation}
 
 \section{Repository Overview}
 
 \section{Overview of Workflow}
 
-\section{Face Descriptors}
+\section{Face Descriptors} \label{sec:SIFTImpl}
 
 \section{WGEML}
 
@@ -457,26 +476,26 @@ Furthermore, I am able to use VGG for non-commercial purposes under the Creative
 
 \subsection{Saving Results to Disk}
 
-\section{CifarNet Extension} \label{CFNExt}
+\section{CifarNet Extension} \label{sec:CFNExt}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%% Evaluation %%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\chapter{Evaluation} \label{Results}
+\chapter{Evaluation} \label{chapter:Evaluation}
 
 \section{Success Criterion}
 
-\section{Original Results} \label{MainResults}
+\section{Original Results} \label{sec:MainResults}
 
-\section{Potential Biases in Datasets} \label{Biases}
+\section{Potential Biases in Datasets} \label{sec:Biases}
 
 \section{Ablation Studies}
 
-\subsection{Blocking Face Descriptors} \label{FDAbStudies}
+\subsection{Blocking Face Descriptors} \label{sec:FDAbStudies}
 
-\subsection{Blocking Parts of Images} \label{ImageAbStudies}
+\subsection{Blocking Parts of Images} \label{sec:ImageAbStudies}
 
 \section{Replacing VGG}
 
