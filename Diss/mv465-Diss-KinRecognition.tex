@@ -169,9 +169,8 @@ We must first
 
 Face detection is the task of finding a face within a given image and returning the set of faces found as seen in Figure \ref{fig:FaceDetEx}. This differs from face recognition since the task is only to find the faces and not to recognize who the faces belong to. 
 
-\begin{figure}[h]
+\begin{figure}[h]\label{fig:FaceDetEx}
     \centering
-    \label{fig:FaceDetEx}
     \caption{Face detection example}
 \end{figure}
 
@@ -395,11 +394,67 @@ K-Nearest Neighbors is an algorithm that finds the $K$ nearest neighbors for eac
 
 \subsection{Principle Component Analysis}
 
-Principle Component Analysis (PCA) is a statistical tool that we can use to reduce the dimension of a vector. Firstly, 
+Principle Component Analysis (PCA) \cite{PCA} is a statistical tool that we can use to reduce the dimensionality of a dataset while maintaining as much of the variability as possible. The algorithm identifies \textit{principle components} which are the directions of maximum variance in the dataset, which can be visualized in figure \ref{fig:PCA}.
 
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.5]{PCAComps.jpeg}
+    \caption{Principle components of an arbitrary 2 dimensional dataset}
+    \label{fig:PCA}
+\end{figure}
+
+Let $p$ be the number of variables that are being measured in the dataset, which in our case is the dimension of the face descriptor. Let $\mathbf{X}$ be the matrix $n \times p$ data matrix that is composed of the $p$ $n$-dimensional vectors $\mathbf{x_1}, ..., \mathbf{x_p}$ in which $x_i$ represents the $n$ observations of the $i$th variable.
+The goal of PCA is then to create a $p \times k$ matrix $\mathbf{W}$, where $k \leq p$, which maps each row-vector of $\mathbf{X}$ from the original $p$-dimensional feature space to a new $k$-dimensional feature subspace such that the variability of the dataset is kept in tact, as much as possible. 
+
+First, the dataset must be standardized which means that the mean of each feature must be $0$, which we denote as the matrix $\mathbf{X'}$ and the column vectors as $\mathbf{x_1'}, ..., \mathbf{x_p'}$. From there, the covariance matrix is obtained. This matrix is the following:
+
+\[\Sigma = \begin{bmatrix}
+    Cov(\mathbf{x_1'}, \mathbf{x_1'}) & ... & Cov(\mathbf{x_1'}, \mathbf{x_p'}) \\
+    \vdots & \ddots & \vdots \\
+    Cov(\mathbf{x_p'}, \mathbf{x_1'}) & ... & Cov(\mathbf{x_p'}, \mathbf{x_p'})
+\end{bmatrix}\]
+
+Where:
+
+\[\Sigma_{ij} = Cov(\mathbf{x_i'}, \mathbf{x_j'}) = \frac{1}{n}(\mathbf{x_i'}\cdot \mathbf{x_j'})\]
+
+Since we have that the mean of both are $0$ now, after standardization. Thus:
+
+\[\Sigma = \frac{1}{N} \mathbf{X'}\mathbf{X'}^T\]
+
+We then find the eigenvalues and eigenvectors of $\Sigma$, of which we get $p$ of them. The eigenvalues get sorted from largest to smallest and, thus, the first principle component is the eigenvector that corresponds to the largest eigenvalue, the second principle component is the eigenvector with the second largest eigenvalue, etc. 
+Denoting $\mathbf{w_i}$ as the $i$th principle component, we can make the matrix $\mathbf{W}$ as:
+
+\[\mathbf{W} = \begin{bmatrix}
+    \mathbf{w_1} & ... & \mathbf{w_k}
+\end{bmatrix}\]
+
+Which is a $p \times k$ matrix. Thus, to reduce the dimensions of the original dataset, we can create the matrix:
+
+\[\mathbf{T} = \mathbf{X}\mathbf{W}\]
+
+In which the $i$th row of $\mathbf{T}$ corresponds with the $i$th observation of $\mathbf{X}$ and this vector has is $k$-dimensional where $k \leq p$. 
 \section{Requirements Analysis} \label{sec:ReqAnal}
 
+The main requirement of the project is stated in \ref{chapter:Proposal} which is to replicate the results from Liang et al. (2019) \cite{WGEML} within a $15\%$ error range or to reject the results. In other words, the project should implement the Weighted Graph Embedding-Based Metric Learning (WGEML) algorithm for Kin Recognition. 
+The core project can be broken down into the following requirements:
+\begin{itemize}
+    \item \textbf{Face Detection}: Given an image, the faces in the image must be identified and saved as a $64 \times 64$ image on disk. 
+    \item \textbf{Face Descriptors}: The face descriptors, LBP, HOG, SIFT and VGG, must be implemented such that, given an image, each of these face descriptors should be able to be obtained from them. 
+    \item \textbf{WGEML}: The WGEML algorithm must be implemented such that, given a relationship, the positive pairs of faces, the negative pairs of faces, if any, it returns the distance metric matrix for each face descriptor used and how much each face descriptor should be weighted in the prediction step. 
+    \item \textbf{Prediction}: Given the model obtained from the WGEML algorithm, a pair of images, and a relationship, it must return how similar the images are and whether the people in the images have the kin relationship given. 
+    \item \textbf{End-to-end Replication}: Running the project end-to-end on the given datasets either gives similar results to the original paper or rejects the original results. 
+\end{itemize}
 
+The extensions can be summarized as follows:
+\begin{itemize}
+    \item Replace the VGG face descriptor with a smaller network to see how it affects accuracies. 
+    \item Look at how biases in the datasets affect the results and identify these biases. 
+    \item Use different combinations of face descriptors for WGEML to see how it affects accuracy of the model. 
+\end{itemize}
+
+\textbf{Analysis} There were two main phases for the project, the phase to finish the core requirements and one for the extensions. Each of the first 4 core requirements were split up into their own modules and thus constituted its own sub-phase in the main part of the project. They were also linear in that each requirement depended on the output of the last modules. 
+The last requirement constituted of a medley of scripts which were used to integrate the functions that were created for each of the requirements with the datasets, which required a data preparation module. 
 
 \section{Software Engineering Practices} \label{sec:SEPractices}
 
@@ -525,7 +580,7 @@ Furthermore, I am able to use VGG for non-commercial purposes under the Creative
 % the appendices
 \appendix
 
-\chapter{Project Proposal}
+\chapter{Project Proposal}\label{chapter:Proposal}
 
 %\input{proposal}
 
