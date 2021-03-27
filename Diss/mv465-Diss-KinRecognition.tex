@@ -161,7 +161,7 @@ In this chapter, I discuss the necessary technical background information needed
 
 \section{Convolutional Neural Networks} \label{sec:CNN}
 
-We must first 
+We must first discuss what a regular neural network is before going onto what a Convolutional Neural Network (CNN) is. 
 
 \subsection{Convolutional Layers}
 
@@ -169,9 +169,10 @@ We must first
 
 Face detection is the task of finding a face within a given image and returning the set of faces found as seen in Figure \ref{fig:FaceDetEx}. This differs from face recognition since the task is only to find the faces and not to recognize who the faces belong to. 
 
-\begin{figure}[h]\label{fig:FaceDetEx}
+\begin{figure}[h]
     \centering
     \caption{Face detection example}
+    \label{fig:FaceDetEx}
 \end{figure}
 
 \section{Face Descriptors}
@@ -320,6 +321,47 @@ In the project, the image is split up into $16 \times 16$ blocks of size $4 \tim
 
 SIFT \cite{SIFT} is another way of obtaining face descriptors, although the original SIFT algorithm differs from how it is used in the project, though it is still important to briefly go over. 
 
+The first thing to do is to create octaves for the given image. An octave is a set of the given image being blurred multiple times. 
+For example, in the first octave, the original image is the first image, and then the next image is blurred slightly which is then blurred further for the next image in the octave, etc. In the second octave, the image is halved in size and the same blurring effect happens. So, if the original image was of size $64 \times 64$, then the images in the second octave will be $32 \times 32$ and in the third it would be $16 \times 16$ and so on. A specified number of octaves and blurred images are used for the SIFT algorithm. The way that the image is blurred is as follows:
+\[L(x, y, \sigma) = G(x, y, \sigma) * I(x, y)\]
+Where $x, y$ is the coordinate in the image, $I$ is the function mapping coordinates to the value of the image at that coordinate, $\sigma$ is the amount of blurring, $*$ represents convolving $G$ on the image and:
+\[G(x, y, \sigma) = \frac{1}{2\pi\sigma^2}e^{-\frac{x^2 + y^2}{2\sigma^2}}\]
+Which is the Gaussian blur. 
+
+From here, for each octave, a difference of Gaussians is created to help find the keypoints of the image. The difference of Gaussians is just the difference between the consecutive Gaussians. This can be visualized in figure \ref{fig:DiffOfGauss}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.2]{DoG.png}
+    \caption{The Difference of Gaussians being created}
+    \label{fig:DiffOfGauss}
+
+\end{figure}
+
+This is used to approximate the Laplacian of Gaussians as the LoG helps find the edges of the image by blurring the image a bit and then finding the second order derivatives. It is first blurred as taking the Laplacian straight away would be sensitive to noise. However, this is computationally expensive. The Difference of Gaussians is a good approximation of the scale invariant Laplacian, $\sigma^2\nabla^2G$.
+
+From here we look for the keypoints in the image using the Difference of Gaussians. This is done by finding the local maxima and minima of the DoG. Once the extrema of the Difference of Gaussians are obtained, we need to refine the approximation of the keypoint because the actual keypoint is more likely to be between pixels. Thus, we can use a Taylor expansion around the proposed keypoint of the scale-space function $D(\sigma, x, y)$ where $\sigma$ is the blur level in the DoG. This Taylor expansion looks like:
+\[D(\mathbf{x}) = D + \frac{\partial D}{\partial \mathbf{x}}^T\mathbf{x} + \frac{1}{2}\mathbf{x^T}\frac{\partial^2 D}{\partial \mathbf{x}^2}\mathbf{x}\]
+Where $D$ is the value of $D$ at the proposed keypoint, $\mathbf{x} = (\sigma, x, y)^T$, $\frac{\partial D}{\partial \mathbf{x}}^T = (\frac{\partial D}{\partial \sigma}, \frac{\partial D}{\partial x}, \frac{\partial D}{\partial y})$. Letting this equal 0, we get that the offset from our keypoint is:
+\[\hat{\mathbf{x}} = - \frac{\partial^2 D}{\partial \mathbf{x}^2}^{-1} \frac{\partial D}{\partial \mathbf{x}}\]
+If our offset is greater than 0.5 in any dimension, then we want to try again since that means it's closer to another sample point. We keep trying again until we get an offset which is close to the sample point. We then find the value at the subpixel extrema:
+\[D(\hat{\mathbf{x}}) = D + \frac{1}{2}\frac{\partial D}{\partial \mathbf{x}}^T\hat{\mathbf{x}}\]
+And if the value of the extrema is less than $0.03 \times 255$, then we throw it out since it is an unstable extrema and has low contrast. 
+
+Furthermore, we also eliminate any keypoints that are potentially on an edge. We can do this by looking at the Hessian of the keypoint. We have that the Hessian is:
+\[\mathbf{H} = \begin{bmatrix}
+        D_{xx} & D_{xy}\\
+        D_{yx} & D_{yy}
+    \end{bmatrix}\]
+To determine whether something is a corner, we care about the eigenvalues of $\mathbf{H}$, or more specifically, the ratio between the eigenvalues. Using the trace and determinant of $\mathbf{H}$, we can find that:
+\[\frac{\text{Tr}(\mathbf{H})^2}{\text{Det}(\mathbf{H})} = \frac{(r+1)^2}{r}\]
+Where $r$ is the ratio of the eigenvalues. Thus, letting the maximum ratio that the eigenvalues are allowed to be at be $r_0 = 10$, we just need to find if:
+\[\frac{\text{Tr}(\mathbf{H})^2}{\text{Det}(\mathbf{H})} < \frac{(r_0+1)^2}{r_0}\]
+If it is, then this is a proper keypoint. If it isn't then this is an edge so we can discard it. 
+
+We now have each of the keypoints which are scale-invariant so we need to make it rotation-invariant as well. This is done by assigning an orientation to the keypoints. A neighborhood is taken around the keypoint in which the gradient is obtained for each pixel in the area and a histogram of these gradients is created based on the angle, this time in bins of $0$ to $10$, 10 to 20, etc. until 350 to 360. The peak in this histogram is calculated and taken and any peak above 80\% of it is also considered to calculate the orientation. 
+
+Now, for each keypoint, we have the location, scale and orientation so we can finally create the descriptor. A $16 \times 16$ window is obtained around the keypoint and divided into 16 blocks. For each block, a histogram of the gradients is taken with 8 bins which are then appended together which gives a 128-dimensional vector for the keypoint. The SIFT descriptor of the image is then the vectors for each keypoint appended together to create a $128n$-dimensional vector where $n$ is the number of keypoints in the image. 
 % Talk about the difference between actual implementation in Implementation 
 
 The actual implementation of SIFT that is used differs from the original version which is talked about in section \ref{sec:SIFTImpl}.
@@ -336,7 +378,7 @@ There are 5 configurations of the network, which have varying depth and, as a re
     \label{fig:VGGArch}
 \end{figure}
 
-By training this model on the ImageNet dataset, the model is able to get a top-5 classification error of 7.5\%, which means that for 7.4\% of the entries in the test set, none of the top 5 classes that the image could be were the actual image. 
+By training this model on the ImageNet dataset, the model is able to get a top-5 classification error of 7.5\%, which means that for 7.5\% of the entries in the test set, none of the top 5 classes that the image could be were the actual image. 
 
 However, in order to use the model for face description, we must change the output layer and the training dataset \cite{VGGFace}. Instead of training on general objects in an image, we train the model on faces, specifically celebrity faces. 
 The celebrities are curated to a list of 2622 people in which 2000 images are obtained for each celebrity and the images are then curated. The curated set of images constitutes the training set for the VGG model for faces. 
