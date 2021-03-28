@@ -12,6 +12,7 @@
 \DeclarePairedDelimiter\paren{\lparen}{\rparen}
 \DeclarePairedDelimiter\bracks{\lbrack}{\rbrack}
 \usepackage{xcolor}
+\usepackage[edges]{forest}
 % \usepackage{docmute}   % only needed to allow inclusion of proposal.tex
 
 \raggedbottom                           % try to avoid widows and orphans
@@ -72,6 +73,7 @@ College:            & \bf St John's College                     \\
 Project Title:      & \bf Kin Recognition Using Weighted Graph Embeddings \\
 Examination:        & \bf Computer Science Tripos -- Part II, June 2021  \\
 Word Count:         & \bf TBA  \\ % TODO: Change
+Line Count:         & \bf TBA  \\ % TODO: Change
 Project Originator: & \bf The Dissertation Author                   \\
 Supervisor:         & \bf Daniel Bates                    \\ 
 \end{tabular}
@@ -188,7 +190,7 @@ As such, given an image we want the descriptor of, we must first convert it to g
 
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.2]{Lbp_neighbors.png}
+    \includegraphics[scale=0.2]{Prep/Lbp_neighbors.png}
     \caption{Potential neighborhoods of the pixel}
     \label{fig:LBPNeighborhood}
 \end{figure}
@@ -201,7 +203,7 @@ Applying this to figure \ref{fig:LBPExample}, we get that our LBP value for this
 
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.75]{LBPExample.png}
+    \includegraphics[scale=0.75]{Prep/LBPExample.png}
     \caption{Example of LBP operator on a pixel}
     \label{fig:LBPExample}
 \end{figure}
@@ -299,7 +301,7 @@ We can see an example of this in figure \ref{fig:HOGHistoVisual}.
 
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.5]{HOGHisto.png}
+    \includegraphics[scale=0.5]{Prep/HOGHisto.png}
     \caption{Creating a histogram for a block of the image}
     \label{fig:HOGHistoVisual}
 \end{figure}
@@ -308,7 +310,7 @@ In other words, the closer the angle is to the label, the more of the magnitude 
 
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.5]{HOGHistoCirc.png}
+    \includegraphics[scale=0.5]{Prep/HOGHistoCirc.png}
     \caption{What happens in the case where $\phi_1 = 160$ and $\phi_2 = 180$}
     \label{fig:HOGHistoVisualCirc}
 \end{figure}
@@ -332,7 +334,7 @@ From here, for each octave, a difference of Gaussians is created to help find th
 
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.2]{DoG.png}
+    \includegraphics[scale=0.2]{Prep/DoG.png}
     \caption{The Difference of Gaussians being created}
     \label{fig:DiffOfGauss}
 
@@ -373,8 +375,8 @@ There are 5 configurations of the network, which have varying depth and, as a re
 
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.5]{VGGArch.png} 
-    \caption{The different configurations that VGG can have}
+    \includegraphics[scale=0.65]{Prep/VGGArch.png} 
+    \caption{The different configurations that VGG can have. Image Reproduced from Simonyan et. al (2015) \cite{VGG}}
     \label{fig:VGGArch}
 \end{figure}
 
@@ -385,10 +387,8 @@ The celebrities are curated to a list of 2622 people in which 2000 images are ob
 
 The VGG model for faces is then the model described above with the softmax layer having dimension of 2622. The model is then trained with the dataset we described which allows us to get rid of the softmax layer and use the output of the last fully-connected layer as our 4096-dimensional face descriptor for the image. 
 
-% \subsection{CifarNet}
-
 \section{Metric Learning}
-% Have section on what metric learning is and another paragraph or so to tie it in with the project
+% TODO: Have section on what metric learning is and another paragraph or so to tie it in with the project
 
 We wish to measure the similarity between a pair of faces in order to determine whether they are related or not. One way to approach this is to use similarity learning, which is a type of approach to the problem in which the goal is to learn a similarity function in order to measure how similar two objects are. 
 However, we often use distance to help measure the similarity between data points. By learning what this distance function ought to be, we would be able to find a better similarity function so finding this distance function is the goal of metric learning \cite{metricLearningPrimer}. To go more in depth, we must first define a few concepts.
@@ -420,7 +420,7 @@ We can visualize this in figure \ref{fig:MetricLearning}.
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.75]{MetricLearning.png}
+    \includegraphics[scale=0.65]{Prep/MetricLearningEx.eps}
     \caption{How metric learning works at a high-level view}
     \label{fig:MetricLearning}
 \end{figure}
@@ -440,7 +440,7 @@ Principle Component Analysis (PCA) \cite{PCA} is a statistical tool that we can 
 
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.5]{PCAComps.jpeg}
+    \includegraphics[scale=0.5]{Prep/PCAComps.jpeg}
     \caption{Principle components of an arbitrary 2 dimensional dataset}
     \label{fig:PCA}
 \end{figure}
@@ -478,7 +478,7 @@ Which is a $p \times k$ matrix. Thus, to reduce the dimensions of the original d
 In which the $i$th row of $\mathbf{T}$ corresponds with the $i$th observation of $\mathbf{X}$ and this vector has is $k$-dimensional where $k \leq p$. 
 \section{Requirements Analysis} \label{sec:ReqAnal}
 
-The main requirement of the project is stated in \ref{chapter:Proposal} which is to replicate the results from Liang et al. (2019) \cite{WGEML} within a $15\%$ error range or to reject the results. In other words, the project should implement the Weighted Graph Embedding-Based Metric Learning (WGEML) algorithm for Kin Recognition. 
+The main requirement of the project is stated in Appendix \ref{chapter:Proposal} which is to replicate the results from Liang et al. (2019) \cite{WGEML} within a $15\%$ error range or to reject the results. In other words, the project should implement the Weighted Graph Embedding-Based Metric Learning (WGEML) algorithm for Kin Recognition. 
 The core project can be broken down into the following requirements:
 \begin{itemize}
     \item \textbf{Face Detection}: Given an image, the faces in the image must be identified and saved as a $64 \times 64$ image on disk. 
@@ -553,7 +553,43 @@ Furthermore, I am able to use VGG for non-commercial purposes under the Creative
 
 \chapter{Implementation} \label{chapter:Implementation}
 
+In this chapter, 
+
 \section{Repository Overview}
+
+Hi 
+
+\begin{figure}[h]
+    \begin{forest}
+        for tree={%
+          folder,
+          grow'=0,
+          fit=band,
+        }
+        [KinRecognitionWGEML
+          [data
+          ]
+          [out
+            [ablation\_studies]
+            [pairwise\_accs]
+          ]
+          [src
+            [face\_descriptors]
+            [face\_detection]
+            [prediction]
+            [scripts]
+            [test]
+            [WGEML]
+          ]
+          [venv]
+          [.coveragerc]
+          [.gitignore]
+          [Makefile]
+          [README.md]
+          [requirements.txt]
+        ]
+      \end{forest}    
+\end{figure}  
 
 \section{Overview of Workflow}
 
