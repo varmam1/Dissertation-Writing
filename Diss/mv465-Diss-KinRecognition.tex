@@ -73,7 +73,7 @@ College:            & \bf St John's College                     \\
 Project Title:      & \bf Kin Recognition Using Weighted Graph Embeddings \\
 Examination:        & \bf Computer Science Tripos -- Part II, June 2021  \\
 Word Count:         & \bf TBA  \\ % TODO: Change
-Line Count:         & \bf TBA  \\ % TODO: Change
+Line Count:         & \bf 2907  \\ % TODO: Change
 Project Originator: & \bf The Dissertation Author                   \\
 Supervisor:         & \bf Daniel Bates                    \\ 
 \end{tabular}
@@ -421,7 +421,7 @@ We can visualize this in figure \ref{fig:MetricLearning}.
 \begin{figure}[ht]
     \centering
     \includegraphics[scale=0.65]{Prep/MetricLearningEx.eps}
-    \caption{How metric learning works at a high-level view}
+    \caption{A high-level view of metric learning}
     \label{fig:MetricLearning}
 \end{figure}
 
@@ -553,53 +553,90 @@ Furthermore, I am able to use VGG for non-commercial purposes under the Creative
 
 \chapter{Implementation} \label{chapter:Implementation}
 
-In this chapter, 
+In this chapter, the repository is examined in detail in section \ref{sec:RepositoryOverview}, how the project is run from end-to-end is discussed in section \ref{sec:Workflow}, 
+and each of the modules are discussed in sections \ref{sec:FDModule}, \ref{sec:WGEMLModule}, \ref{sec:PredictionModule}, and \ref{sec:DataPrep}. Finally, the extension to replace VGG with another face descriptor is discussed in section \ref{sec:CFNExt}.
 
-\section{Repository Overview}
+\section{Repository Overview} \label{sec:RepositoryOverview}
 
-Hi 
+The repository is shown in Figure \ref{fig:RepoOverview}
 
 \begin{figure}[h]
-    \begin{forest}
-        for tree={%
-          folder,
-          grow'=0,
-          fit=band,
-        }
-        [KinRecognitionWGEML
-          [data
-          ]
-          [out
-            [ablation\_studies]
-            [pairwise\_accs]
-          ]
-          [src
-            [face\_descriptors]
-            [face\_detection]
-            [prediction]
-            [scripts]
-            [test]
-            [WGEML]
-          ]
-          [venv]
-          [.coveragerc]
-          [.gitignore]
-          [Makefile]
-          [README.md]
-          [requirements.txt]
-        ]
-      \end{forest}    
+    % \begin{forest}
+    %     for tree={%
+    %       folder,
+    %       grow'=0,
+    %       fit=band,
+    %     }
+    %     [KinRecognitionWGEML
+    %       [data
+    %       ]
+    %       [out
+    %         [ablation\_studies]
+    %         [pairwise\_accs]
+    %       ]
+    %       [src
+    %         [data\_preparation
+    %             % [\_\_init\_\_.py]
+    %             [PCA.py]
+    %             [prep\_cross\_valid.py]
+    %             [properly\_formatted\_inputs.py]
+    %             [save\_and\_load.py]
+    %         ]
+    %         [face\_descriptors
+    %             % [\_\_init\_\_.py]
+    %             [CifarNet.py]
+    %             [HOG.py]
+    %             [LBP.py]
+    %             [SIFT.py]
+    %             [VGG.py]
+    %         ]
+    %         [face\_detection
+    %             % [\_\_init\_\_.py]
+    %             [face\_detection.py]
+    %         ]
+    %         [prediction
+    %             % [\_\_init\_\_.py]
+    %             [predictor.py]
+    %         ]
+    %         [scripts
+    %             % [\_\_init\_\_.py]
+    %             [ablation\_study.py]
+    %             [preprocessing\_fds.py]
+    %             [preprocessing\_TSK.py]
+    %             [testing.py]
+    %             [training.py]
+    %             [get\_pairwise\_accuracies.py]
+    %         ]
+    %         [test]
+    %         [WGEML
+    %             % [\_\_init\_\_.py]
+    %             [constants.py]
+    %             [WGEML\_training.py]
+    %         ]
+    %       ]
+    %       [venv]
+    %       [.coveragerc]
+    %       [.gitignore]
+    %       [Makefile]
+    %       [README.md]
+    %       [requirements.txt]
+    %     ]
+    %   \end{forest}    
+    \caption{Folder Structure of the project}
+    \label{fig:RepoOverview}
 \end{figure}  
 
-\section{Overview of Workflow}
+\section{Face Descriptors} \label{sec:FDModule}
 
-\section{Face Descriptors} \label{sec:SIFTImpl}
+\subsection{SIFT Implementation} \label{sec:SIFTImpl}
 
-\section{WGEML}
+\subsection{VGG Implementation} \label{sec:VGGImpl}
 
-\section{Prediction}
+\section{WGEML} \label{sec:WGEMLModule}
 
-\section{Data Preparation}
+\section{Prediction} \label{sec:PredictionModule}
+
+\section{Data Preparation} \label{sec:DataPrep}
 
 \subsection{Cross-Validation}
 
@@ -607,7 +644,51 @@ Hi
 
 \subsection{PCA}
 
+In order to save on computation time for the training process as well as on disk space, PCA is used in order to reduce the dimensions of each of the face descriptors. In the implementation, after each image had its face descriptors obtained for a dataset, for each type of face descriptor, PCA is done to reduce the dimensions to $100$. 
+
 \subsection{Saving Results to Disk}
+
+\section{Overview of Workflow} \label{sec:Workflow}
+
+There are 3 main stages to running the project, which are, for each dataset, the preprocessing stage, the training stage and then the testing stage. The important outputs of each of these stages are saved onto disk so that each stage doesn't have to be run right after another. 
+
+\subsection{Preprocessing}
+
+Given a dataset, 
+
+\begin{figure}[h]
+    
+    \caption{The preprocessing pipeline}
+    \label{fig:PreprocessingPipeline}
+\end{figure}
+\subsection{Training}
+
+Once all of the face descriptors for each dataset is computed and, for each relationship in the dataset and for each setting (restricted or unrestricted), the cross-validation folds are created, the training set is properly made from the data and WGEML, which is described in section \ref{sec:WGEMLModule}, is run. The output of 
+WGEML is then saved onto disk, which are the metrics and weights for each face descriptor for each fold. In the end, this is done for each relationship, setting and fold, so for KinFaceW-I, for example, there would be $4 \times 2 \times 5 = 40$ models saved. 
+
+\begin{figure}[h]
+    
+    \caption{The training pipeline}
+    \label{fig:TrainingPipeline}
+\end{figure}
+
+\subsection{Testing}
+
+Given a dataset, setting and relationship, the folds and the corresponding models are loaded from on disk and, for each test set, the corresponding model is used to predict whether the images in the test set are of the given relationship or not. The accuracy is then recorded and 
+the average accuracy is outputted for the given configuration along with each of the individual accuracies, as shown in Figure \ref{fig:OutputOfTesting}. 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.9]{Implementation/TrainingOutput.png}
+    \caption{A sample output of the testing stage on KinFaceW-I unrestricted}
+    \label{fig:OutputOfTesting}
+\end{figure}
+
+\begin{figure}[h]
+    
+    \caption{The testing pipeline}
+    \label{fig:TestingPipeline}
+\end{figure}
 
 \section{CifarNet Extension} \label{sec:CFNExt}
 
