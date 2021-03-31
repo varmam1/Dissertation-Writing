@@ -10,8 +10,10 @@
 \usepackage{dirtree}
 \usepackage{mathtools}
 \DeclarePairedDelimiter\paren{\lparen}{\rparen}
-\DeclarePairedDelimiter\bracks{\lbrack}{\rbrack}
+\DeclarePairedDelimiter\bracks{\l   brack}{\rbrack}
 \usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows,positioning,shapes.geometric}
 \usepackage[edges]{forest}
 % \usepackage{docmute}   % only needed to allow inclusion of proposal.tex
 
@@ -387,7 +389,7 @@ The celebrities are curated to a list of 2622 people in which 2000 images are ob
 
 The VGG model for faces is then the model described above with the softmax layer having dimension of 2622. The model is then trained with the dataset we described which allows us to get rid of the softmax layer and use the output of the last fully-connected layer as our 4096-dimensional face descriptor for the image. 
 
-\section{Metric Learning}
+\section{Metric Learning} \label{sec:MetricLearningPrimer}
 % TODO: Have section on what metric learning is and another paragraph or so to tie it in with the project
 
 We wish to measure the similarity between a pair of faces in order to determine whether they are related or not. One way to approach this is to use similarity learning, which is a type of approach to the problem in which the goal is to learn a similarity function in order to measure how similar two objects are. 
@@ -434,7 +436,7 @@ Aside from the main algorithms that will be used which were described earlier, a
 
 K-Nearest Neighbors is an algorithm that finds the $K$ nearest neighbors for each datum in a given set of data. Given a list of datapoints in Euclidean space, we wish to find, for each datapoint, the $K$ closest datapoints to it. 
 
-\subsection{Principle Component Analysis}
+\subsection{Principle Component Analysis} \label{sec:PCA}
 
 Principle Component Analysis (PCA) \cite{PCA} is a statistical tool that we can use to reduce the dimensionality of a dataset while maintaining as much of the variability as possible. The algorithm identifies \textit{principle components} which are the directions of maximum variance in the dataset, which can be visualized in figure \ref{fig:PCA}.
 
@@ -626,27 +628,72 @@ The repository is shown in Figure \ref{fig:RepoOverview}
     \label{fig:RepoOverview}
 \end{figure}  
 
+\section{Data Preparation} \label{sec:DataPrep}
+
+\subsection{Cross-Validation}
+
+We split the datasets for each relationship into 5 folds each in which each fold within a relationship has around the same amount of pairs. 
+Each training set composed of $4$ of the folds and the last fold was designated as the test set, which composed of 5 training/testing set combinations.
+For the KinFaceW datasets, as the images were already split into folds by the dataset, that was used in the project, whereas with TSKinFace, it had to be generated randomly. 
+
+\subsection{Positive and Negative Pairs}
+
+Within each dataset, there are pairs of images which either have the kin relationship or don't, which we call positive and negative pairs respectively. 
+
+KinFaceW had these negative and positive pairs prepared in the \texttt{mat} files that came with the dataset. However, as TSKinFace only came with the images, only the positive images could be found from them. Thus, negative pairs for the dataset had to be created
+randomly. For each relationship, the number of negative pairs was set to be equal to the number of positive pairs in the corresponding set, which was 404 for the training set and 101 for the test set. Then, an two images were picked out randomly such that they didn't belong to the same positive pair.
+
+Finally, each of the KinFaceW datasets had a setting, restricted or unrestricted, in which the restricted setting meant that no negative pairs are used in the training splits and unrestricted means that they are used \cite{KinFaceCitation1}.
+TSKinFace didn't have this type of setting, however, but the differences in whether negative pairs were or weren't used in the training process was still explored. 
+
+\subsection{PCA}
+
+In order to save on computation time for the training process as well as on disk space, PCA is used in order to reduce the dimensions of each of the face descriptors. In the implementation, after each image had its face descriptors obtained for a dataset, for each type of face descriptor, PCA is used to reduce the dimensions to $100$ through the method defined in Section \ref{sec:PCA}. 
+
+\subsection{Saving Results to Disk}
+
+Running the project end-to-end each time would take too long each time and, in order to better explore some of the results that were taken, the pipeline needed to be split into modules. This ended up being the preprocessing stage, the training stage and then the testing stage. These stages are explained in further detail in section \ref{sec:Workflow}. 
+What was saved to disk is as follows, split by stage:
+
+\begin{enumerate}
+    \item \textit{Preprocessing}: \
+    \begin{itemize}
+        \item \textbf{Face Descriptors}: Under the corresponding dataset folder in the data folder, the each face descriptor for each image is stored as a pickle file which contains a map from the image name to the PCA reduced face descriptor. The files are split up by face descriptor type so \texttt{VGG\_face\_descriptors.pkl} would correspond to the VGG face descriptors of each image. 
+        \item \textbf{TSKinFace Splits and Negative Pairs}: Since the TSKinFace splits and negative pairs are created randomly and both are used in the training and testing step, it is imperative that these are saved on disk since trying to recompute them would result in different splits and negative pairs. 
+    \end{itemize}
+    \item \textit{Training}: \
+    \begin{itemize}
+        \item \textbf{WGEML Output}: The output of the training is saved on disk for each fold of the relationship. It is saved to the \texttt{data} folder under the corresponding dataset and setting. Each file is called \texttt{[relationship]\_out.pkl} which is under the folder path \texttt{data/[dataset]/WGEML\_out/[setting]/[relationship]\_out.pkl}.
+    \end{itemize}
+    \item \textit{Testing}: \
+    \begin{itemize}
+        \item \textbf{Ablation Studies Results}: The accuracies obtained from the ablation studies are stored in a CSV for each dataset and setting configuration which is stored in the path 
+        \texttt{out/ablation\_studies/[dataset]\_[setting].csv}. 
+        \item \textbf{Pairwise Accuracies}: Similarly, the accuracies obtained from changing which dataset the test data comes from for each model is saved as a CSV to the path \texttt{out/pairwise\_accs/[dataset]\_[setting].csv}.
+    \end{itemize}
+\end{enumerate}
+
 \section{Face Descriptors} \label{sec:FDModule}
 
 \subsection{SIFT Implementation} \label{sec:SIFTImpl}
 
 \subsection{VGG Implementation} \label{sec:VGGImpl}
 
+\subsection{CifarNet Extension} \label{sec:CFNExt}
+
 \section{WGEML} \label{sec:WGEMLModule}
 
 \section{Prediction} \label{sec:PredictionModule}
 
-\section{Data Preparation} \label{sec:DataPrep}
+Given the matrices $U_p$ and weights $w_p$ from WGEML for all face descriptors where $U_p$ corresponds to the $p$'th face descriptor, we can use this to predict whether a given pair of images are of the kin relationship specified. 
+First, we transform each of the faces into their $M$ face descriptors and use PCA to reduce the dimensions to the proper dimensionality. We then have $\mathbf{x} = \{x_p \mid 1 \leq p \leq M\}$ and $\mathbf{y} = \{y_p \mid 1 \leq p \leq M\}$.
+Then, the similarity of these images can be calculated as follows, letting $A_p = U_pU_p^T$:
 
-\subsection{Cross-Validation}
+\[sim(\mathbf{x}, \mathbf{y}) = \sum_{p = 1}^{M} \frac{w_p}{2} \paren*{\frac{x_p^TA_py_p}{\sqrt{x_p^TA_px_p}\sqrt{y_p^TA_py_p}} + 1}\]
 
-\subsection{Positive and Negative Pairs}
-
-\subsection{PCA}
-
-In order to save on computation time for the training process as well as on disk space, PCA is used in order to reduce the dimensions of each of the face descriptors. In the implementation, after each image had its face descriptors obtained for a dataset, for each type of face descriptor, PCA is done to reduce the dimensions to $100$. 
-
-\subsection{Saving Results to Disk}
+This ends up finding a weighted cosine similarity for a non-Euclidean space, since our metric here is $A_p$, for each face descriptor that is used. The function $sim$ ranges from $0$ to $1$ as needed of a similarity function. 
+In order to then determine whether two images are of the kin relationship specified, the similarity must then be compared to a threshold, $\theta$. If $sim(\mathbf{x}, \mathbf{y}) \geq \theta$, then the pair is labelled as having that relationship and, otherwise, it isn't.
+As this value $\theta$ wasn't mentioned in \cite{WGEML}, it had to be found experimentally. By ranging over samples from $0$ to $1$, it was found that $\theta = 0.6$ yielded the best results for the accuracies and seemed the most similar to what the original paper had. 
 
 \section{Overview of Workflow} \label{sec:Workflow}
 
@@ -657,7 +704,38 @@ There are 3 main stages to running the project, which are, for each dataset, the
 Given a dataset, 
 
 \begin{figure}[h]
-    
+    \centering
+    \begin{tikzpicture}[>=latex']
+        \tikzset{block/.style= {draw, rectangle, align=center,minimum width=2cm,minimum height=1cm},
+        rblock/.style={draw, shape=rectangle,rounded corners=1.5em,align=center,minimum width=2cm,minimum height=1cm},
+        input/.style={ % requires library shapes.geometric
+        draw,
+        trapezium,
+        trapezium left angle=60,
+        trapezium right angle=120,
+        minimum width=2cm,
+        align=center,
+        minimum height=1cm
+    },
+        }
+        \node [rblock]  (start) {Start: \\ Take dataset name \\as input};
+        \node [block, right =0.75cm of start] (FDs) {Obtain Face \\ Descriptors};
+        \node [block, right =0.75cm of FDs] (PCA) {Use PCA to \\ Reduce the \\ Face Descriptor \\Dimensions};
+        \node [block, right =0.75cm of PCA] (Save1) {Save Face \\ Descriptors to \\ Disk};
+        \node [block, below right =2cm and -0.5cm of start] (TSKCV) {If dataset is \\ TSKinFace, \\ compute folds and \\ negative pairs};
+        \node [block, right =2cm of TSKCV] (Save2) {Save folds \\ and negative \\ pairs to disk};
+        \node [coordinate, below right =1cm and 0.5cm of Save1] (right) {};  %% Coordinate on right and middle
+        \node [coordinate,above left =1cm and 0.5cm of TSKCV] (left) {};  %% Coordinate on left and middle
+
+%% paths
+        \path[draw,->] (start) edge (FDs)
+                    (FDs) edge (PCA)
+                    (PCA) edge (Save1)
+                    (Save1.east) -| (right) -- (left)|- (TSKCV)
+                    (TSKCV) edge (Save2)
+                    ;
+    \end{tikzpicture}
+
     \caption{The preprocessing pipeline}
     \label{fig:PreprocessingPipeline}
 \end{figure}
@@ -667,7 +745,35 @@ Once all of the face descriptors for each dataset is computed and, for each rela
 WGEML is then saved onto disk, which are the metrics and weights for each face descriptor for each fold. In the end, this is done for each relationship, setting and fold, so for KinFaceW-I, for example, there would be $4 \times 2 \times 5 = 40$ models saved. 
 
 \begin{figure}[h]
-    
+    \centering
+    \begin{tikzpicture}[>=latex']
+        \tikzset{block/.style= {draw, rectangle, align=center,minimum width=2cm,minimum height=1cm},
+        rblock/.style={draw, shape=rectangle,rounded corners=1.5em,align=center,minimum width=2cm,minimum height=1cm},
+        input/.style={ % requires library shapes.geometric
+        draw,
+        trapezium,
+        trapezium left angle=60,
+        trapezium right angle=120,
+        minimum width=2cm,
+        align=center,
+        minimum height=1cm
+    },
+        }
+        \node [rblock]  (start) {Start: \\ Take dataset name \\ setting and relationship \\as input};
+        \node [block, right =0.75cm of start] (Load) {Load Face \\ Descriptors and \\ folds from disk};
+        \node [block, right =0.75cm of Load] (Format) {Format the inputs \\ for WGEML};
+        \node [block, right =0.75cm of Format] (WGEML) {Run WGEML \\ for each fold};
+        \node [block, below right =1cm and 0.75cm of start] (Save) {Save output of each WGEML on disk};
+        \node [coordinate, below right =1cm and 0.5cm of WGEML] (right) {};  %% Coordinate on right and middle
+        \node [coordinate, above left=0.5cm and 0.5cm of Save] (left) {};  %% Coordinate on left and middle
+
+%% paths
+        \path[draw,->] (start) edge (Load)
+                    (Load) edge (Format)
+                    (Format) edge (WGEML)
+                    (WGEML.east) -| (right) -- (left)|- (Save)
+                    ;
+    \end{tikzpicture}
     \caption{The training pipeline}
     \label{fig:TrainingPipeline}
 \end{figure}
@@ -685,12 +791,39 @@ the average accuracy is outputted for the given configuration along with each of
 \end{figure}
 
 \begin{figure}[h]
-    
+    \centering
+    \begin{tikzpicture}[>=latex']
+        \tikzset{block/.style= {draw, rectangle, align=center,minimum width=2cm,minimum height=1cm},
+        rblock/.style={draw, shape=rectangle,rounded corners=1.5em,align=center,minimum width=2cm,minimum height=1cm},
+        input/.style={ % requires library shapes.geometric
+        draw,
+        trapezium,
+        trapezium left angle=60,
+        trapezium right angle=120,
+        minimum width=2cm,
+        align=center,
+        minimum height=1cm
+    },
+        }
+        \node [rblock]  (start) {Start: \\ Take dataset name \\ setting and relationship \\as input};
+        \node [block, right =0.75cm of start] (Load) {Load Face \\ Descriptors, \\ folds and \\ models from disk};
+        \node [block, right =0.75cm of Load] (Predict) {Run prediction \\ for each pair \\ in each fold};
+        \node [block, right =0.75cm of Predict] (Accs) {Obtain accuracies \\ for each fold};
+        \node [block, below right =1cm and 0.25cm of start] (Out) {Output accuracies for each fold and mean accuracy};
+        \node [coordinate, below right =1.1cm and 0.5cm of Accs] (right) {};  %% Coordinate on right and middle
+        \node [coordinate, above left=0.5cm and 0.5cm of Out] (left) {};  %% Coordinate on left and middle
+
+%% paths
+        \path[draw,->] (start) edge (Load)
+                    (Load) edge (Predict)
+                    (Predict) edge (Accs)
+                    (Accs.east) -| (right) -- (left)|- (Out)
+                    ;
+    \end{tikzpicture}
+
     \caption{The testing pipeline}
     \label{fig:TestingPipeline}
 \end{figure}
-
-\section{CifarNet Extension} \label{sec:CFNExt}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%% Evaluation %%%%%%%%%%%
