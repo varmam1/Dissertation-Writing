@@ -15,6 +15,8 @@
 \usepackage{tikz}
 \usetikzlibrary{arrows,positioning,shapes.geometric}
 \usepackage[edges]{forest}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
 % \usepackage{docmute}   % only needed to allow inclusion of proposal.tex
 
 \raggedbottom                           % try to avoid widows and orphans
@@ -179,7 +181,7 @@ Face detection is the task of finding a face within a given image and returning 
     \label{fig:FaceDetEx}
 \end{figure}
 
-\section{Face Descriptors}
+\section{Face Descriptors} \label{sec:PrepFD}
 
 We wish to be able to create a mapping from a colored image into a vector to make computations easier and to be able to determine similarity between images, which we do using the distance. These are called image descriptors for general images. When we try and map face images to vectors, we call these face descriptors. 
 We want these face descriptor mappings to be able to match the same person in different poses and illuminant geometries to face descriptors that are close to each other in distance. Thus, these mappings try and capture color, texture, and shapes,
@@ -321,7 +323,7 @@ We can do this for each pixel in the block and, thus, we are able to get a $9$-d
 In the project, the image is split up into $16 \times 16$ blocks of size $4 \times 4$ first and then $8 \times 8$ blocks of size $8 \times 8$ next and each of these blocks contributes a histogram to the overall vector which leads us with a face descriptor with dimension:
 \[16 \times 16 \times 9 + 8 \times 8 \times 9 = 2880\]
 
-\subsection{Scale-Invariant Feature Transform}
+\subsection{Scale-Invariant Feature Transform} \label{sec:SIFTPrep}
 
 SIFT \cite{SIFT} is another way of obtaining face descriptors, although the original SIFT algorithm differs from how it is used in the project, though it is still important to briefly go over. 
 
@@ -436,14 +438,14 @@ Aside from the main algorithms that will be used which were described earlier, a
 
 K-Nearest Neighbors is an algorithm that finds the $K$ nearest neighbors for each datum in a given set of data. Given a list of datapoints in Euclidean space, we wish to find, for each datapoint, the $K$ closest datapoints to it. 
 
-\subsection{Principle Component Analysis} \label{sec:PCA}
+\subsection{Principal Component Analysis} \label{sec:PCA}
 
-Principle Component Analysis (PCA) \cite{PCA} is a statistical tool that we can use to reduce the dimensionality of a dataset while maintaining as much of the variability as possible. The algorithm identifies \textit{principle components} which are the directions of maximum variance in the dataset, which can be visualized in figure \ref{fig:PCA}.
+Principal Component Analysis (PCA) \cite{PCA} is a statistical tool that we can use to reduce the dimensionality of a dataset while maintaining as much of the variability as possible. The algorithm identifies \textit{principal components} which are the directions of maximum variance in the dataset, which can be visualized in figure \ref{fig:PCA}.
 
 \begin{figure}[h]
     \centering
     \includegraphics[scale=0.5]{Prep/PCAComps.jpeg}
-    \caption{Principle components of an arbitrary 2 dimensional dataset}
+    \caption{Principal components of an arbitrary 2 dimensional dataset}
     \label{fig:PCA}
 \end{figure}
 
@@ -466,8 +468,8 @@ Since we have that the mean of both are $0$ now, after standardization. Thus:
 
 \[\Sigma = \frac{1}{N} \mathbf{X'}\mathbf{X'}^T\]
 
-We then find the eigenvalues and eigenvectors of $\Sigma$, of which we get $p$ of them. The eigenvalues get sorted from largest to smallest and, thus, the first principle component is the eigenvector that corresponds to the largest eigenvalue, the second principle component is the eigenvector with the second largest eigenvalue, etc. 
-Denoting $\mathbf{w_i}$ as the $i$th principle component, we can make the matrix $\mathbf{W}$ as:
+We then find the eigenvalues and eigenvectors of $\Sigma$, of which we get $p$ of them. The eigenvalues get sorted from largest to smallest and, thus, the first principal component is the eigenvector that corresponds to the largest eigenvalue, the second principal component is the eigenvector with the second largest eigenvalue, etc. 
+Denoting $\mathbf{w_i}$ as the $i$th principal component, we can make the matrix $\mathbf{W}$ as:
 
 \[\mathbf{W} = \begin{bmatrix}
     \mathbf{w_1} & ... & \mathbf{w_k}
@@ -675,13 +677,105 @@ What was saved to disk is as follows, split by stage:
 
 \section{Face Descriptors} \label{sec:FDModule}
 
+Each of the LBP and HOG face descriptors were implemented exactly as mentioned in section \ref{sec:PrepFD} directly without the use of any libraries other than Numpy and OpenCV. However, 
+
 \subsection{SIFT Implementation} \label{sec:SIFTImpl}
 
+The major difference between the original version of SIFT described in \cite{SIFT} and what was needed was that keypoints of each image weren't calculated. 
+Instead, the descriptor that was obtained from each keypoint, which is described in section \ref{sec:SIFTPrep}, is instead obtained from dividing the image into $7 \times 7$ overlapping
+patches on a $16 \times 16$ grid as shown in figure \ref{fig:Patches}.
+
+\begin{figure}[h]
+    
+    % TODO: Change caption and provide an image to show what the overlapping patches look like
+    \caption{The overlapping patches}
+    \label{fig:Patches}
+\end{figure}
+% Describe differences
+This leads to there being a 128-dimensional vector for each patch which leads to a $128 \times 7 \times 7 = 6272$-dimensional vector for each image. This also helps to standardize the dimension of the vector for each image
+as different images can have a different number of keypoints which would lead to different dimensionalities of the vectors. 
+
+Due to the differences, this version of SIFT had to be implemented directly rather than using a library function like OpenCV's SIFT implementation. 
+
 \subsection{VGG Implementation} \label{sec:VGGImpl}
+
+The original VGG network that was trained on ImageNet had 138 million parameters \cite{VGG} which would then increase if we were to increase the number of outputs of the softmax layer for the face network. This would take too long to train in practice and 
+the pretrained weights were uploaded to their site\footnote{\url{https://www.robots.ox.ac.uk/~vgg/software/vgg_face/}}. Therefore, it was easier to download the weights from the website and reformat it as needed. 
+
+Firstly, due to the fact that the weights were used 566MB, this wasn't something that could just be uploaded to GitHub. Thus, when predicting, I made sure to check if there was a weights file with a specific name in the \texttt{src/face\_descriptors} folder path. If there wasn't, then the weights would be 
+downloaded from the site. Due to the fact that I was using the Torch weights but I was implementing this in Keras, I needed to reshape a few of the fully-connected layers. For example, one layer had the shape $(7, 7, 512, 4096)$ for the weights but for Keras, it needed to be in the shape $(7\times 7\times 512, 4096)$. 
+This was easily solved by using the \texttt{np.reshape} function for each of the fully-connected layers and these slightly modified weights were saved to an \texttt{h5} file on disk. 
+
+From there, the weights would be on disk so, to get a face descriptor for a set of images, I would create the VGG face model with the softmax layer, then load the weights into the model before returning the model without the softmax layer. This model then was used to get the face descriptors for the set of images given. Due to the fact that 
+VGG takes images of size $224 \times 224$, the images needed to be resized to $224 \times 224$ before it could be used as an input into the model. Thus, the model took a \texttt{numpy} array of size $(n, 224, 224, 3)$ and outputted a list of face descriptors which had size $(n, 4096)$. 
 
 \subsection{CifarNet Extension} \label{sec:CFNExt}
 
 \section{WGEML} \label{sec:WGEMLModule}
+
+The main algorithm used in the project is Weighted Graph Embedding-Based Metric Learning (WGEML) \cite{WGEML}. The algorithm is a form of metric learning which takes in, as input, a training positive set for each face descriptor, $\mathcal{S}^p = \{(\mathbf{x}_i^p, \mathbf{y}_i^p) \mid 1 \leq i \leq N\}$ where $N$ is the number of image pairs in the set and a negative pair set $\mathcal{D}^p = \{(\mathbf{x}_i^p, \mathbf{y}_j^p) \mid 1 \leq i \leq N, j \neq i\}$. Let there be $M$ face descriptors for each image in the set. 
+It also takes in a tuning parameter $r$ and a neighborhood size $K$ as input but those have been experimentally found to be 5 for each, each of which will be discussed later in this section. 
+
+\subsection{Problem}
+
+Given these inputs, the goal is to find the distance metrics and weights for:
+\begin{align*}
+d^2(\mathbf{x}_i, \mathbf{y}_i) &= \sum_{p = 1}^{M} w_p(\mathbf{x}_i^p - \mathbf{y}_i^p)^T\mathbf{A}_p(\mathbf{x}_i^p - \mathbf{y}_i^p)\\ 
+&= \sum_{p = 1}^{M} w_p d^2_{\mathbf{A}_p}(\mathbf{x}_i^p, \mathbf{y}_j^p)
+\end{align*}
+
+Where $\mathbf{x}_i^p$ represents the $p$th face descriptor of the image $\mathbf{x}_i$, $w_p$ is a weight and $\mathbf{A}_p$ is a $D \times D$ semidefinite positive matrix, where $D$ is the dimensionality of the corresponding face descriptor. This distance function finds the distance between each pair of face descriptors and weights them accordingly.
+We wish to find $\mathbf{A}_p$ such that the between-class variance is maximized and the within-class variance is minimized. This can be formalized as the optimization problem:
+
+\begin{align*}
+    \max_{\mathbf{A}, \mathbf{w}} \mathcal{F} &= \sum_{p = 1}^{M} w_p^r[(\frac{1}{2}(\frac{1}{NK}\sum_{i = 1}^{N}\sum_{n_1 = 1}^{K} d^2_{\mathbf{A}_p}(\mathbf{x}_i^p, \mathbf{y}_{in_1}^p) + \frac{1}{NK}\sum_{i = 1}^{N}\sum_{n_2 = 1}^{K} d^2_{\mathbf{A}_p}(\mathbf{x}_{in_2}^p, \mathbf{y}_i^p)) \\
+    & + \frac{1}{N} \sum_{i = 1, j \neq i}^{N} d^2_{\mathbf{A}_p}(\mathbf{x}_i^p, \mathbf{y}_j^p))/\frac{1}{N} \sum_{i = 1}^{N} d^2_{\mathbf{A}_p}(\mathbf{x}_i^p, \mathbf{y}_i^p)]
+\end{align*}
+
+\[s.t. \; \sum_{p = 1}^{M} w_p = 1\]
+\[\forall p \in \{1, ..., M\}, w_p \geq 0\]
+Where $\mathbf{y}_{in_1}^p$ is the $n_1$th nearest neighbor of $\mathbf{y}_i$ and similarly for $\mathbf{x}_{in_2}$. We have $w_p^r$ in order to avoid over-fitting and use information from each face descriptor. 
+This optimization function tries to minimizes the denominator which, in turn, pulls the samples that have the kin relationship together and maximizes the numerator which means that the pairs which don't have the kin relationship are pushed further away from each other as well as those of their neighbors.
+\subsection{Approach}
+
+Now that the problem is defined, we break down $\mathbf{A}_p = \mathbf{U}_p\mathbf{U}_p^T$ since $\mathbf{A}_p$ is symmetric and positive semidefinite. $\mathbf{U}_p$ has size $D \times d$ such that $d \ll D$. 
+Thus, the optimization problem can be rewritten as:
+
+\[\max_{\mathbf{U}, \mathbf{w}} = \sum_{p = 1}^{M} w_p^r \frac{tr[\mathbf{U}_p^T(\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p)\mathbf{U}_p]}{tr[\mathbf{U}_p^T\mathbf{S}_p\mathbf{U}_p]}\]
+Such that $\mathbf{U}_P^T \mathbf{U}_p = I$, $\sum_{p = 1}^{M} w_p = 1$ and $\forall p \in \{1, ..., M\}, w_p \geq 0$, where:
+
+\[\mathbf{S}_p = \frac{1}{N} \sum_{(\mathbf{x}_i^p, \mathbf{y}_i^p) \in \mathcal{S}^p} (\mathbf{x}_i^p - \mathbf{y}_i^p)(\mathbf{x}_i^p - \mathbf{y}_i^p)^T\]
+\[\mathbf{D}_p = \frac{1}{N} \sum_{(\mathbf{x}_i^p, \mathbf{y}_j^p) \in \mathcal{D}^p} (\mathbf{x}_i^p - \mathbf{y}_j^p)(\mathbf{x}_i^p - \mathbf{y}_j^p)^T\]
+\[\mathbf{D}_{1p} = \frac{1}{NK} \sum_{\substack{(\mathbf{x}_i^p, \mathbf{y}_i^p) \in \mathcal{S}^p \\ \mathbf{y}_k^p \in \mathcal{N}_K(\mathbf{y}_i^p)}} (\mathbf{x}_i^p - \mathbf{y}_k^p)(\mathbf{x}_i^p - \mathbf{y}_k^p)^T\] 
+\[\mathbf{D}_{2p} = \frac{1}{NK} \sum_{\substack{(\mathbf{x}_i^p, \mathbf{y}_i^p) \in \mathcal{S}^p \\ \mathbf{x}_k^p \in \mathcal{N}_K(\mathbf{x}_i^p)}} (\mathbf{x}_k^p - \mathbf{y}_i^p)(\mathbf{x}_k^p - \mathbf{y}_i^p)^T\]
+
+Where $\mathcal{N}_K(\mathbf{x}_i^p)$ represents the $K$ nearest neighbors of $\mathbf{x}_i^p$. This is when K-nearest neighbors is used and $K$ is set to 5 in the experiments.
+In order to solve this, we first let $\mathbf{w}$ be constant in order to solve $\mathbf{U}$ and then use that to find $\mathbf{w}$. By letting $\mathbf{w}$ be constant, the problem is reduced to:
+\[\max_{\mathbf{U}_P^T \mathbf{U}_p = I} = \frac{tr[\mathbf{U}_p^T(\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p)\mathbf{U}_p]}{tr[\mathbf{U}_p^T\mathbf{S}_p\mathbf{U}_p]}\]
+For each $p \in \{1, ..., M\}$. 
+
+The overall algorithm is written in psuedocode in Algorithm \ref{code:WGEMLPsuedocode} from \cite{WGEML}:
+\begin{algorithm}
+\caption{WGEML}\label{code:WGEMLPsuedocode}
+\textbf{Inputs}:
+
+\textbf{Outputs}:
+\begin{algorithmic}[1]
+\Procedure{MyProcedure}{}
+\State $\textit{stringlen} \gets \text{length of }\textit{string}$
+\State $i \gets \textit{patlen}$
+\If {$i > \textit{stringlen}$} \Return false
+\EndIf
+\State $j \gets \textit{patlen}$
+\If {$\textit{string}(i) = \textit{path}(j)$}
+\State $j \gets j-1$.
+\State $i \gets i-1$.
+\State \textbf{close};
+\EndIf
+\State $i \gets i+\max(\textit{delta}_1(\textit{string}(i)),\textit{delta}_2(j))$.
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
 
 \section{Prediction} \label{sec:PredictionModule}
 
@@ -692,6 +786,11 @@ Then, the similarity of these images can be calculated as follows, letting $A_p 
 \[sim(\mathbf{x}, \mathbf{y}) = \sum_{p = 1}^{M} \frac{w_p}{2} \paren*{\frac{x_p^TA_py_p}{\sqrt{x_p^TA_px_p}\sqrt{y_p^TA_py_p}} + 1}\]
 
 This ends up finding a weighted cosine similarity for a non-Euclidean space, since our metric here is $A_p$, for each face descriptor that is used. The function $sim$ ranges from $0$ to $1$ as needed of a similarity function. 
+This differs from the version mentioned in \cite{WGEML} which was:
+\[sim(\mathbf{x}, \mathbf{y}) = \sum_{p = 1}^{M} \frac{w_p}{2} \paren*{\frac{x_p^TU_p^TU_py_p}{\sqrt{x_p^TU_p^TU_px_p}\sqrt{y_p^TU_p^TU_py_p}} + 1}\]
+However, as mentioned in section \ref{sec:WGEMLModule}, the model was trained such that $U_p^TU_p = I$ which would make this boil down to a weighted cosine similarity which wouldn't make much use of the metric learning. 
+As such, this was changed up to use $A_p$ in the implementation rather than $U_p^TU_p$. 
+
 In order to then determine whether two images are of the kin relationship specified, the similarity must then be compared to a threshold, $\theta$. If $sim(\mathbf{x}, \mathbf{y}) \geq \theta$, then the pair is labelled as having that relationship and, otherwise, it isn't.
 As this value $\theta$ wasn't mentioned in \cite{WGEML}, it had to be found experimentally. By ranging over samples from $0$ to $1$, it was found that $\theta = 0.6$ yielded the best results for the accuracies and seemed the most similar to what the original paper had. 
 
@@ -701,7 +800,7 @@ There are 3 main stages to running the project, which are, for each dataset, the
 
 \subsection{Preprocessing}
 
-Given a dataset, 
+Given a dataset, we wish to precompute the face descriptors for each image and set up the 5-fold cross validation for TSKinFace. 
 
 \begin{figure}[h]
     \centering
@@ -763,7 +862,7 @@ WGEML is then saved onto disk, which are the metrics and weights for each face d
         \node [block, right =0.75cm of start] (Load) {Load Face \\ Descriptors and \\ folds from disk};
         \node [block, right =0.75cm of Load] (Format) {Format the inputs \\ for WGEML};
         \node [block, right =0.75cm of Format] (WGEML) {Run WGEML \\ for each fold};
-        \node [block, below right =1cm and 0.75cm of start] (Save) {Save output of each WGEML on disk};
+        \node [block, below right =1cm and 0.75cm of start] (Save) {Save output of WGEML for each fold on disk};
         \node [coordinate, below right =1cm and 0.5cm of WGEML] (right) {};  %% Coordinate on right and middle
         \node [coordinate, above left=0.5cm and 0.5cm of Save] (left) {};  %% Coordinate on left and middle
 
