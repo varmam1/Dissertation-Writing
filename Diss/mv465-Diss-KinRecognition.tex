@@ -171,7 +171,7 @@ We must first discuss what a regular neural network is before going onto what a 
 
 \subsection{Convolutional Layers}
 
-\section{Face Detection}
+\section{Face Detection} \label{sec:FaceDetection}
 
 Face detection is the task of finding a face within a given image and returning the set of faces found as seen in Figure \ref{fig:FaceDetEx}. This differs from face recognition since the task is only to find the faces and not to recognize who the faces belong to. 
 
@@ -565,70 +565,78 @@ and each of the modules are discussed in sections \ref{sec:FDModule}, \ref{sec:W
 The repository is shown in Figure \ref{fig:RepoOverview}
 
 \begin{figure}[h]
-    % \begin{forest}
-    %     for tree={%
-    %       folder,
-    %       grow'=0,
-    %       fit=band,
-    %     }
-    %     [KinRecognitionWGEML
-    %       [data
-    %       ]
-    %       [out
-    %         [ablation\_studies]
-    %         [pairwise\_accs]
-    %       ]
-    %       [src
-    %         [data\_preparation
-    %             % [\_\_init\_\_.py]
-    %             [PCA.py]
-    %             [prep\_cross\_valid.py]
-    %             [properly\_formatted\_inputs.py]
-    %             [save\_and\_load.py]
-    %         ]
-    %         [face\_descriptors
-    %             % [\_\_init\_\_.py]
-    %             [CifarNet.py]
-    %             [HOG.py]
-    %             [LBP.py]
-    %             [SIFT.py]
-    %             [VGG.py]
-    %         ]
-    %         [face\_detection
-    %             % [\_\_init\_\_.py]
-    %             [face\_detection.py]
-    %         ]
-    %         [prediction
-    %             % [\_\_init\_\_.py]
-    %             [predictor.py]
-    %         ]
-    %         [scripts
-    %             % [\_\_init\_\_.py]
-    %             [ablation\_study.py]
-    %             [preprocessing\_fds.py]
-    %             [preprocessing\_TSK.py]
-    %             [testing.py]
-    %             [training.py]
-    %             [get\_pairwise\_accuracies.py]
-    %         ]
-    %         [test]
-    %         [WGEML
-    %             % [\_\_init\_\_.py]
-    %             [constants.py]
-    %             [WGEML\_training.py]
-    %         ]
-    %       ]
-    %       [venv]
-    %       [.coveragerc]
-    %       [.gitignore]
-    %       [Makefile]
-    %       [README.md]
-    %       [requirements.txt]
-    %     ]
-    %   \end{forest}    
+    \begin{forest}
+        for tree={%
+          folder,
+          grow'=0,
+          fit=band,
+        }
+        [KinRecognitionWGEML
+          [data
+          ]
+          [out
+            [ablation\_studies]
+            [pairwise\_accs]
+          ]
+          [src
+            [data\_preparation
+                % [\_\_init\_\_.py]
+                [PCA.py]
+                [prep\_cross\_valid.py]
+                [properly\_formatted\_inputs.py]
+                [save\_and\_load.py]
+            ]
+            [face\_descriptors
+                % [\_\_init\_\_.py]
+                [CifarNet.py]
+                [HOG.py]
+                [LBP.py]
+                [SIFT.py]
+                [VGG.py]
+            ]
+            [face\_detection
+                % [\_\_init\_\_.py]
+                [face\_detection.py]
+            ]
+            [prediction
+                % [\_\_init\_\_.py]
+                [predictor.py]
+            ]
+            [scripts
+                % [\_\_init\_\_.py]
+                [ablation\_study.py]
+                [preprocessing\_fds.py]
+                [preprocessing\_TSK.py]
+                [testing.py]
+                [training.py]
+                [get\_pairwise\_accuracies.py]
+            ]
+            [test]
+            [WGEML
+                % [\_\_init\_\_.py]
+                [constants.py]
+                [WGEML\_training.py]
+            ]
+          ]
+          [venv]
+          [.coveragerc]
+          [.gitignore]
+          [Makefile]
+          [README.md]
+          [requirements.txt]
+        ]
+      \end{forest}    
     \caption{Folder Structure of the project}
     \label{fig:RepoOverview}
 \end{figure}  
+
+The \texttt{src} folder is split up into the different overarching modules which contain the functions needed, \texttt{data\_preparation}, \texttt{face\_descriptors}, \texttt{face\_detection}, \texttt{prediction} and \texttt{WGEML}. The face detection module implements face detection by using OpenCV which uses the method described in section \ref{sec:FaceDetection}.
+The rest of the modules are discussed in sections \ref{sec:DataPrep}, \ref{sec:FDModule}, \ref{sec:WGEMLModule}, and \ref{sec:PredictionModule}. The \texttt{test} folder contains all of the unit tests for each of the files in the aforementioned modules. 
+The \texttt{scripts} folder contains any scripts that would be run directly with Python which integrate the modules together in order to run the overall project. The majority of the computation is done in the modules and the scripts mainly run the functions from the modules with the proper data. 
+
+The \texttt{data} folder contains the three datasets which contain the images and the meta data about the images, such as which are positive and negative pairs. Certain extra information is saved to these folders as well which is discussed in section \ref{sec:SaveDisk}. 
+
+Finally, the \texttt{out} folder contains CSVs that contain the accuracies of certain experiments which are also discussed in section \ref{sec:SaveDisk}. 
 
 \section{Data Preparation} \label{sec:DataPrep}
 
@@ -652,7 +660,7 @@ TSKinFace didn't have this type of setting, however, but the differences in whet
 
 In order to save on computation time for the training process as well as on disk space, PCA is used in order to reduce the dimensions of each of the face descriptors. In the implementation, after each image had its face descriptors obtained for a dataset, for each type of face descriptor, PCA is used to reduce the dimensions to $100$ through the method defined in Section \ref{sec:PCA}. 
 
-\subsection{Saving Results to Disk}
+\subsection{Saving Results to Disk} \label{sec:SaveDisk}
 
 Running the project end-to-end each time would take too long each time and, in order to better explore some of the results that were taken, the pipeline needed to be split into modules. This ended up being the preprocessing stage, the training stage and then the testing stage. These stages are explained in further detail in section \ref{sec:Workflow}. 
 What was saved to disk is as follows, split by stage:
@@ -677,7 +685,7 @@ What was saved to disk is as follows, split by stage:
 
 \section{Face Descriptors} \label{sec:FDModule}
 
-Each of the LBP and HOG face descriptors were implemented exactly as mentioned in section \ref{sec:PrepFD} directly without the use of any libraries other than Numpy and OpenCV. However, 
+Each of the LBP and HOG face descriptors were implemented exactly as mentioned in section \ref{sec:PrepFD} directly without the use of any libraries other than Numpy and OpenCV. However, there are some extra details that need to be explained for the SIFT and VGG face descriptors.
 
 \subsection{SIFT Implementation} \label{sec:SIFTImpl}
 
@@ -710,6 +718,17 @@ From there, the weights would be on disk so, to get a face descriptor for a set 
 VGG takes images of size $224 \times 224$, the images needed to be resized to $224 \times 224$ before it could be used as an input into the model. Thus, the model took a \texttt{numpy} array of size $(n, 224, 224, 3)$ and outputted a list of face descriptors which had size $(n, 4096)$. 
 
 \subsection{CifarNet Extension} \label{sec:CFNExt}
+
+In the CifarNet extension, I replaced the VGG network with a smaller network that was trained on CIFAR-10 \cite{CIFAR10}, which is called CifarNet, until it was able to achieve a 91\% accuracy with it. The architecture is shown in figure \ref{fig:CFNArch}.
+
+\begin{figure}[h]
+    
+    \caption{The Architecture of the CifarNet model}
+    \label{fig:CFNArch}
+\end{figure}
+
+This was achieved by using Stochastic Gradient Descent as the optimizer and an adaptive learning rate and using a learning rate of $0.05$ for the first 50 epochs before shrinking it to $0.005$ for the next 25 epochs and finally $0.0005$ for the last 25. 
+The face descriptor is then obtained in a similar manner to VGG where the softmax layer is taken out and the layer before is used as the face descriptor. 
 
 \section{WGEML} \label{sec:WGEMLModule}
 
@@ -816,7 +835,7 @@ There are 3 main stages to running the project, which are, for each dataset, the
 
 \subsection{Preprocessing}
 
-Given a dataset, we wish to precompute the face descriptors for each image and set up the 5-fold cross validation for TSKinFace. 
+Given a dataset, we wish to precompute the face descriptors for each image and set up the 5-fold cross validation for TSKinFace. The pipeline is shown in figure \ref{fig:PreprocessingPipeline}.
 
 \begin{figure}[h]
     \centering
@@ -857,7 +876,7 @@ Given a dataset, we wish to precompute the face descriptors for each image and s
 \subsection{Training}
 
 Once all of the face descriptors for each dataset is computed and, for each relationship in the dataset and for each setting (restricted or unrestricted), the cross-validation folds are created, the training set is properly made from the data and WGEML, which is described in section \ref{sec:WGEMLModule}, is run. The output of 
-WGEML is then saved onto disk, which are the metrics and weights for each face descriptor for each fold. In the end, this is done for each relationship, setting and fold, so for KinFaceW-I, for example, there would be $4 \times 2 \times 5 = 40$ models saved. 
+WGEML is then saved onto disk, which are the metrics and weights for each face descriptor for each fold. In the end, this is done for each relationship, setting and fold, so for KinFaceW-I, for example, there would be $4 \times 2 \times 5 = 40$ models saved. The pipeline is shown in figure \ref{fig:TrainingPipeline}.
 
 \begin{figure}[h]
     \centering
@@ -896,7 +915,7 @@ WGEML is then saved onto disk, which are the metrics and weights for each face d
 \subsection{Testing}
 
 Given a dataset, setting and relationship, the folds and the corresponding models are loaded from on disk and, for each test set, the corresponding model is used to predict whether the images in the test set are of the given relationship or not. The accuracy is then recorded and 
-the average accuracy is outputted for the given configuration along with each of the individual accuracies, as shown in Figure \ref{fig:OutputOfTesting}. 
+the average accuracy is outputted for the given configuration along with each of the individual accuracies, as shown in Figure \ref{fig:OutputOfTesting}. The pipeline is shown in figure \ref{fig:TestingPipeline}.
 
 \begin{figure}[h]
     \centering
