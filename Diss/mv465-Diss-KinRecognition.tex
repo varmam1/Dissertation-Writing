@@ -714,9 +714,9 @@ VGG takes images of size $224 \times 224$, the images needed to be resized to $2
 \section{WGEML} \label{sec:WGEMLModule}
 
 The main algorithm used in the project is Weighted Graph Embedding-Based Metric Learning (WGEML) \cite{WGEML}. The algorithm is a form of metric learning which takes in, as input, a training positive set for each face descriptor, $\mathcal{S}^p = \{(\mathbf{x}_i^p, \mathbf{y}_i^p) \mid 1 \leq i \leq N\}$ where $N$ is the number of image pairs in the set and a negative pair set $\mathcal{D}^p = \{(\mathbf{x}_i^p, \mathbf{y}_j^p) \mid 1 \leq i \leq N, j \neq i\}$. Let there be $M$ face descriptors for each image in the set. 
-It also takes in a tuning parameter $r$ and a neighborhood size $K$ as input but those have been experimentally found to be 5 for each, each of which will be discussed later in this section. 
+It also takes in a tuning parameter $r$ and a neighborhood size $K$ as input but those have been experimentally found to be 5 for each, each of which will be discussed later in this section. This section discusses the problem statement in section \label{sec:WGEMLProblem} and then the specifics of the approach in section \label{sec:WGEMLApproach} before summarizing the overall algorithm in Algorithm \ref{code:WGEMLPsuedocode}. 
 
-\subsection{Problem}
+\subsection{Problem} \label{sec:WGEMLProblem}
 
 Given these inputs, the goal is to find the distance metrics and weights for:
 \begin{align*}
@@ -736,12 +736,13 @@ We wish to find $\mathbf{A}_p$ such that the between-class variance is maximized
 \[\forall p \in \{1, ..., M\}, w_p \geq 0\]
 Where $\mathbf{y}_{in_1}^p$ is the $n_1$th nearest neighbor of $\mathbf{y}_i$ and similarly for $\mathbf{x}_{in_2}$. We have $w_p^r$ in order to avoid over-fitting and use information from each face descriptor. 
 This optimization function tries to minimizes the denominator which, in turn, pulls the samples that have the kin relationship together and maximizes the numerator which means that the pairs which don't have the kin relationship are pushed further away from each other as well as those of their neighbors.
-\subsection{Approach}
+
+\subsection{Approach} \label{sec:WGEMLApproach}
 
 Now that the problem is defined, we break down $\mathbf{A}_p = \mathbf{U}_p\mathbf{U}_p^T$ since $\mathbf{A}_p$ is symmetric and positive semidefinite. $\mathbf{U}_p$ has size $D \times d$ such that $d \ll D$. 
 Thus, the optimization problem can be rewritten as:
 
-\[\max_{\mathbf{U}, \mathbf{w}} = \sum_{p = 1}^{M} w_p^r \frac{tr[\mathbf{U}_p^T(\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p)\mathbf{U}_p]}{tr[\mathbf{U}_p^T\mathbf{S}_p\mathbf{U}_p]}\]
+\[\max_{\mathbf{U}, \mathbf{w}}  \sum_{p = 1}^{M} w_p^r \frac{tr[\mathbf{U}_p^T(\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p)\mathbf{U}_p]}{tr[\mathbf{U}_p^T\mathbf{S}_p\mathbf{U}_p]}\]
 Such that $\mathbf{U}_P^T \mathbf{U}_p = I$, $\sum_{p = 1}^{M} w_p = 1$ and $\forall p \in \{1, ..., M\}, w_p \geq 0$, where:
 
 \[\mathbf{S}_p = \frac{1}{N} \sum_{(\mathbf{x}_i^p, \mathbf{y}_i^p) \in \mathcal{S}^p} (\mathbf{x}_i^p - \mathbf{y}_i^p)(\mathbf{x}_i^p - \mathbf{y}_i^p)^T\]
@@ -751,29 +752,44 @@ Such that $\mathbf{U}_P^T \mathbf{U}_p = I$, $\sum_{p = 1}^{M} w_p = 1$ and $\fo
 
 Where $\mathcal{N}_K(\mathbf{x}_i^p)$ represents the $K$ nearest neighbors of $\mathbf{x}_i^p$. This is when K-nearest neighbors is used and $K$ is set to 5 in the experiments.
 In order to solve this, we first let $\mathbf{w}$ be constant in order to solve $\mathbf{U}$ and then use that to find $\mathbf{w}$. By letting $\mathbf{w}$ be constant, the problem is reduced to:
-\[\max_{\mathbf{U}_P^T \mathbf{U}_p = I} = \frac{tr[\mathbf{U}_p^T(\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p)\mathbf{U}_p]}{tr[\mathbf{U}_p^T\mathbf{S}_p\mathbf{U}_p]}\]
-For each $p \in \{1, ..., M\}$. 
+\[\max_{\mathbf{U}_p^T \mathbf{U}_p = I} \frac{\text{tr}[\mathbf{U}_p^T(\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p)\mathbf{U}_p]}{\text{tr}[\mathbf{U}_p^T\mathbf{S}_p\mathbf{U}_p]}\]
+For each $p \in \{1, ..., M\}$. This can then be converted to an alternative problem \cite{RatioTrace}:
+\[\max_{\mathbf{U}_p}  \text{ tr}\left[(\mathbf{U}_p^T\mathbf{S}_p\mathbf{U}_p)^{-1} \mathbf{U}_p^T\paren*{\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p}\mathbf{U}_p\right]\]
+Which can be solved by solving the following generalized eigenvalue problem:
+\[\paren*{\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p}\mathbf{u} = \lambda \mathbf{S}_p \mathbf{u}\]
+Thus, $\mathbf{U}_p = [u_1, u_2, ..., u_d]$ such that the corresponding eigenvalues for $u_1, .., u_d$ are the top $d$ largest eigenvalues (ie. $\lambda_1 \geq ... \geq \lambda_d$). However, this can be problematic in practice since $\mathbf{S}_p$ can be near singluar when $D > N$. Thus, the identity matrix is added as a regularizer as follows:
+\[\mathbf{S}_p = (1 - \beta)\mathbf{S}_p + \beta \frac{\text{tr}(\mathbf{S}_p)}{N}\mathbf{I}\]
+Where $\beta$ is a regularization parameter which is set to 0.5 experimentally. This allows us to then not need to solve the generalized eigenvalue problem, as that takes more computation time, and we can solve:
+\[\mathbf{S}_p^{-1}\paren*{\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p}\mathbf{u} = \lambda \mathbf{u}\]
+Thus, we have found $\mathbf{U}_p, \forall p \in \{1, ..., M\}$. 
 
+To find the weights, $\mathbf{w}$, we can construct the Lagrangian:
+\[\mathcal{L}(\mathbf{w}, \lambda) = \sum_{p = 1}^{M} w_p^r \frac{\text{tr}[\mathbf{U}_p^T(\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p)\mathbf{U}_p]}{\text{tr}[\mathbf{U}_p^T\mathbf{S}_p\mathbf{U}_p]} - \lambda \paren*{\sum_{p = 1}^{M}w_p - 1}\]
+And thus solve it:
+\[\frac{\partial \mathcal{L}}{\partial w_p} = rw_p^{r-1} \frac{\text{tr}[\mathbf{U}_p^T(\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p)\mathbf{U}_p]}{\text{tr}[\mathbf{U}_p^T\mathbf{S}_p\mathbf{U}_p]} - \lambda = 0\]
+\[\frac{\partial \mathcal{L}}{\partial \lambda} = \sum_{p = 1}^{M} w_p - 1 = 0\]
+Which means:
+\[w_p' = \paren*{\frac{\text{tr}[\mathbf{U}_p^T\mathbf{S}_p\mathbf{U}_p]}{\text{tr}[\mathbf{U}_p^T(\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p)\mathbf{U}_p]}}^{\frac{1}{r - 1}}\]
+\[w_p = \frac{w_p'}{\sum_{i = 1}^{M}w_i'}\]
+Thus, we now have the matrices to calculate the distance and the weights for each face descriptor. 
 The overall algorithm is written in psuedocode in Algorithm \ref{code:WGEMLPsuedocode} from \cite{WGEML}:
 \begin{algorithm}
 \caption{WGEML}\label{code:WGEMLPsuedocode}
-\textbf{Inputs}:
+\textbf{Inputs}: The positive and negative pair sets $\mathcal{S}^p$ and $\mathcal{D}^p$ for each face descriptor, the tuning parameter $r$ and the amount of neighbors to be considered $K$
 
-\textbf{Outputs}:
+\textbf{Outputs}: The matrices $\mathbf{U}_p$ and the weights $w_p$ for each face descriptor. 
 \begin{algorithmic}[1]
-\Procedure{MyProcedure}{}
-\State $\textit{stringlen} \gets \text{length of }\textit{string}$
-\State $i \gets \textit{patlen}$
-\If {$i > \textit{stringlen}$} \Return false
-\EndIf
-\State $j \gets \textit{patlen}$
-\If {$\textit{string}(i) = \textit{path}(j)$}
-\State $j \gets j-1$.
-\State $i \gets i-1$.
-\State \textbf{close};
-\EndIf
-\State $i \gets i+\max(\textit{delta}_1(\textit{string}(i)),\textit{delta}_2(j))$.
-\EndProcedure
+\State Initialize $\mathbf{w}$
+\State Initialize $\mathbf{U}$
+\For{$p \in \{1, ..., M\}$}{}
+    \State Use KNN to find the nearest neighbors of each $\mathbf{x}_i^p$ and $\mathbf{y}_i^p$. 
+    \State Create the matrices $\mathbf{S}_p, \mathbf{D}_p, \mathbf{D}_{1p}, \mathbf{D}_{2p}$
+    \State Regularize the matrix $\mathbf{S}_p$
+    \State Solve the eigenvalue problem to get $\mathbf{U}_p$ and append it to $\mathbf{U}$
+    \State Compute $w_p'$ and append it to $\mathbf{w}$
+\EndFor
+\State Divide each $w_p'$ in $\mathbf{w}$ by $\sum_{i = 1}^{M} w_p'$ to get the vector $\mathbf{w}$ such that the values sum to 1
+\State Return $\mathbf{w}$ and $\mathbf{U}$. 
 \end{algorithmic}
 \end{algorithm}
 
