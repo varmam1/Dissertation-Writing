@@ -339,7 +339,7 @@ From here, for each octave, a difference of Gaussians is created to help find th
 \begin{figure}[ht]
     \centering
     \includegraphics[scale=0.2]{Prep/DoG.png}
-    \caption{The Difference of Gaussians being created}
+    \caption{The Difference of Gaussians being created. Image reproduced from Lowe (2004) \cite{SIFT}}
     \label{fig:DiffOfGauss}
 
 \end{figure}
@@ -380,7 +380,7 @@ There are 5 configurations of the network, which have varying depth and, as a re
 \begin{figure}[ht]
     \centering
     \includegraphics[scale=0.65]{Prep/VGGArch.png} 
-    \caption{The different configurations that VGG can have. Image Reproduced from Simonyan et. al (2015) \cite{VGG}}
+    \caption{The different configurations that VGG can have. Image reproduced from Simonyan et. al (2015) \cite{VGG}}
     \label{fig:VGGArch}
 \end{figure}
 
@@ -998,13 +998,20 @@ TSK     & Neg In Test/Train             & 0.8409 & 0.8203 & 0.8242 & 0.8362 & 0.
     KFWII   & Unrestricted             & -4.8  & 0.4   & -0.2  & -3.6  &       &       \\
     KFWII   & Restricted               & -3.4  & -0.6  & -3    & -1    &       &       \\
     TSK     & Only Positive Pairs      & 1.71  & -1.54 & 0.22  & 1.42  & \textbf{2.21}  & 0.43  \\
-    TSK     & Neg In Test/Pos in Train & -6.21 & -6.98 & -6.92 & -8.47 & -7.84 & -7    \\
-    TSK     & Neg In Test/Train        & -6.21 & -7.77 & \textbf{-8.98} & -6.78 & -6.86 & -8.69
+    TSK     & All Pairs In Test/Positive Pairs in Train & -6.21 & -6.98 & -6.92 & -8.47 & -7.84 & -7    \\
+    TSK     & All Pairs In Test/Train        & -6.21 & -7.77 & \textbf{-8.98} & -6.78 & -6.86 & -8.69
 \end{tabular}
 \caption{Differences in accuracies between my implementation and \cite{WGEML} in \%}
 \label{table:diffInAccs}
 \end{table}    
-    
+
+% TODO: Add graphs cause ew tables yucky
+
+We can see that none of the absolute values of the differences go higher than $8.89\%$ which, as will be discussed in \ref{sec:SuccCriterionEval}, means that the success criterion is fulfilled. 
+
+We also see that the Father-Son relationship does better than the other relationships for the same dataset except in the Mother-Son relationship for TSKinFace when there was only positive pairs in the training set and all pairs in the testing set. 
+
+When only positive pairs were used for the TSKinFace dataset for both training and testing, we get accuracies that are fairly close to that of the original paper with an average difference of $0.742\%$. However, when negative pairs were added to the test set, the accuracies drop by, on average, $8.29\%$. 
 
 \section{Success Criterion} \label{sec:SuccCriterionEval}
 
@@ -1013,15 +1020,62 @@ Furthermore, referring to the requirements analysis in section \ref{sec:ReqAnal}
 
 \section{Potential Biases in Datasets} \label{sec:Biases}
 
+For the pairwise accuracies, in every case the accuracies went down when a different testing set was used than the training set, as expected. 
+It seemed that the KinFaceW-I dataset generalizes fairly well, compared to KinFaceW-II and TSKinFace, since it seems to have the lowest differences of the 3 datasets with an average of an 8\% decrease in accuracy compared to the accuracies when it is tested with itself. 
+Then, KinFaceW-II was worse at a difference of 11.7\% and then TSKinFace was by far the worst with an average difference of 15.7\%. The specifics are in the attachment on the 3rd sheet in it. 
+ 
+As for my analysis of that, I think the main reason for this is due to the fact that both KinFaceW-II and TSKinFace get the positive pairs from the same image whereas KinFaceW-I doesn’t. What this means from a high-level view is that WGEML might be taking into account the lighting of the image or other non-face related features of the image and WGEML is using the similarity of those features more in the KinFaceW-II and TSKinFace datasets. For example, if a pair of images that have a similar lighting comes up, WGEML might be using the fact that it has similar lighting for inference, if that makes sense. This problem is probably exacerbated in the TSKinFace dataset just due to how many pairs of images there are in the dataset thus reinforcing the idea further. Since pairs in KinFaceW-I aren’t from the same image, necessarily, this might help its generalization ability and explain why the differences are smaller than that of KinFaceW-II and TSKinFace. I think there’s quite a bit of literature about this which I need to read in more detail before I write my evaluation chapter. 
+
+
 \section{Ablation Studies} \label{sec:AbStudies}
 
 \subsection{Blocking Face Descriptors} \label{sec:FDAbStudies}
+
+Ablation studies were done by using each possible subset of the $4$ face descriptors that were originally used for WGEML for training and testing. For example, only the VGG face descriptor was used for training and testing and the accuracies were obtained for each dataset, setting, and relationship.
+
+I then decided to group up the accuracies by the amount of face descriptors used, so that, 
+given a dataset and the amount of face descriptors used and a relationship, you can see the 
+average accuracy that is obtained if that many face descriptors were used. This is the big chart 
+on the right of the spreadsheet. I put a coloring rule on the differences where the green cells are the 
+largest in that dataset and the red is the smallest and I did the same for the averages of the differences, 
+so the green cell is the highest value in the dataset and the red is the smallest. 
+ 
+As expected, the more face descriptors used, on average, the better the accuracy becomes. 
+However, the amount the accuracy becomes better by decreases as you add more face descriptors 
+(ie. the second derivative is negative, which can be seen right of the big chart). 
+The only dataset this doesn’t seem to apply to is KinFaceW-I unrestricted in which adding the 2nd 
+face descriptor does a lot to the accuracy but the 3rd doesn’t increase it too much and then the 4th 
+increases it more. However, I think this is mainly due to the two outliers, for the FD relationship, 
+increasing from 2 to 3 face descriptors only added 0.2 to the accuracy and for the MS relationship, 
+going from 3 to 4 added 3 accuracy points. 
+ 
+My high-level guess as to why this is so is that as you add more face descriptors, the features 
+that each face descriptor capture are more likely to overlap with each other, compared to when 
+there's only one face descriptor, in which case another one could add a lot more information. 
+However, if there is already 3 face descriptors, another face descriptor might share a lot of 
+the same information the others already have captured and only be able to add a, relatively, 
+less amount of information.
+
+Similarly, I had to redo the ablation studies for that dataset and, again, nothing major 
+changed from a high level perspective but, with respect to the configurations of face descriptors 
+where it did better than all of the face descriptors, now there are 22 of such instances, 
+down from 24, and all 22 use the VGG face descriptor.
 
 % \subsection{Blocking Parts of Images} \label{sec:ImageAbStudies}
 
 \section{CifarNet Extension} \label{sec:CFNResults}
 
+I essentially found that replacing VGG with CFN does worse in the KinFaceW-I dataset, it does better in the KinFaceW-II dataset and it doesn’t have a huge effect on the TSKinFace dataset (with the biggest difference being a 1\% difference in accuracy). When grouped by relationship, I found that the father-son relationship had the least change in accuracy with an average 0.092\% accuracy difference. A graph, that needs to be cleaned up before it is properly put in the write up, that I made to illustrate this is:
+ 
+Where this is the original face descriptor accuracies minus the LBP, HOG, SIFT and CFN face descriptor accuracies (so a positive number implies that the original face descriptors did better). We see that there is more variation in the other relationships, ignoring fms and fmd as there’s only one dataset for this, than there is in the father-son relationship, and this is reflected in the standard deviations for each relationship. When we group this by dataset, we get the following graph, which also needs more polish before I put it in the write-up:
+ 
+In which we see that, generally, VGG did better than CFN for KinFaceW-I and did worse for KFW-II. In terms of any other things I thought might be interesting to note, the maximum difference in accuracies was 5.4\% which occurred in the KFW-II unrestricted setting with the mother-daughter relationship in which CFN made the accuracy increase by 5.4\%. The maximum decrease in accuracy was 4.7\% with the KFW-I Restricted dataset for the mother-son relationship. We also got that the KFW-II Unrestricted setting with the mother-son relationship had no difference whatsoever in accuracies between the face descriptors, though I think this is more likely to have happened by chance than having any underlying reason. 
+ 
+With respect to why KFW-II did better with the CFN face descriptor, I’m not entirely sure but I think it goes back to the fact that the pairs of images are taken from the same image in KFW-II but not in KFW-I. My guess is that, since the input to the CFN network is a 32 x 32 image, potentially it could be generalizing the lighting and other non-face related features more which could be exacerbating the problem we saw earlier with the bias. The main reason I’m unsure about this is since I would’ve imagined something similar would have occurred with TSKinFace if this was the case but it doesn’t seem to have happened, or at least not with the same magnitude of effect. 
+
 \section{Unit Tests} \label{sec:UnitTests}
+
+% TODO: Add figure which shows the coverage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%% Conclusion %%%%%%%%%%%
