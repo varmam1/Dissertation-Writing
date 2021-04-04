@@ -175,7 +175,7 @@ We must first discuss what a regular neural network is before going onto what a 
 
 Face detection is the task of finding a face within a given image and returning the set of faces found as seen in Figure \ref{fig:FaceDetEx}. This differs from face recognition since the task is only to find the faces and not to recognize who the faces belong to. 
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \caption{Face detection example}
     \label{fig:FaceDetEx}
@@ -192,7 +192,7 @@ for example. There are multiple face descriptors that can be made of a face imag
 One such face descriptor is the Local Binary Patterns (LBP) visual descriptor which is adapted for faces. LBP is a texture descriptor \cite{LBPFace} which means that the algorithm attempts to describe the texture of the image, rather than anything to do with the color. 
 As such, given an image we want the descriptor of, we must first convert it to grayscale. Then, for each pixel in the image, a neighborhood of pixels is obtained from it. There are multiple ways to define this neighborhood, as shown in figure \ref{fig:LBPNeighborhood}. 
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[scale=0.2]{Prep/Lbp_neighbors.png}
     \caption{Potential neighborhoods of the pixel}
@@ -205,7 +205,7 @@ Once we have our neighborhood of the pixel, we compare the grayscale value of th
 We are then able to create a binary number from the neighboring values. In practice, where the number is started from doesn't matter but in my implementation, the number starts from the left cell and goes counterclockwise. 
 Applying this to figure \ref{fig:LBPExample}, we get that our LBP value for this pixel would be $01111000_2$ which, in decimal, is $120$. 
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[scale=0.75]{Prep/LBPExample.png}
     \caption{Example of LBP operator on a pixel}
@@ -303,7 +303,7 @@ And, similarly for $\phi_2$:
 
 We can see an example of this in figure \ref{fig:HOGHistoVisual}.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[scale=0.5]{Prep/HOGHisto.png}
     \caption{Creating a histogram for a block of the image}
@@ -312,7 +312,7 @@ We can see an example of this in figure \ref{fig:HOGHistoVisual}.
 
 In other words, the closer the angle is to the label, the more of the magnitude is contributed to the label's histogram value. As a caveat, if $\phi_2 = 180^{\circ}$, we treat $\phi_2$ as $180^{\circ}$ for the sake of this calculation but we add the value to the label $0$ since $0 \equiv 180 \mod{180}$. An example of this can be seen in figure \ref{fig:HOGHistoVisualCirc}.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[scale=0.5]{Prep/HOGHistoCirc.png}
     \caption{What happens in the case where $\phi_1 = 160$ and $\phi_2 = 180$}
@@ -336,7 +336,7 @@ Which is the Gaussian blur.
 
 From here, for each octave, a difference of Gaussians is created to help find the keypoints of the image. The difference of Gaussians is just the difference between the consecutive Gaussians. This can be visualized in figure \ref{fig:DiffOfGauss}.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[scale=0.2]{Prep/DoG.png}
     \caption{The Difference of Gaussians being created}
@@ -377,7 +377,7 @@ The actual implementation of SIFT that is used differs from the original version
 Another way of getting face descriptors for an image is to use the VGG network. The original VGG network \cite{VGG} is a CNN which takes in a $224 \times 224$ colored image and outputs a probability vector of size 1000 for the ImageNet classes. In other words, if \texttt{out} is the output of the model, \texttt{out[i]} corresponds with the probability that the \texttt{i}$^{\text{th}}$ ImageNet class is the class of the input image. 
 There are 5 configurations of the network, which have varying depth and, as a result, more parameters. The architecture of the second deepest configuration is configuration D in Figure \ref{fig:VGGArch}.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[scale=0.65]{Prep/VGGArch.png} 
     \caption{The different configurations that VGG can have. Image Reproduced from Simonyan et. al (2015) \cite{VGG}}
@@ -442,7 +442,7 @@ K-Nearest Neighbors is an algorithm that finds the $K$ nearest neighbors for eac
 
 Principal Component Analysis (PCA) \cite{PCA} is a statistical tool that we can use to reduce the dimensionality of a dataset while maintaining as much of the variability as possible. The algorithm identifies \textit{principal components} which are the directions of maximum variance in the dataset, which can be visualized in figure \ref{fig:PCA}.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[scale=0.5]{Prep/PCAComps.jpeg}
     \caption{Principal components of an arbitrary 2 dimensional dataset}
@@ -564,7 +564,7 @@ and each of the modules are discussed in sections \ref{sec:FDModule}, \ref{sec:W
 
 The repository is shown in Figure \ref{fig:RepoOverview}
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \begin{forest}
         for tree={%
           folder,
@@ -693,7 +693,7 @@ The major difference between the original version of SIFT described in \cite{SIF
 Instead, the descriptor that was obtained from each keypoint, which is described in section \ref{sec:SIFTPrep}, is instead obtained from dividing the image into $7 \times 7$ overlapping
 patches on a $16 \times 16$ grid as shown in figure \ref{fig:Patches}.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     
     % TODO: Change caption and provide an image to show what the overlapping patches look like
     \caption{The overlapping patches}
@@ -721,7 +721,7 @@ VGG takes images of size $224 \times 224$, the images needed to be resized to $2
 
 In the CifarNet extension, I replaced the VGG network with a smaller network that was trained on CIFAR-10 \cite{CIFAR10}, which is called CifarNet, until it was able to achieve a 91\% accuracy with it. The architecture is shown in figure \ref{fig:CFNArch}.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     
     \caption{The Architecture of the CifarNet model}
     \label{fig:CFNArch}
@@ -733,7 +733,7 @@ The face descriptor is then obtained in a similar manner to VGG where the softma
 \section{WGEML} \label{sec:WGEMLModule}
 
 The main algorithm used in the project is Weighted Graph Embedding-Based Metric Learning (WGEML) \cite{WGEML}. The algorithm is a form of metric learning which takes in, as input, a training positive set for each face descriptor, $\mathcal{S}^p = \{(\mathbf{x}_i^p, \mathbf{y}_i^p) \mid 1 \leq i \leq N\}$ where $N$ is the number of image pairs in the set and a negative pair set $\mathcal{D}^p = \{(\mathbf{x}_i^p, \mathbf{y}_j^p) \mid 1 \leq i \leq N, j \neq i\}$. Let there be $M$ face descriptors for each image in the set. 
-It also takes in a tuning parameter $r$ and a neighborhood size $K$ as input but those have been experimentally found to be 5 for each, each of which will be discussed later in this section. This section discusses the problem statement in section \label{sec:WGEMLProblem} and then the specifics of the approach in section \label{sec:WGEMLApproach} before summarizing the overall algorithm in Algorithm \ref{code:WGEMLPsuedocode}. 
+It also takes in a tuning parameter $r$ and a neighborhood size $K$ as input but those have been experimentally found to be 5 for each, each of which will be discussed later in this section. This section discusses the problem statement in section \ref{sec:WGEMLProblem} and then the specifics of the approach in section \ref{sec:WGEMLApproach} before summarizing the overall algorithm in Algorithm \ref{code:WGEMLPsuedocode}. 
 
 \subsection{Problem} \label{sec:WGEMLProblem}
 
@@ -758,7 +758,7 @@ This optimization function tries to minimizes the denominator which, in turn, pu
 
 \subsection{Approach} \label{sec:WGEMLApproach}
 
-Now that the problem is defined, we break down $\mathbf{A}_p = \mathbf{U}_p\mathbf{U}_p^T$ since $\mathbf{A}_p$ is symmetric and positive semidefinite. $\mathbf{U}_p$ has size $D \times d$ such that $d \ll D$. 
+Now that the problem is defined, we break down $\mathbf{A}_p = \mathbf{U}_p\mathbf{U}_p^T$ since $\mathbf{A}_p$ is symmetric and positive semidefinite. $\mathbf{U}_p$ has size $D \times d$ such that $d \ll D$. In my project, $d$ was set to be $10$ by varying the value and seeing how it affects the accuracies and picking the best values.
 Thus, the optimization problem can be rewritten as:
 
 \[\max_{\mathbf{U}, \mathbf{w}}  \sum_{p = 1}^{M} w_p^r \frac{tr[\mathbf{U}_p^T(\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p)\mathbf{U}_p]}{tr[\mathbf{U}_p^T\mathbf{S}_p\mathbf{U}_p]}\]
@@ -837,7 +837,7 @@ There are 3 main stages to running the project, which are, for each dataset, the
 
 Given a dataset, we wish to precompute the face descriptors for each image and set up the 5-fold cross validation for TSKinFace. The pipeline is shown in figure \ref{fig:PreprocessingPipeline}.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \begin{tikzpicture}[>=latex']
         \tikzset{block/.style= {draw, rectangle, align=center,minimum width=2cm,minimum height=1cm},
@@ -878,7 +878,7 @@ Given a dataset, we wish to precompute the face descriptors for each image and s
 Once all of the face descriptors for each dataset is computed and, for each relationship in the dataset and for each setting (restricted or unrestricted), the cross-validation folds are created, the training set is properly made from the data and WGEML, which is described in section \ref{sec:WGEMLModule}, is run. The output of 
 WGEML is then saved onto disk, which are the metrics and weights for each face descriptor for each fold. In the end, this is done for each relationship, setting and fold, so for KinFaceW-I, for example, there would be $4 \times 2 \times 5 = 40$ models saved. The pipeline is shown in figure \ref{fig:TrainingPipeline}.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \begin{tikzpicture}[>=latex']
         \tikzset{block/.style= {draw, rectangle, align=center,minimum width=2cm,minimum height=1cm},
@@ -917,14 +917,14 @@ WGEML is then saved onto disk, which are the metrics and weights for each face d
 Given a dataset, setting and relationship, the folds and the corresponding models are loaded from on disk and, for each test set, the corresponding model is used to predict whether the images in the test set are of the given relationship or not. The accuracy is then recorded and 
 the average accuracy is outputted for the given configuration along with each of the individual accuracies, as shown in Figure \ref{fig:OutputOfTesting}. The pipeline is shown in figure \ref{fig:TestingPipeline}.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[scale=0.9]{Implementation/TrainingOutput.png}
     \caption{A sample output of the testing stage on KinFaceW-I unrestricted}
     \label{fig:OutputOfTesting}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \begin{tikzpicture}[>=latex']
         \tikzset{block/.style= {draw, rectangle, align=center,minimum width=2cm,minimum height=1cm},
@@ -966,21 +966,62 @@ the average accuracy is outputted for the given configuration along with each of
 
 \chapter{Evaluation} \label{chapter:Evaluation}
 
-\section{Success Criterion}
+In this chapter, I will discuss the accuracies that were obtained from the project in section \ref{sec:MainResults} whether the success criterion was achieved in section \ref{sec:SuccCriterionEval}. 
+Then, the potential biases in these datasets are discussed in section \ref{sec:Biases}, the ablation studies are discussed in section \ref{sec:AbStudies}, the CifarNet extension results will be discussed in section \ref{sec:CFNResults} and finally the unit tests and their coverage will be briefly discussed in section \ref{sec:UnitTests}. 
 
 \section{Original Results} \label{sec:MainResults}
 
+The project is run end-to-end for each dataset, setting and relationship and the raw accuracies are displayed in table \ref{table:Accs}. For the success criterion, we look at the difference between the accuracies my implementation had obtained and the original paper had obtained, which is displayed in table \ref{table:diffInAccs} where a positive number means my accuracies were better. 
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{c|c|c|c|c|c|c|c}
+Dataset & Setting                       & fs     & fd     & ms     & md     & fms    & fmd    \\\hline
+KFWI    & Unrestricted                  & 0.8015 & 0.7166 & 0.7628 & 0.7921 &        &        \\
+KFWI    & Restricted                    & 0.811  & 0.7391 & 0.7405 & 0.769  &        &        \\
+KFWII   & Unrestricted                  & 0.838  & 0.778  & 0.832  & 0.78   &        &        \\
+KFWII   & Restricted                    & 0.848  & 0.768  & 0.802  & 0.814  &        &        \\
+TSK     & Only Positive Pairs           & 0.9201 & 0.8826 & 0.9162 & 0.9182 & 0.9571 & 0.9343 \\
+TSK     & Neg In Test/Pos in Train      & 0.8409 & 0.8282 & 0.8448 & 0.8193 & 0.8566 & 0.86   \\
+TSK     & Neg In Test/Train             & 0.8409 & 0.8203 & 0.8242 & 0.8362 & 0.8664 & 0.8431
+\end{tabular}
+\caption{Accuracies of WGEML applied to each dataset for each relationship}
+\label{table:Accs}
+\end{table}    
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{c|c|c|c|c|c|c|c}
+    Dataset & Setting                  & fs    & fd    & ms    & md    & fms   & fmd   \\\hline
+    KFWI    & Unrestricted             & 1.65  & -2.24 & -4.32 & -2.69 &       &       \\
+    KFWI    & Restricted               & 2.2   & 0.71  & -5.35 & -3.8  &       &       \\
+    KFWII   & Unrestricted             & -4.8  & 0.4   & -0.2  & -3.6  &       &       \\
+    KFWII   & Restricted               & -3.4  & -0.6  & -3    & -1    &       &       \\
+    TSK     & Only Positive Pairs      & 1.71  & -1.54 & 0.22  & 1.42  & \textbf{2.21}  & 0.43  \\
+    TSK     & Neg In Test/Pos in Train & -6.21 & -6.98 & -6.92 & -8.47 & -7.84 & -7    \\
+    TSK     & Neg In Test/Train        & -6.21 & -7.77 & \textbf{-8.98} & -6.78 & -6.86 & -8.69
+\end{tabular}
+\caption{Differences in accuracies between my implementation and \cite{WGEML} in \%}
+\label{table:diffInAccs}
+\end{table}    
+    
+
+\section{Success Criterion} \label{sec:SuccCriterionEval}
+
+As seen in section \ref{sec:MainResults}, I was able to replicate the accuracies from \cite{WGEML} within a $\pm 15\%$ accuracy by using the WGEML methodology which means that the project is a success according to appendix \ref{chapter:Proposal}. 
+Furthermore, referring to the requirements analysis in section \ref{sec:ReqAnal}, each of the core project requirements were completed. Furthermore, the extensions were also completed and the results of which are discussed in sections \ref{sec:Biases}, \ref{sec:AbStudies}, and \ref{sec:CFNResults}.
+
 \section{Potential Biases in Datasets} \label{sec:Biases}
 
-\section{Ablation Studies}
+\section{Ablation Studies} \label{sec:AbStudies}
 
 \subsection{Blocking Face Descriptors} \label{sec:FDAbStudies}
 
-\subsection{Blocking Parts of Images} \label{sec:ImageAbStudies}
+% \subsection{Blocking Parts of Images} \label{sec:ImageAbStudies}
 
-\section{Replacing VGG}
+\section{CifarNet Extension} \label{sec:CFNResults}
 
-\section{Unit Tests}
+\section{Unit Tests} \label{sec:UnitTests}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%% Conclusion %%%%%%%%%%%
