@@ -17,7 +17,7 @@
 \usepackage[edges]{forest}
 \usepackage{algorithm}
 \usepackage[noend]{algpseudocode}
-% \usepackage{docmute}   % only needed to allow inclusion of proposal.tex
+\usepackage{docmute}   % only needed to allow inclusion of proposal.tex
 
 \raggedbottom                           % try to avoid widows and orphans
 \sloppy
@@ -1139,6 +1139,15 @@ face descriptors.
 
 \section{Unit Tests} \label{sec:UnitTests}
 
+To make sure the project was doing everything that it was supposed to be doing, unit tests were created for each file except the scripts due to the fact that the scripts were for integrating the modules together and thus didn't require unit testing.
+The coverage for each file and overall are shown in figure \ref{fig:Coverage}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics{Eval/Coverage.png}
+    \caption{Coverage of the unit tests of the project}
+    \label{fig:Coverage}
+\end{figure}
 % TODO: Add figure which shows the coverage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1167,6 +1176,6 @@ face descriptors.
 
 \chapter{Project Proposal}\label{chapter:Proposal}
 
-%\input{proposal}
+% \input{Proposal/proposal}
 
 \end{document}
