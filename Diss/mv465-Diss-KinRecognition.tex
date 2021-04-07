@@ -167,7 +167,7 @@ In this chapter, I discuss the necessary technical background information needed
 
 \section{Convolutional Neural Networks} \label{sec:CNN}
 
-We must first discuss what a regular neural network is before going onto what a Convolutional Neural Network (CNN) is. 
+A Convolutional Neural Network (CNN) is a type of neural network which is usually applied to image analysis. 
 
 \subsection{Convolutional Layers}
 
@@ -449,7 +449,7 @@ Principal Component Analysis (PCA) \cite{PCA} is a statistical tool that we can 
 \end{figure}
 
 Let $p$ be the number of variables that are being measured in the dataset, which in our case is the dimension of the face descriptor. Let $\mathbf{X}$ be the matrix $n \times p$ data matrix that is composed of the $p$ $n$-dimensional vectors $\mathbf{x_1}, ..., \mathbf{x_p}$ in which $x_i$ represents the $n$ observations of the $i$th variable.
-The goal of PCA is then to create a $p \times k$ matrix $\mathbf{W}$, where $k \leq p$, which maps each row-vector of $\mathbf{X}$ from the original $p$-dimensional feature space to a new $k$-dimensional feature subspace such that the variability of the dataset is kept in tact, as much as possible. 
+The goal of PCA is then to create a $p \times k$ matrix $\mathbf{W}$, where $k \leq p$, which maps each row-vector of $\mathbf{X}$ from the original $p$-dimensional feature space to a new $k$-dimensional feature subspace such that the variability of the dataset is kept intact, as much as possible. 
 
 First, the dataset must be standardized which means that the mean of each feature must be $0$, which we denote as the matrix $\mathbf{X'}$ and the column vectors as $\mathbf{x_1'}, ..., \mathbf{x_p'}$. From there, the covariance matrix is obtained. This matrix is the following:
 
@@ -641,7 +641,7 @@ Finally, the \texttt{out} folder contains CSVs that contain the accuracies of ce
 
 \subsection{Cross-Validation}
 
-We split the datasets for each relationship into 5 folds each in which each fold within a relationship has around the same amount of pairs. 
+We split the datasets for each relationship into 5 folds each in which each fold within a relationship has around the same number of pairs. 
 Each training set composed of $4$ of the folds and the last fold was designated as the test set, which composed of 5 training/testing set combinations.
 For the KinFaceW datasets, as the images were already split into folds by the dataset, that was used in the project, whereas with TSKinFace, it had to be generated randomly. 
 
@@ -650,7 +650,7 @@ For the KinFaceW datasets, as the images were already split into folds by the da
 Within each dataset, there are pairs of images which either have the kin relationship or don't, which we call positive and negative pairs respectively. 
 
 KinFaceW had these negative and positive pairs prepared in the \texttt{mat} files that came with the dataset. However, as TSKinFace only came with the images, only the positive images could be found from them. Thus, negative pairs for the dataset had to be created
-randomly. For each relationship, the number of negative pairs was set to be equal to the number of positive pairs in the corresponding set, which was 404 for the training set and 101 for the test set. Then, an two images were picked out randomly such that they didn't belong to the same positive pair.
+randomly. For each relationship, the number of negative pairs was set to be equal to the number of positive pairs in the corresponding set, which was 404 for the training set and 101 for the test set. Then, two images were picked out randomly such that they didn't belong to the same positive pair.
 
 Finally, each of the KinFaceW datasets had a setting, restricted or unrestricted, in which the restricted setting meant that no negative pairs are used in the training splits and unrestricted means that they are used \cite{KinFaceCitation1}.
 TSKinFace didn't have this type of setting, however, but the differences in whether negative pairs were or weren't used in the training process was still explored. 
@@ -667,7 +667,7 @@ What was saved to disk is as follows, split by stage:
 \begin{enumerate}
     \item \textit{Preprocessing}: \
     \begin{itemize}
-        \item \textbf{Face Descriptors}: Under the corresponding dataset folder in the data folder, the each face descriptor for each image is stored as a pickle file which contains a map from the image name to the PCA reduced face descriptor. The files are split up by face descriptor type so \texttt{VGG\_face\_descriptors.pkl} would correspond to the VGG face descriptors of each image. 
+        \item \textbf{Face Descriptors}: Under the corresponding dataset folder in the data folder, each face descriptor for each image is stored as a pickle file which contains a map from the image name to the PCA reduced face descriptor. The files are split up by face descriptor type so \texttt{VGG\_face\_descriptors.pkl} would correspond to the VGG face descriptors of each image. 
         \item \textbf{TSKinFace Splits and Negative Pairs}: Since the TSKinFace splits and negative pairs are created randomly and both are used in the training and testing step, it is imperative that these are saved on disk since trying to recompute them would result in different splits and negative pairs. 
     \end{itemize}
     \item \textit{Training}: \
@@ -754,7 +754,7 @@ We wish to find $\mathbf{A}_p$ such that the between-class variance is maximized
 \[s.t. \; \sum_{p = 1}^{M} w_p = 1\]
 \[\forall p \in \{1, ..., M\}, w_p \geq 0\]
 Where $\mathbf{y}_{in_1}^p$ is the $n_1$th nearest neighbor of $\mathbf{y}_i$ and similarly for $\mathbf{x}_{in_2}$. We have $w_p^r$ in order to avoid over-fitting and use information from each face descriptor. 
-This optimization function tries to minimizes the denominator which, in turn, pulls the samples that have the kin relationship together and maximizes the numerator which means that the pairs which don't have the kin relationship are pushed further away from each other as well as those of their neighbors.
+This optimization function tries to minimize the denominator which, in turn, pulls the samples that have the kin relationship together and maximizes the numerator which means that the pairs which don't have the kin relationship are pushed further away from each other as well as those of their neighbors.
 
 \subsection{Approach} \label{sec:WGEMLApproach}
 
@@ -776,7 +776,7 @@ For each $p \in \{1, ..., M\}$. This can then be converted to an alternative pro
 \[\max_{\mathbf{U}_p}  \text{ tr}\left[(\mathbf{U}_p^T\mathbf{S}_p\mathbf{U}_p)^{-1} \mathbf{U}_p^T\paren*{\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p}\mathbf{U}_p\right]\]
 Which can be solved by solving the following generalized eigenvalue problem:
 \[\paren*{\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p}\mathbf{u} = \lambda \mathbf{S}_p \mathbf{u}\]
-Thus, $\mathbf{U}_p = [u_1, u_2, ..., u_d]$ such that the corresponding eigenvalues for $u_1, .., u_d$ are the top $d$ largest eigenvalues (ie. $\lambda_1 \geq ... \geq \lambda_d$). However, this can be problematic in practice since $\mathbf{S}_p$ can be near singluar when $D > N$. Thus, the identity matrix is added as a regularizer as follows:
+Thus, $\mathbf{U}_p = [u_1, u_2, ..., u_d]$ such that the corresponding eigenvalues for $u_1, .., u_d$ are the top $d$ largest eigenvalues (ie. $\lambda_1 \geq ... \geq \lambda_d$). However, this can be problematic in practice since $\mathbf{S}_p$ can be near singular when $D > N$. Thus, the identity matrix is added as a regularizer as follows:
 \[\mathbf{S}_p = (1 - \beta)\mathbf{S}_p + \beta \frac{\text{tr}(\mathbf{S}_p)}{N}\mathbf{I}\]
 Where $\beta$ is a regularization parameter which is set to 0.5 experimentally. This allows us to then not need to solve the generalized eigenvalue problem, as that takes more computation time, and we can solve:
 \[\mathbf{S}_p^{-1}\paren*{\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p}\mathbf{u} = \lambda \mathbf{u}\]
@@ -1095,7 +1095,7 @@ going from 3 to 4 increased accuracy by 3\%.  % Would showing the raw numbers be
 At a high-level, as more face descriptors are added, the features 
 that each face descriptor capture are more likely to overlap with each other, compared to when 
 there's only one face descriptor, in which case another one could add a lot more information. 
-However, if there is already 3 face descriptors, another face descriptor might share a lot of 
+However, if there are already 3 face descriptors, another face descriptor might share a lot of 
 the same information the others already have captured and only be able to add, relatively, 
 a small amount of information.
 
@@ -1109,7 +1109,7 @@ used VGG tended to do better in accuracy than the ones that didn't, from what I 
 This makes sense since VGG is a deep feature detector whereas the other face descriptors use the texture only.
  
 Furthermore, the KinFaceW-I restricted configuration had by far the 
-most amount of configurations which did better than using all 4 face descriptors for that 
+highest number of configurations which did better than using all 4 face descriptors for that 
 relationship, with 11 of the 22 configurations. The other datasets had about 3-4 instances where 
 this occurred. 
 
@@ -1176,11 +1176,37 @@ The coverage for each file and overall are shown in figure \ref{fig:Coverage}.
 
 \chapter{Conclusion}
 
-\section{Achievements}
+Overall, the project was successful since I was able to replicate the findings of the WGEML paper within a 15\% error range. 
+This meant that I was able to implement each of the core components, as specified in section \ref{sec:ReqAnal}. Furthermore, I was able to further explore the intricacies of the algorithm and how it reacts to variations in the input. By doing ablation studies, 
+I was able to discover that adding face descriptors to the algorithm has diminishing returns in section \ref{sec:FDAbStudies}. Furthermore, sources of bias in the datasets were found in section \ref{sec:Biases}.
+
+% \section{Achievements}
+
+% I was able to implement the WGEML approach to kin recognition and further explore the 
 
 \section{Lessons Learnt}
 
+% basic research skills (vagueness of papers + how to learn from online)
+% Dependencies
+
+One of the main lessons I learnt was with respect to how important testing is. By writing these unit tests, even for seemingly simple functions, I saved myself a lot of potential future problems as I was able to catch many of the bugs while I was writing the code instead of at the integration stage. Of course there were still bugs when I tried running the project end-to-end but these were much simpler to solve knowing that each individual function I wrote and used is correct. 
+For example, solving the eigenvalue problem and getting the top $d$ vectors with respect to WGEML is a fairly simple function to write. However, had I not created some non-trivial matrices to test that function with, I wouldn't have realized that the function was only returning $d$ elements of each eigenvector instead of $d$ eigenvectors. 
+
+As I hadn't had much experience with Computer Vision prior to this project, a lot of research had to be done into the intricacies of the original WGEML paper, such as what each face descriptor is and how they work. I was able to learn how to read multiple research papers and consolidate their information into my project. 
+
+Dependencies posed minor problems at points. Although I had a \texttt{requirements.txt} file and a virtual environment, running the testing pipeline on my laptop caused different results to the external GPU I was using for running the project end-to-end. The testing pipeline was the only pipeline I could reasonably run on my laptop due to its simplicity. However, 
+due to the fact that I had changed some of the dependencies in the \texttt{requirements.txt} file on the external GPU, I had obtained different results. I realized how important maintaining the same dependencies was to a project.
+
+If I were to do the project over again, I think using more sophisticated software engineering tools such as some continuous integration tool such as Jenkins together with a containerization tool such as Docker would help immensely. Sometimes I would forget to run my unit tests before pushing my changes to the feature branch and only afterwards I would realize that the unit tests fail and one time I only noticed after the broken changes had already reached the master branch which continuous integration could help prevent. Docker could have also helped to prevent the dependency issue I had. 
+
 \section{Future Work}
+
+In the future, the model can be extended to work on videos. This was an extension at the beginning of the project which ended up not coming to fruition due to the fact that I couldn't obtain a dataset for it.  
+Furthermore, the project can be extended such that the potential relationship doesn't have to be specified in the input, which would answer whether two people are related at all rather than if they are related in a specific way. 
+
+% Using WGEML on different datasets which dont have the bias that KFW-II has, 
+% Creating a proper application for it?
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % the bibliography
