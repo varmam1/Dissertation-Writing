@@ -18,6 +18,8 @@
 \usepackage{algorithm}
 \usepackage[noend]{algpseudocode}
 \usepackage{docmute}   % only needed to allow inclusion of proposal.tex
+\usepackage{neuralnetwork}
+\usepackage{adjustbox}
 
 \raggedbottom                           % try to avoid widows and orphans
 \sloppy
@@ -167,19 +169,70 @@ In this chapter, I discuss the necessary technical background information needed
 
 \section{Convolutional Neural Networks} \label{sec:CNN}
 
-A Convolutional Neural Network (CNN) is a type of neural network which is usually applied to image analysis. 
-
-\subsection{Convolutional Layers}
-
-\section{Face Detection} \label{sec:FaceDetection}
-
-Face detection is the task of finding a face within a given image and returning the set of faces found as seen in Figure \ref{fig:FaceDetEx}. This differs from face recognition since the task is only to find the faces and not to recognize who the faces belong to. 
+% TODO: what is a neural network
+To talk about Convolutional Neural Networks, first we must discuss what a neural network is. 
 
 \begin{figure}[ht]
     \centering
-    \caption{Face detection example}
-    \label{fig:FaceDetEx}
+    \begin{neuralnetwork}[height=4]
+        \newcommand{\x}[2]{$x_#2$}
+        \newcommand{\y}[2]{$\hat{y}_#2$}
+        \newcommand{\hfirst}[2]{\small $h^{(1)}_#2$}
+        \newcommand{\hsecond}[2]{\small $h^{(2)}_#2$}
+        \inputlayer[count=3, bias=true, title=Input\\layer, text=\x]
+        \hiddenlayer[count=3, bias=false, title=Hidden\\layer 1, text=\hfirst] \linklayers
+        \hiddenlayer[count=3, bias=false, title=Hidden\\layer 2, text=\hsecond] \linklayers
+        \outputlayer[count=2, title=Output\\layer, text=\y] \linklayers
+    \end{neuralnetwork}
+    \caption{An example of an artificial neural network with two hidden layers}
+    \label{fig:ANNEx}
 \end{figure}
+
+
+A Convolutional Neural Network (CNN) is a type of neural network which is used to process data with a grid pattern such as images. As opposed to an artificial neural network which is just composed of fully-connected layers, a CNN also uses convolutional layers and pooling layers \cite{CNN1}. 
+
+\subsection{Fully-Connected Layers}
+
+\subsection{Convolutional Layers}
+
+A convolutional
+
+\subsection{Pooling Layers}
+
+Pooling layers in a CNN tend to reduce the dimension of the representation. This then reduces the number of parameters in the representation. 
+There are multiple pooling layers, such as max-pooling and average-pooling, which are the two types that are used in this project in VGG and CifarNet which are discussed in sections \ref{sec:VGGPrep} and \ref{sec:CFNExt}. 
+These pooling layers take an input of size $W_1 \times H_1 \times D_1$, have hyperparameters which are the stride, $S$, and filter size, $F$, and output a tensor of size:
+
+\[\frac{W_1 - F}{S + 1} \times \frac{H_1 - F}{S + 1} \times D_1\]
+
+% TODO: Describe pooling better
+This output is calculated by taking each $F \times F$ subarray for each slice of the input and doing the corresponding operation on it and returning that as the output for that cell. So, max-pooling would take the max of each of the $F \times F$ cells and average-pooling would take the average. The stride is the same as the stride in the convolutional layer.
+We can see an example of this with a max pooling layer of stride 2 and has filter size $2 \times 2$ in figure \ref{fig:PoolEx}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.5]{Prep/poolingExample.jpeg}
+    \caption{An example of the max pooling operation done on a single slice of the input}
+    \label{fig:PoolEx}
+\end{figure}
+
+\subsection{Activation Functions}
+
+\subsubsection{ReLU}
+
+\subsubsection{Softmax}
+
+\section{Face Detection} \label{sec:FaceDetection}
+
+Face detection is the task of finding a face within a given image and returning the set of faces found. 
+%  as seen in Figure \ref{fig:FaceDetEx}. 
+This differs from face recognition since the task is only to find the faces and not to recognize who the faces belong to. 
+
+% \begin{figure}[ht]
+%     \centering
+%     \caption{Face detection example}
+%     \label{fig:FaceDetEx}
+% \end{figure}
 
 \section{Face Descriptors} \label{sec:PrepFD}
 
@@ -301,23 +354,7 @@ And, similarly for $\phi_2$:
 
 \[\frac{\theta - \phi_1}{20} \times m\]
 
-We can see an example of this in figure \ref{fig:HOGHistoVisual}.
-
-\begin{figure}[ht]
-    \centering
-    \includegraphics[scale=0.5]{Prep/HOGHisto.png}
-    \caption{Creating a histogram for a block of the image}
-    \label{fig:HOGHistoVisual}
-\end{figure}
-
-In other words, the closer the angle is to the label, the more of the magnitude is contributed to the label's histogram value. As a caveat, if $\phi_2 = 180^{\circ}$, we treat $\phi_2$ as $180^{\circ}$ for the sake of this calculation but we add the value to the label $0$ since $0 \equiv 180 \mod{180}$. An example of this can be seen in figure \ref{fig:HOGHistoVisualCirc}.
-
-\begin{figure}[ht]
-    \centering
-    \includegraphics[scale=0.5]{Prep/HOGHistoCirc.png}
-    \caption{What happens in the case where $\phi_1 = 160$ and $\phi_2 = 180$}
-    \label{fig:HOGHistoVisualCirc}
-\end{figure}
+In other words, the closer the angle is to the label, the more of the magnitude is contributed to the label's histogram value. As a caveat, if $\phi_2 = 180^{\circ}$, we treat $\phi_2$ as $180^{\circ}$ for the sake of this calculation but we add the value to the label $0$ since $0 \equiv 180 \mod{180}$. 
 
 We can do this for each pixel in the block and, thus, we are able to get a $9$-dimensional vector for each block. 
 In the project, the image is split up into $16 \times 16$ blocks of size $4 \times 4$ first and then $8 \times 8$ blocks of size $8 \times 8$ next and each of these blocks contributes a histogram to the overall vector which leads us with a face descriptor with dimension:
@@ -372,7 +409,7 @@ Now, for each keypoint, we have the location, scale and orientation so we can fi
 
 The actual implementation of SIFT that is used differs from the original version which is talked about in section \ref{sec:SIFTImpl}.
 
-\subsection{VGG}
+\subsection{VGG} \label{sec:VGGPrep}
 
 Another way of getting face descriptors for an image is to use the VGG network. The original VGG network \cite{VGG} is a CNN which takes in a $224 \times 224$ colored image and outputs a probability vector of size 1000 for the ImageNet classes. In other words, if \texttt{out} is the output of the model, \texttt{out[i]} corresponds with the probability that the \texttt{i}$^{\text{th}}$ ImageNet class is the class of the input image. 
 There are 5 configurations of the network, which have varying depth and, as a result, more parameters. The architecture of the second deepest configuration is configuration D in Figure \ref{fig:VGGArch}.
@@ -398,7 +435,8 @@ However, we often use distance to help measure the similarity between data point
 
 Given a non-empty set $A$, we define a \textit{distance} over $A$ as a function $d: A \times A \to \mathbb{R}$ such that the following holds:
 \begin{enumerate}
-    \item $\forall x, y \in A$, $d(x, y) \geq 0$ and $d(x, y) = 0$ if and only if $x = y$. 
+    \item \textbf{Non-Negativity}: $\forall x, y \in A$, $d(x, y) \geq 0$ 
+    \item \textbf{Coincidence}: $\forall x, y \in A$, $d(x, y) = 0$ if and only if $x = y$. 
     \item \textbf{Symmetry}: $\forall x, y \in A$, $d(x, y) = d(y, x)$
     \item \textbf{Triangle Inequality}: The triangle inequality must hold. That is, $\forall x, y, z \in A$: 
     \[d(x, y) + d(y, z) \geq d(x, z)\]
@@ -409,6 +447,11 @@ Given the definition of a distance, we define a \textit{Mahalanobis distance} th
 
 If $M$ is positive semidefinite, then $M$ must be decomposable into $B^TB$ where $B$ is a real matrix. Thus, we can also write the Mahalanobis distance as:
 \[d_M(x, y) = \sqrt{(x - y)^TM(x - y)} = \sqrt{(x - y)^TB^TB(x - y)} = \sqrt{(Bx - By)^T(Bx - By)}\]
+
+So the Mahalanobis distance is essentially a Euclidean distance after applying a linear transformation to each of the input vectors. 
+This makes it so that we only have to learn what this linear transformation is which is simpler to find than searching through the set of all possible distance functions to see which is the best overall distance function. 
+
+The Mahalanobis distance is a \textit{pseudometric}, which is a distance function in which the coincidence property doesn't hold, when the matrix $M$ isn't full-rank. A matrix is \textit{full-rank} when the rank of the matrix is either equal to the number of rows or columns in the matrix.
 
 Thus, given a dataset $\mathcal{X} = \{x_1, ..., x_n\} \subset \mathbb{R}^d$ which has the sets:
 
@@ -569,6 +612,7 @@ The repository is shown in Figure \ref{fig:RepoOverview}
           folder,
           grow'=0,
           fit=band,
+          font=\ttfamily
         }
         [KinRecognitionWGEML
           [data
@@ -624,7 +668,7 @@ The repository is shown in Figure \ref{fig:RepoOverview}
           [README.md]
           [requirements.txt]
         ]
-      \end{forest}    
+      \end{forest}
     \caption{Folder Structure of the project}
     \label{fig:RepoOverview}
 \end{figure}  
@@ -719,7 +763,7 @@ VGG takes images of size $224 \times 224$, the images needed to be resized to $2
 
 \subsection{CifarNet Extension} \label{sec:CFNExt}
 
-In the CifarNet extension, I replaced the VGG network with a smaller network that was trained on CIFAR-10 \cite{CIFAR10}, which is called CifarNet, until it was able to achieve a 91\% accuracy with it. The architecture is shown in figure \ref{fig:CFNArch}.
+In the CifarNet extension, I replaced the VGG network with a smaller network that was trained on CIFAR-10 \cite{CIFAR10}, which is called CifarNet\footnote{Architecture taken from https://github.com/deep-fry/mayo/blob/master/models/cifarnet.yaml}, until it was able to achieve a 91\% accuracy with it. The architecture is shown in figure \ref{fig:CFNArch}.
 
 \begin{figure}[ht]
     
@@ -791,7 +835,7 @@ Which means:
 \[w_p' = \paren*{\frac{\text{tr}[\mathbf{U}_p^T\mathbf{S}_p\mathbf{U}_p]}{\text{tr}[\mathbf{U}_p^T(\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p)\mathbf{U}_p]}}^{\frac{1}{r - 1}}\]
 \[w_p = \frac{w_p'}{\sum_{i = 1}^{M}w_i'}\]
 Thus, we now have the matrices to calculate the distance and the weights for each face descriptor. 
-The overall algorithm is written in psuedocode in Algorithm \ref{code:WGEMLPsuedocode} from \cite{WGEML}:
+The overall algorithm is written in psuedocode in Algorithm \ref{code:WGEMLPsuedocode} from \cite{WGEML}.
 \begin{algorithm}
 \caption{WGEML}\label{code:WGEMLPsuedocode}
 \textbf{Inputs}: The positive and negative pair sets $\mathcal{S}^p$ and $\mathcal{D}^p$ for each face descriptor, the tuning parameter $r$ and the amount of neighbors to be considered $K$
@@ -1211,7 +1255,6 @@ Furthermore, the project can be extended such that the potential relationship do
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % the bibliography
 \addcontentsline{toc}{chapter}{Bibliography}
-%\bibliography{refs}
 \bibliographystyle{plain}
 \bibliography{citations.bib}
 
