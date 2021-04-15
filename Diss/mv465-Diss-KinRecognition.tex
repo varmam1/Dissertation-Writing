@@ -218,8 +218,6 @@ We can see an example of this with a max pooling layer of stride 2 and has filte
 
 \subsection{Activation Functions}
 
-\subsubsection{ReLU}
-
 \subsubsection{Softmax}
 
 \section{Face Detection} \label{sec:FaceDetection}
@@ -265,7 +263,7 @@ Applying this to figure \ref{fig:LBPExample}, we get that our LBP value for this
     \label{fig:LBPExample}
 \end{figure}
 
-To summarize the LBP operator mathematically, given a coordinate in the image, $(x, y)$ which has grayscale value $g$, a neighborhood of $P$ points with radius $R$ enumerated by $g_p$ where $p \in \{0, P - 1\}$, we have that, \cite{textureSurvey}:
+To summarize the LBP operator mathematically, given a coordinate in the image, $(x, y)$ which has grayscale value $g$, a neighborhood of $P$ points with radius $R$ enumerated by $g_p$ where $p \in \{0, P - 1\}$, we have that \cite{textureSurvey}:
 \[LBP_{P, R}(x, y) = \sum_{p = 0}^{P - 1} s(g_p - g)2^p\]
 Where:
 \[s(x) = \begin{cases} 1 & \text{if } x > 0 \\ 0 & \text{else} \end{cases}\]
@@ -442,7 +440,7 @@ Given a non-empty set $A$, we define a \textit{distance} over $A$ as a function 
     \[d(x, y) + d(y, z) \geq d(x, z)\]
 \end{enumerate}
 
-Given the definition of a distance, we define a \textit{Mahalanobis distance} that corresponds to the positive semidefinite matrix $M$ to be a distance function, $d_M: \mathbb{R}^d \times \mathbb{R}^d \to \mathbb{R}$, where $d$ is the number of dimensions the input vector has, which is defined as:
+Given the definition of a distance, we define a \textit{Mahalanobis distance} that corresponds to the positive semidefinite matrix $M$ to be a distance function, $d_M: \mathbb{R}^d \times \mathbb{R}^d \to \mathbb{R}$, where $d$ is the number of dimensions the input vector has which is defined as:
 \[d_M(x, y) = \sqrt{(x - y)^TM(x - y)}\]
 
 If $M$ is positive semidefinite, then $M$ must be decomposable into $B^TB$ where $B$ is a real matrix. Thus, we can also write the Mahalanobis distance as:
@@ -755,7 +753,7 @@ The original VGG network that was trained on ImageNet had 138 million parameters
 the pretrained weights were uploaded to their site\footnote{\url{https://www.robots.ox.ac.uk/~vgg/software/vgg_face/}}. Therefore, it was easier to download the weights from the website and reformat it as needed. 
 
 Firstly, due to the fact that the weights were used 566MB, this wasn't something that could just be uploaded to GitHub. Thus, when predicting, I made sure to check if there was a weights file with a specific name in the \texttt{src/face\_descriptors} folder path. If there wasn't, then the weights would be 
-downloaded from the site. Due to the fact that I was using the Torch weights but I was implementing this in Keras, I needed to reshape a few of the fully-connected layers. For example, one layer had the shape $(7, 7, 512, 4096)$ for the weights but for Keras, it needed to be in the shape $(7\times 7\times 512, 4096)$. 
+downloaded from the site. Due to the fact that I was using the Torch weights, but I was implementing this in Keras, I needed to reshape a few of the fully-connected layers. For example, one layer had the shape $(7, 7, 512, 4096)$ for the weights but for Keras, it needed to be in the shape $(7\times 7\times 512, 4096)$. 
 This was easily solved by using the \texttt{np.reshape} function for each of the fully-connected layers and these slightly modified weights were saved to an \texttt{h5} file on disk. 
 
 From there, the weights would be on disk so, to get a face descriptor for a set of images, I would create the VGG face model with the softmax layer, then load the weights into the model before returning the model without the softmax layer. This model then was used to get the face descriptors for the set of images given. Due to the fact that 
@@ -763,10 +761,11 @@ VGG takes images of size $224 \times 224$, the images needed to be resized to $2
 
 \subsection{CifarNet Extension} \label{sec:CFNExt}
 
-In the CifarNet extension, I replaced the VGG network with a smaller network that was trained on CIFAR-10 \cite{CIFAR10}, which is called CifarNet\footnote{Architecture taken from https://github.com/deep-fry/mayo/blob/master/models/cifarnet.yaml}, until it was able to achieve a 91\% accuracy with it. The architecture is shown in figure \ref{fig:CFNArch}.
+In the CifarNet extension, I replaced the VGG network with a smaller network that was trained on CIFAR-10 \cite{CIFAR10}, which is called CifarNet\footnote{Architecture taken from https://github.com/deep-fry/mayo/blob/master/models/cifarnet.yaml}, until it was able to achieve a 91\% accuracy with it. The architecture is shown in figure \ref{fig:CFNArch}. Aftter each of the convolutional layers, a batch normalization layer was applied with momentum 0.9997 and after the fourth and seventh batch normalization layer, a dropout layer was applied. The last layer after the flatten layer is a fully-connected layer with the softmax function as its activation function. 
 
 \begin{figure}[ht]
-    
+    \centering
+    \includegraphics[scale=0.46]{Implementation/CFNArch.png}
     \caption{The Architecture of the CifarNet model}
     \label{fig:CFNArch}
 \end{figure}
@@ -795,7 +794,7 @@ We wish to find $\mathbf{A}_p$ such that the between-class variance is maximized
     & + \frac{1}{N} \sum_{i = 1, j \neq i}^{N} d^2_{\mathbf{A}_p}(\mathbf{x}_i^p, \mathbf{y}_j^p))/\frac{1}{N} \sum_{i = 1}^{N} d^2_{\mathbf{A}_p}(\mathbf{x}_i^p, \mathbf{y}_i^p)]
 \end{align*}
 
-\[s.t. \; \sum_{p = 1}^{M} w_p = 1\]
+\[\text{s.t. } \sum_{p = 1}^{M} w_p = 1\]
 \[\forall p \in \{1, ..., M\}, w_p \geq 0\]
 Where $\mathbf{y}_{in_1}^p$ is the $n_1$th nearest neighbor of $\mathbf{y}_i$ and similarly for $\mathbf{x}_{in_2}$. We have $w_p^r$ in order to avoid over-fitting and use information from each face descriptor. 
 This optimization function tries to minimize the denominator which, in turn, pulls the samples that have the kin relationship together and maximizes the numerator which means that the pairs which don't have the kin relationship are pushed further away from each other as well as those of their neighbors.
@@ -813,7 +812,7 @@ Such that $\mathbf{U}_P^T \mathbf{U}_p = I$, $\sum_{p = 1}^{M} w_p = 1$ and $\fo
 \[\mathbf{D}_{1p} = \frac{1}{NK} \sum_{\substack{(\mathbf{x}_i^p, \mathbf{y}_i^p) \in \mathcal{S}^p \\ \mathbf{y}_k^p \in \mathcal{N}_K(\mathbf{y}_i^p)}} (\mathbf{x}_i^p - \mathbf{y}_k^p)(\mathbf{x}_i^p - \mathbf{y}_k^p)^T\] 
 \[\mathbf{D}_{2p} = \frac{1}{NK} \sum_{\substack{(\mathbf{x}_i^p, \mathbf{y}_i^p) \in \mathcal{S}^p \\ \mathbf{x}_k^p \in \mathcal{N}_K(\mathbf{x}_i^p)}} (\mathbf{x}_k^p - \mathbf{y}_i^p)(\mathbf{x}_k^p - \mathbf{y}_i^p)^T\]
 
-Where $\mathcal{N}_K(\mathbf{x}_i^p)$ represents the $K$ nearest neighbors of $\mathbf{x}_i^p$. This is when K-nearest neighbors is used and $K$ is set to 5 in the experiments.
+Where $\mathcal{N}_K(\mathbf{x}_i^p)$ represents the $K$ nearest neighbors of $\mathbf{x}_i^p$. This is when K-nearest neighbors is used, and $K$ is set to 5 in the experiments.
 In order to solve this, we first let $\mathbf{w}$ be constant in order to solve $\mathbf{U}$ and then use that to find $\mathbf{w}$. By letting $\mathbf{w}$ be constant, the problem is reduced to:
 \[\max_{\mathbf{U}_p^T \mathbf{U}_p = I} \frac{\text{tr}[\mathbf{U}_p^T(\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p)\mathbf{U}_p]}{\text{tr}[\mathbf{U}_p^T\mathbf{S}_p\mathbf{U}_p]}\]
 For each $p \in \{1, ..., M\}$. This can then be converted to an alternative problem \cite{RatioTrace}:
@@ -828,7 +827,7 @@ Thus, we have found $\mathbf{U}_p, \forall p \in \{1, ..., M\}$.
 
 To find the weights, $\mathbf{w}$, we can construct the Lagrangian:
 \[\mathcal{L}(\mathbf{w}, \lambda) = \sum_{p = 1}^{M} w_p^r \frac{\text{tr}[\mathbf{U}_p^T(\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p)\mathbf{U}_p]}{\text{tr}[\mathbf{U}_p^T\mathbf{S}_p\mathbf{U}_p]} - \lambda \paren*{\sum_{p = 1}^{M}w_p - 1}\]
-And thus solve it:
+And thus, solve it:
 \[\frac{\partial \mathcal{L}}{\partial w_p} = rw_p^{r-1} \frac{\text{tr}[\mathbf{U}_p^T(\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p)\mathbf{U}_p]}{\text{tr}[\mathbf{U}_p^T\mathbf{S}_p\mathbf{U}_p]} - \lambda = 0\]
 \[\frac{\partial \mathcal{L}}{\partial \lambda} = \sum_{p = 1}^{M} w_p - 1 = 0\]
 Which means:
@@ -838,7 +837,7 @@ Thus, we now have the matrices to calculate the distance and the weights for eac
 The overall algorithm is written in psuedocode in Algorithm \ref{code:WGEMLPsuedocode} from \cite{WGEML}.
 \begin{algorithm}
 \caption{WGEML}\label{code:WGEMLPsuedocode}
-\textbf{Inputs}: The positive and negative pair sets $\mathcal{S}^p$ and $\mathcal{D}^p$ for each face descriptor, the tuning parameter $r$ and the amount of neighbors to be considered $K$
+\textbf{Inputs}: The positive and negative pair sets $\mathcal{S}^p$ and $\mathcal{D}^p$ for each face descriptor, the tuning parameter $r$ and the number of neighbors to be considered $K$
 
 \textbf{Outputs}: The matrices $\mathbf{U}_p$ and the weights $w_p$ for each face descriptor. 
 \begin{algorithmic}[1]
@@ -966,7 +965,7 @@ WGEML is then saved onto disk, which are the metrics and weights for each face d
 
 \subsection{Testing}
 
-Given a dataset, setting and relationship, the folds and the corresponding models are loaded from on disk and, for each test set, the corresponding model is used to predict whether the images in the test set are of the given relationship or not. The accuracy is then recorded and 
+Given a dataset, setting and relationship, the folds and the corresponding models are loaded from on disk, and, for each test set, the corresponding model is used to predict whether the images in the test set are of the given relationship or not. The accuracy is then recorded, and 
 the average accuracy is outputted for the given configuration along with each of the individual accuracies, as shown in Figure \ref{fig:OutputOfTesting}. The pipeline is shown in figure \ref{fig:TestingPipeline}.
 
 \begin{figure}[ht]
@@ -1023,7 +1022,7 @@ Then, the potential biases in these datasets are discussed in section \ref{sec:B
 
 \section{Original Results} \label{sec:MainResults}
 
-The project is run end-to-end for each dataset, setting and relationship and the raw accuracies are displayed in table \ref{table:Accs}. For the success criterion, we look at the difference between the accuracies my implementation had obtained and the original paper had obtained, which is displayed in table \ref{table:diffInAccs} where a positive number means my accuracies were better. 
+The project is run end-to-end for each dataset, setting and relationship and the raw accuracies are displayed in table \ref{table:Accs}. For the success criterion, we look at the difference between the accuracies my implementation had obtained, and the original paper had obtained, which is displayed in table \ref{table:diffInAccs} where a positive number means my accuracies were better. 
 
 \begin{table}[ht]
 \centering
@@ -1034,8 +1033,8 @@ KFWI    & Restricted                    & 0.811  & 0.7391 & 0.7405 & 0.769  &   
 KFWII   & Unrestricted                  & 0.838  & 0.778  & 0.832  & 0.78   &        &        \\
 KFWII   & Restricted                    & 0.848  & 0.768  & 0.802  & 0.814  &        &        \\
 TSK     & Only Positive Pairs           & 0.9201 & 0.8826 & 0.9162 & 0.9182 & 0.9571 & 0.9343 \\
-TSK     & Neg In Test/Pos in Train      & 0.8409 & 0.8282 & 0.8448 & 0.8193 & 0.8566 & 0.86   \\
-TSK     & Neg In Test/Train             & 0.8409 & 0.8203 & 0.8242 & 0.8362 & 0.8664 & 0.8431
+TSK     & All Pairs In Test/Pos Pairs in Train      & 0.8409 & 0.8282 & 0.8448 & 0.8193 & 0.8566 & 0.86   \\
+TSK     & All Pairs In Test/Train             & 0.8409 & 0.8203 & 0.8242 & 0.8362 & 0.8664 & 0.8431
 \end{tabular}
 \caption{Accuracies of WGEML applied to each dataset for each relationship}
 \label{table:Accs}
@@ -1050,7 +1049,7 @@ TSK     & Neg In Test/Train             & 0.8409 & 0.8203 & 0.8242 & 0.8362 & 0.
     KFWII   & Unrestricted             & -4.8  & 0.4   & -0.2  & -3.6  &       &       \\
     KFWII   & Restricted               & -3.4  & -0.6  & -3    & -1    &       &       \\
     TSK     & Only Positive Pairs      & 1.71  & -1.54 & 0.22  & 1.42  & \textbf{2.21}  & 0.43  \\
-    TSK     & All Pairs In Test/Positive Pairs in Train & -6.21 & -6.98 & -6.92 & -8.47 & -7.84 & -7    \\
+    TSK     & All Pairs In Test/Pos Pairs in Train & -6.21 & -6.98 & -6.92 & -8.47 & -7.84 & -7    \\
     TSK     & All Pairs In Test/Train        & -6.21 & -7.77 & \textbf{-8.98} & -6.78 & -6.86 & -8.69
 \end{tabular}
 \caption{Differences in accuracies between my implementation and \cite{WGEML} in \%}
@@ -1061,9 +1060,9 @@ TSK     & Neg In Test/Train             & 0.8409 & 0.8203 & 0.8242 & 0.8362 & 0.
 
 We can see that none of the absolute values of the differences go higher than $8.89\%$ which, as will be discussed in \ref{sec:SuccCriterionEval}, means that the success criterion is fulfilled. 
 
-We also see that the Father-Son relationship does better than the other relationships for the same dataset except in the Mother-Son relationship for TSKinFace when there was only positive pairs in the training set and all pairs in the testing set. 
+We also see that the Father-Son relationship does better than the other relationships for the same dataset except in the Mother-Son relationship for TSKinFace when there were only positive pairs in the training set and all pairs in the testing set. 
 
-When only positive pairs were used for the TSKinFace dataset for both training and testing, we get accuracies that are fairly close to that of the original paper with an average difference of $0.742\%$. However, when negative pairs were added to the test set, the accuracies drop by, on average, $8.29\%$. As a note, in the later sections of this chapter, TSKinFace refers to having all pairs in both the training and test set. 
+When only positive pairs were used for the TSKinFace dataset for both training and testing, we get accuracies that are fairly close to that of the original paper with an average difference of $0.742\%$. However, when negative pairs were added to the test set, the accuracies drop by, on average, $8.29\%$. This led me to believe that the original paper had only used the positive pairs for the testing phase of TSKinFace as TSKinFace didn't come with any premade negative pairs. As a note, in the later sections of this chapter, TSKinFace refers to having all pairs in both the training and test set. 
 
 \section{Success Criterion} \label{sec:SuccCriterionEval}
 
@@ -1072,9 +1071,9 @@ Furthermore, referring to the requirements analysis in section \ref{sec:ReqAnal}
 
 \section{Potential Biases in Datasets} \label{sec:Biases}
 
-In order to look at potential biases that could occur in each of the datasets, each model was tested on all of the datasets that were available. So, for example, the model that was returned from training on the KinFaceW-I unrestricted dataset for the Father-Son relationship will have been tested on by all of the 3 datasets that were used. 
+In order to look at potential biases that could occur in each of the datasets, each model was tested on all of the datasets that were available. So, for example, the model that was returned from training on the KinFaceW-I unrestricted dataset for the Father-Son relationship will have been tested on all of the 3 datasets that were used. 
 
-In every case, the accuracies went down when the test set that was used came from a different dataset than the training set. This is to be expected as the model might be generalizing on small biases that are inherent in every dataset. 
+In every case, the accuracies went down when the test set that was used came from a different dataset than the training set. This is to be expected as the model might be overfitting to small biases that are inherent in every dataset. 
 The models trained with the KinFaceW-I dataset generalizes fairly well, compared to KinFaceW-II and TSKinFace, since it seems to have the lowest differences of the 3 datasets 
 with an average of an 8\% decrease in accuracy compared to the accuracies when it is tested with itself. 
 Then, KinFaceW-II was worse at a difference of 11.7\% and then TSKinFace was by far the worst with an 
@@ -1112,7 +1111,7 @@ Ablation studies were done by using each possible subset of the $4$ face descrip
 After obtaining each accuracy for each dataset, setting, relationship and subset of face descriptors, I decided to group up the accuracies by the amount of face descriptors used by averaging the accuracies for each subset of that number.
 
 As expected, in general, as the number of face descriptors are increased, the accuracy increases as well. 
-However, the amount the accuracy increases by decreases as you increase the number of face descriptors (ie. the second derivative is negative). An example of this is shown with KinFaceW-II unrestricted which is shown in figure \ref{fig:KFW-IIUAbStudy}.
+However, as you increase the number of face descriptors, there are diminishing returns on the accuracy (ie. the second derivative is negative). An example of this is shown with KinFaceW-II unrestricted which is shown in figure \ref{fig:KFW-IIUAbStudy}.
 % Could group the two ab study plots in one figure?
 \begin{figure}[ht]
     \centering
@@ -1143,7 +1142,7 @@ However, if there are already 3 face descriptors, another face descriptor might 
 the same information the others already have captured and only be able to add, relatively, 
 a small amount of information.
 
-I then looked at which individual configurations of face descriptors used and relationship resulted in a 
+I then looked at which individual configurations of face descriptors used, and relationship resulted in a 
 better accuracy than if all of the face descriptors were used.
 One thing I saw was that, out of the 22 instances this happened among all of the datasets, 
 all of them used the VGG face descriptor.
@@ -1162,10 +1161,13 @@ this occurred.
 \section{CifarNet Extension} \label{sec:CFNResults}
 
 When I replaced VGG with CifarNet (CFN), I found that it does worse in the KinFaceW-I dataset, 
-it does better in the KinFaceW-II dataset and it doesn't have a huge effect on the TSKinFace dataset 
+it does better in the KinFaceW-II dataset, and it doesn't have a huge effect on the TSKinFace dataset 
 (with the biggest difference being a 1\% difference in accuracy). When grouped by relationship, I 
 found that the father-son relationship had the least change in accuracy with an average 0.092\% 
-accuracy difference. This is shown in figure \ref{fig:CFNRelationshipGrouping}.
+accuracy difference. This is shown in figure \ref{fig:CFNRelationshipGrouping} where a positive number implies that the original face descriptors did better. There is more variation in the other relationships than there is in the father-son relationship, 
+and this is reflected in the standard deviations for each relationship, ignoring the tri-kin relationships as there is only one dataset for this. 
+% TODO: Might want to put the standard deviations here as a graph or a table?
+The differences grouped by dataset is shown in figure \ref{fig:CFNDatasetGrouping}.
 
 \begin{figure}[ht]
     \centering
@@ -1173,12 +1175,6 @@ accuracy difference. This is shown in figure \ref{fig:CFNRelationshipGrouping}.
     \caption{Differences in accuracy when VGG is replaced with CFN grouped by relationship}
     \label{fig:CFNRelationshipGrouping}
 \end{figure}
- 
-Where a positive number implies that the original face descriptors did better. There is more variation in the other relationships, 
-ignoring the tri-kin relationships as there is only one dataset for this, than there is in the father-son relationship, 
-and this is reflected in the standard deviations for each relationship. 
-% TODO: Might want to put the standard deviations here as a graph or a table?
-The differences grouped by dataset is shown in figure \ref{fig:CFNDatasetGrouping}.
  
 \begin{figure}[ht]
     \centering
@@ -1193,6 +1189,9 @@ the mother-daughter relationship in which CFN made the accuracy increase by 5.4\
 in accuracy was 4.7\% with the KinFaceW-I Restricted dataset for the mother-son relationship. The KinFaceW-II 
 Unrestricted setting with the mother-son relationship had no difference whatsoever in accuracies between the 
 face descriptors. 
+
+Although VGG generally did better accuracy-wise, it might be useful to use the CFN descriptor instead due to the smaller model which means that there is less computation when it comes to prediction. The fact that it is a smaller model also means that there are less weights so the file the weights are saved to is smaller, which can be seen since the CFN weights are 5MB whereas the VGG weights are 566MB. 
+This means that using the CFN model can be useful in mobile and embedded systems whereas having the extra computation and size cost might not be worth it for the $5\%$ gain in some cases. However, the CFN model does need to be trained whereas, with the VGG model, the weights are just obtained from the website of the authors of the paper describing how to use VGG for faces \cite{VGGFace}. Thus, training time is essentially 0 for VGG but that doesn't help the fact that running the model will still, inevitably, take more computation time than CFN. 
  
 % With respect to why KinFaceW-II did better with the CFN face descriptor, I'm not entirely sure but I think it 
 % goes back to the fact that the pairs of images are taken from the same image in KFW-II but not in KFW-I. 
@@ -1205,7 +1204,7 @@ face descriptors.
 \section{Unit Tests} \label{sec:UnitTests}
 
 To make sure the project was doing everything that it was supposed to be doing, unit tests were created for each file except the scripts due to the fact that the scripts were for integrating the modules together and thus didn't require unit testing.
-The coverage for each file and overall are shown in figure \ref{fig:Coverage}.
+The statement coverage for each file and overall is shown in figure \ref{fig:Coverage}. In general, most of the files had 100\% statement coverage and the main reason that CifarNet doesn't have a higher coverage is due to a function which trains the model and another function which packages up the creation of the model and training the model into one function. This is fairly difficult to unit test from my knowledge, which is what makes up the most of the untested code.
 
 \begin{figure}[ht]
     \centering
@@ -1220,20 +1219,16 @@ The coverage for each file and overall are shown in figure \ref{fig:Coverage}.
 
 \chapter{Conclusion}
 
-Overall, the project was successful since I was able to replicate the findings of the WGEML paper within a 15\% error range. 
-This meant that I was able to implement each of the core components, as specified in section \ref{sec:ReqAnal}. Furthermore, I was able to further explore the intricacies of the algorithm and how it reacts to variations in the input. By doing ablation studies, 
+Overall, the project was successful since I was able to replicate implement each of the core components, as specified in section \ref{sec:ReqAnal} and, this allowed me to replicate the findings of the WGEML paper within a 15\% error range. 
+Furthermore, I was able to further explore the intricacies of the algorithm and how it reacts to variations in the input. By doing ablation studies, 
 I was able to discover that adding face descriptors to the algorithm has diminishing returns in section \ref{sec:FDAbStudies}. Furthermore, sources of bias in the datasets were found in section \ref{sec:Biases}.
-
-% \section{Achievements}
-
-% I was able to implement the WGEML approach to kin recognition and further explore the 
 
 \section{Lessons Learnt}
 
 % basic research skills (vagueness of papers + how to learn from online)
 % Dependencies
 
-One of the main lessons I learnt was with respect to how important testing is. By writing these unit tests, even for seemingly simple functions, I saved myself a lot of potential future problems as I was able to catch many of the bugs while I was writing the code instead of at the integration stage. Of course there were still bugs when I tried running the project end-to-end but these were much simpler to solve knowing that each individual function I wrote and used is correct. 
+One of the main lessons I learnt was with respect to how important testing is. By writing these unit tests, even for seemingly simple functions, I saved myself a lot of potential future problems as I was able to catch many of the bugs while I was writing the code instead of at the integration stage. Of course, there were still bugs when I tried running the project end-to-end but these were much simpler to solve knowing that each individual function I wrote and used is correct. 
 For example, solving the eigenvalue problem and getting the top $d$ vectors with respect to WGEML is a fairly simple function to write. However, had I not created some non-trivial matrices to test that function with, I wouldn't have realized that the function was only returning $d$ elements of each eigenvector instead of $d$ eigenvectors. 
 
 As I hadn't had much experience with Computer Vision prior to this project, a lot of research had to be done into the intricacies of the original WGEML paper, such as what each face descriptor is and how they work. I was able to learn how to read multiple research papers and consolidate their information into my project. 
