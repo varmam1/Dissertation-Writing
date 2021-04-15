@@ -133,9 +133,9 @@ Furthermore, there are potential use-cases in social media and also poses privac
 \section{Related Work}     
 
 One of the first papers in the field of computational kinship recognition used color, facial parts, facial distances and a Histogram of Gradients vector as the features for each image. 
-Using these features, K-Nearest-Neighbors and an SVM were used in order to classify the image pairs into true and false parent-child pairs \cite{fang2010}. A classification accuracy of $70.67\%$ was obtained overall and an SVM with a radial basis kernel obtained an accuracy of $68.6\%$. 
+Using these features, K-Nearest-Neighbors and a Support Vector Machine (SVM) were used in order to classify the image pairs into true and false parent-child pairs \cite{fang2010}. A classification accuracy of $70.67\%$ was obtained overall and an SVM with a radial basis kernel obtained an accuracy of $68.6\%$. 
 
-Other approaches include using deep learning to solve the problem. One paper used a Siamese CNN approach by putting both of the face images in the pair through a SqueezeNet network which was trained on VGGFace2 which creates a feature vector for each image \cite{DeepSiameseCNN}. Using a similarity criterion, a new feature vector is created using the two feature vectors and a fully connected layer and a sigmoid activation function creates the predicted similarity score. This approach yielded an average test accuracy of $67.66\%$ over all of the relationships that were in the dataset. 
+Other approaches include using deep learning to solve the problem. One paper used a Siamese Convolutional Neural Network (CNN) approach by putting both of the face images in the pair through a SqueezeNet network which was trained on VGGFace2 which creates a feature vector for each image \cite{DeepSiameseCNN}. Using a similarity criterion, a new feature vector is created using the two feature vectors and a fully connected layer and a sigmoid activation function creates the predicted similarity score. This approach yielded an average test accuracy of $67.66\%$ over all of the relationships that were in the dataset. 
 Another paper that used a Siamese approach aimed to solve both the standard kinship verification problem and the Tri-Subject problem \cite{DeepFusion}. Both networks for the problems had three stages, a feature extraction stage, which used the ResNet50 or SENet50 models pretrained on VGGFace2 to extract the features from each face into a vector, a feature fusion stage which combines the feature vectors together, and a similarity quantization stage to get the similarity score. 
 They then use a jury system to fuse together models which allows them to achieve an accuracy of $75.9\%$. 
 
@@ -604,69 +604,106 @@ and each of the modules are discussed in sections \ref{sec:FDModule}, \ref{sec:W
 
 The repository is shown in Figure \ref{fig:RepoOverview}
 
-\begin{figure}[ht]
-    \begin{forest}
-        for tree={%
-          folder,
-          grow'=0,
-          fit=band,
-          font=\ttfamily
-        }
-        [KinRecognitionWGEML
-          [data
-          ]
-          [out
-            [ablation\_studies]
-            [pairwise\_accs]
-          ]
-          [src
-            [data\_preparation
-                % [\_\_init\_\_.py]
-                [PCA.py]
-                [prep\_cross\_valid.py]
-                [properly\_formatted\_inputs.py]
-                [save\_and\_load.py]
-            ]
-            [face\_descriptors
-                % [\_\_init\_\_.py]
-                [CifarNet.py]
-                [HOG.py]
-                [LBP.py]
-                [SIFT.py]
-                [VGG.py]
-            ]
-            [face\_detection
-                % [\_\_init\_\_.py]
-                [face\_detection.py]
-            ]
-            [prediction
-                % [\_\_init\_\_.py]
-                [predictor.py]
-            ]
-            [scripts
-                % [\_\_init\_\_.py]
-                [ablation\_study.py]
-                [preprocessing\_fds.py]
-                [preprocessing\_TSK.py]
-                [testing.py]
-                [training.py]
-                [get\_pairwise\_accuracies.py]
-            ]
-            [test]
-            [WGEML
-                % [\_\_init\_\_.py]
-                [constants.py]
-                [WGEML\_training.py]
-            ]
-          ]
-          [venv]
-          [.coveragerc]
-          [.gitignore]
-          [Makefile]
-          [README.md]
-          [requirements.txt]
-        ]
-      \end{forest}
+\begin{figure}[h!]
+    % \begin{forest}
+    %     for tree={%
+    %       folder,
+    %       grow'=0,
+    %       fit=band,
+    %       font=\ttfamily\small
+    %     }
+    %     [KinRecognitionWGEML
+    %       [data
+    %       ]
+    %       [out
+    %         [ablation\_studies]
+    %         [pairwise\_accs]
+    %       ]
+    %       [src
+    %         [data\_preparation
+    %             % [\_\_init\_\_.py]
+    %             [PCA.py]
+    %             [prep\_cross\_valid.py]
+    %             [properly\_formatted\_inputs.py]
+    %             [save\_and\_load.py]
+    %         ]
+    %         [face\_descriptors
+    %             % [\_\_init\_\_.py]
+    %             [CifarNet.py]
+    %             [HOG.py]
+    %             [LBP.py]
+    %             [SIFT.py]
+    %             [VGG.py]
+    %         ]
+    %         [face\_detection/face\_detection.py
+    %             % [\_\_init\_\_.py]
+    %         ]
+    %         [prediction/predictor.py
+    %             % [\_\_init\_\_.py]
+    %         ]
+    %         [scripts
+    %             % [\_\_init\_\_.py]
+    %             [ablation\_study.py]
+    %             [preprocessing\_fds.py]
+    %             [preprocessing\_TSK.py]
+    %             [testing.py]
+    %             [training.py]
+    %             [get\_pairwise\_accuracies.py]
+    %         ]
+    %         [test]
+    %         [WGEML
+    %             % [\_\_init\_\_.py]
+    %             [constants.py]
+    %             [WGEML\_training.py]
+    %         ]
+    %       ]
+    %       [venv]
+    %       [.coveragerc]
+    %       [.gitignore]
+    %       [Makefile]
+    %       [README.md]
+    %       [requirements.txt]
+    %     ]
+    %   \end{forest}
+    \dirtree{%
+        .1 KinRecognitionWGEML.
+        .2 data/.
+        .2 out.
+        .3 ablation\_studies.
+        .3 pairwise\_accs.
+        .2 src.
+        .3 data\_preparation.
+        .4 PCA.py.
+        .4 prep\_cross\_valid.py.
+        .4 properly\_formatted\_inputs.py.
+        .4 save\_and\_load.py.
+        .3 face\_descriptors.
+        .4 CifarNet.py.
+        .4 HOG.py.
+        .4 LBP.py.
+        .4 SIFT.py.
+        .4 VGG.py.
+        .3 face\_detection/face\_detection.py.
+        .3 prediction/predictor.py.
+        .3 scripts.
+        .4 ablation\_study.py.
+        .4 preprocessing\_fds.py.
+        .4 preprocessing\_TSK.py.
+        .4 testing.py.
+        .4 training.py.
+        .4 get\_pairwise\_accuracies.py.
+        .3 test/.
+        .3 WGEML.
+        .4 constants.py.
+        .4 WGEML\_training.py.
+        .2 venv/.
+        .2 .coveragerc.
+        .2 .gitignore.
+        .2 Makefile.
+        .2 README.md.
+        .2 requirements.txt.
+    }
+
     \caption{Folder Structure of the project}
     \label{fig:RepoOverview}
 \end{figure}  
@@ -732,7 +769,7 @@ Each of the LBP and HOG face descriptors were implemented exactly as mentioned i
 
 The major difference between the original version of SIFT described in \cite{SIFT} and what was needed was that keypoints of each image weren't calculated. 
 Instead, the descriptor that was obtained from each keypoint, which is described in section \ref{sec:SIFTPrep}, is instead obtained from dividing the image into $7 \times 7$ overlapping
-patches on a $16 \times 16$ grid.
+patches on a $16 \times 16$ grid. 
 %  as shown in figure \ref{fig:Patches}.
 
 % \begin{figure}[ht]
@@ -743,7 +780,7 @@ patches on a $16 \times 16$ grid.
 % \end{figure}
 % Describe differences
 This leads to there being a 128-dimensional vector for each patch which leads to a $128 \times 7 \times 7 = 6272$-dimensional vector for each image. This also helps to standardize the dimension of the vector for each image
-as different images can have a different number of keypoints which would lead to different dimensionalities of the vectors. 
+as different images can have a different number of keypoints which would lead to different dimensionalities of the vectors. This decision was made by the WGEML paper in their description of what face descriptors were used. 
 
 Due to the differences, this version of SIFT had to be implemented directly rather than using a library function like OpenCV's SIFT implementation. 
 
@@ -763,7 +800,7 @@ VGG takes images of size $224 \times 224$, the images needed to be resized to $2
 
 In the CifarNet extension, I replaced the VGG network with a smaller network that was trained on CIFAR-10 \cite{CIFAR10}, which is called CifarNet\footnote{Architecture taken from https://github.com/deep-fry/mayo/blob/master/models/cifarnet.yaml}, until it was able to achieve a 91\% accuracy with it. The architecture is shown in figure \ref{fig:CFNArch}. Aftter each of the convolutional layers, a batch normalization layer was applied with momentum 0.9997 and after the fourth and seventh batch normalization layer, a dropout layer was applied. The last layer after the flatten layer is a fully-connected layer with the softmax function as its activation function. 
 
-\begin{figure}[ht]
+\begin{figure}[h!]
     \centering
     \includegraphics[scale=0.46]{Implementation/CFNArch.png}
     \caption{The Architecture of the CifarNet model}
@@ -888,7 +925,7 @@ There are 3 main stages to running the project, which are, for each dataset, the
 
 Given a dataset, we wish to precompute the face descriptors for each image and set up the 5-fold cross validation for TSKinFace. The pipeline is shown in figure \ref{fig:PreprocessingPipeline}.
 
-\begin{figure}[ht]
+\begin{figure}[h!]
     \centering
     \begin{tikzpicture}[>=latex']
         \tikzset{block/.style= {draw, rectangle, align=center,minimum width=2cm,minimum height=1cm},
@@ -929,7 +966,7 @@ Given a dataset, we wish to precompute the face descriptors for each image and s
 Once all of the face descriptors for each dataset is computed and, for each relationship in the dataset and for each setting (restricted or unrestricted), the cross-validation folds are created, the training set is properly made from the data and WGEML, which is described in section \ref{sec:WGEMLModule}, is run. The output of 
 WGEML is then saved onto disk, which are the metrics and weights for each face descriptor for each fold. In the end, this is done for each relationship, setting and fold, so for KinFaceW-I, for example, there would be $4 \times 2 \times 5 = 40$ models saved. The pipeline is shown in figure \ref{fig:TrainingPipeline}.
 
-\begin{figure}[ht]
+\begin{figure}[h!]
     \centering
     \begin{tikzpicture}[>=latex']
         \tikzset{block/.style= {draw, rectangle, align=center,minimum width=2cm,minimum height=1cm},
@@ -968,14 +1005,14 @@ WGEML is then saved onto disk, which are the metrics and weights for each face d
 Given a dataset, setting and relationship, the folds and the corresponding models are loaded from on disk, and, for each test set, the corresponding model is used to predict whether the images in the test set are of the given relationship or not. The accuracy is then recorded, and 
 the average accuracy is outputted for the given configuration along with each of the individual accuracies, as shown in Figure \ref{fig:OutputOfTesting}. The pipeline is shown in figure \ref{fig:TestingPipeline}.
 
-\begin{figure}[ht]
+\begin{figure}[h!]
     \centering
     \includegraphics[scale=0.9]{Implementation/TrainingOutput.png}
     \caption{A sample output of the testing stage on KinFaceW-I unrestricted}
     \label{fig:OutputOfTesting}
 \end{figure}
 
-\begin{figure}[ht]
+\begin{figure}[h!]
     \centering
     \begin{tikzpicture}[>=latex']
         \tikzset{block/.style= {draw, rectangle, align=center,minimum width=2cm,minimum height=1cm},
@@ -1024,7 +1061,7 @@ Then, the potential biases in these datasets are discussed in section \ref{sec:B
 
 The project is run end-to-end for each dataset, setting and relationship and the raw accuracies are displayed in table \ref{table:Accs}. For the success criterion, we look at the difference between the accuracies my implementation had obtained, and the original paper had obtained, which is displayed in table \ref{table:diffInAccs} where a positive number means my accuracies were better. 
 
-\begin{table}[ht]
+\begin{table}[h!]
 \centering
 \begin{tabular}{c|c|c|c|c|c|c|c}
 Dataset & Setting                       & fs     & fd     & ms     & md     & fms    & fmd    \\\hline
@@ -1040,7 +1077,7 @@ TSK     & All Pairs In Test/Train             & 0.8409 & 0.8203 & 0.8242 & 0.836
 \label{table:Accs}
 \end{table}    
 
-\begin{table}[ht]
+\begin{table}[h!]
 \centering
 \begin{tabular}{c|c|c|c|c|c|c|c}
     Dataset & Setting                  & fs    & fd    & ms    & md    & fms   & fmd   \\\hline
@@ -1079,14 +1116,14 @@ with an average of an 8\% decrease in accuracy compared to the accuracies when i
 Then, KinFaceW-II was worse at a difference of 11.7\% and then TSKinFace was by far the worst with an 
 average difference of 15.7\%. The average accuracy difference across the two test datasets for each training dataset and relationship is shown in figure \ref{fig:PairwiseAccByRel} and the average accuracy differences for each dataset across all relationships and test datasets is shown in figure \ref{fig:AvgPairwiseAcc}.
 
-\begin{figure}[ht]
+\begin{figure}[h!]
     \centering
     \includegraphics[scale=0.6]{Eval/AvgPairwiseAccByRelationship.png}
     \caption{The average accuracy differences of the two test datasets for each training dataset and relationship}
     \label{fig:PairwiseAccByRel}
 \end{figure}
  
-\begin{figure}[ht]
+\begin{figure}[h!]
     \centering
     \includegraphics[scale=0.6]{Eval/AvgPairwiseAcc.png}
     \caption{The average accuracy differences of the two test datasets and relationship for each training dataset}
@@ -1113,7 +1150,7 @@ After obtaining each accuracy for each dataset, setting, relationship and subset
 As expected, in general, as the number of face descriptors are increased, the accuracy increases as well. 
 However, as you increase the number of face descriptors, there are diminishing returns on the accuracy (ie. the second derivative is negative). An example of this is shown with KinFaceW-II unrestricted which is shown in figure \ref{fig:KFW-IIUAbStudy}.
 % Could group the two ab study plots in one figure?
-\begin{figure}[ht]
+\begin{figure}[h!]
     \centering
     \includegraphics[scale=0.75]{Eval/KFWII-Unrestricted-AbStudy.png}
     \caption{The plot of accuracy versus number of face descriptors used for KinFaceW-II Unrestricted}
@@ -1124,7 +1161,7 @@ The only dataset this doesn't seem to apply to is KinFaceW-I unrestricted in whi
 face descriptor increases the accuracy quite a bit but the third doesn't increase it too much and then the fourth 
 increases it more, as seen in figure \ref{fig:KFW-IUAbStudy}.
 
-\begin{figure}[ht]
+\begin{figure}[h!]
     \centering
     \includegraphics[scale=0.75]{Eval/KFWI-Unrestricted-AbStudy.png}
     \caption{The plot of accuracy versus number of face descriptors used for KinFaceW-I Unrestricted}
@@ -1169,14 +1206,14 @@ and this is reflected in the standard deviations for each relationship, ignoring
 % TODO: Might want to put the standard deviations here as a graph or a table?
 The differences grouped by dataset is shown in figure \ref{fig:CFNDatasetGrouping}.
 
-\begin{figure}[ht]
+\begin{figure}[h!]
     \centering
     \includegraphics[scale=0.6]{Eval/DiffAccCFNRelationship.png}
     \caption{Differences in accuracy when VGG is replaced with CFN grouped by relationship}
     \label{fig:CFNRelationshipGrouping}
 \end{figure}
  
-\begin{figure}[ht]
+\begin{figure}[h!]
     \centering
     \includegraphics[scale=0.6]{Eval/DiffAccCFNDataset.png}
     \caption{Differences in accuracy when VGG is replaced with CFN grouped by dataset}
@@ -1206,7 +1243,7 @@ This means that using the CFN model can be useful in mobile and embedded systems
 To make sure the project was doing everything that it was supposed to be doing, unit tests were created for each file except the scripts due to the fact that the scripts were for integrating the modules together and thus didn't require unit testing.
 The statement coverage for each file and overall is shown in figure \ref{fig:Coverage}. In general, most of the files had 100\% statement coverage and the main reason that CifarNet doesn't have a higher coverage is due to a function which trains the model and another function which packages up the creation of the model and training the model into one function. This is fairly difficult to unit test from my knowledge, which is what makes up the most of the untested code.
 
-\begin{figure}[ht]
+\begin{figure}[h!]
     \centering
     \includegraphics{Eval/Coverage.png}
     \caption{Coverage of the unit tests of the project}
@@ -1242,6 +1279,8 @@ If I were to do the project over again, I think using more sophisticated softwar
 
 In the future, the model can be extended to work on videos. This was an extension at the beginning of the project which ended up not coming to fruition due to the fact that I couldn't obtain a dataset for it.  
 Furthermore, the project can be extended such that the potential relationship doesn't have to be specified in the input, which would answer whether two people are related at all rather than if they are related in a specific way. 
+
+% Could also look into how a proper SIFT implementation would affect things. 
 
 % Using WGEML on different datasets which dont have the bias that KFW-II has, 
 % Creating a proper application for it?
