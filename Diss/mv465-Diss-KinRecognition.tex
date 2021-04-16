@@ -150,7 +150,6 @@ The following is shown in the dissertation:
 \begin{enumerate}
     \item The algorithm, WGEML, is implemented and accuracies that are within an acceptable range are obtained, as shown in section \ref{sec:MainResults}.
     \item Ablation studies on the face descriptors are performed and the results are in section \ref{sec:FDAbStudies}.
-    % \item Ablation studies are done on the image by blocking certain sections of the image, the results of which are in section \ref{sec:ImageAbStudies}
     \item We use the models that were created to discover biases in the datasets that were used and find out the impact that has overall in section \ref{sec:Biases}. 
     \item We further test the face descriptors by replacing VGG with a smaller CNN in which the implementation is discussed in section \ref{sec:CFNExt}. 
 \end{enumerate}
@@ -165,12 +164,12 @@ Chapter \ref{chapter:Evaluation} then discusses all of the results that were obt
 
 \chapter{Preparation} \label{chapter:Prep}
 
-In this chapter, I discuss the necessary technical background information needed for the project in sections \ref{sec:CNN} through \ref{sec:PCAandKNN}, then the requirements of the project are elaborated on in section \ref{sec:ReqAnal} before the starting point and Software Engineering practices are discussed in section \ref{sec:SEPractices}. 
+In this chapter, I discuss the necessary technical background information needed for the project in sections \ref{sec:CNN} through \ref{sec:PCA}, then the requirements of the project are elaborated on in section \ref{sec:ReqAnal} before the starting point and Software Engineering practices are discussed in section \ref{sec:SEPractices}. 
 
 \section{Convolutional Neural Networks} \label{sec:CNN}
 
 % TODO: what is a neural network
-To talk about Convolutional Neural Networks, first we must discuss what a neural network is. 
+To talk about Convolutional Neural Networks, first we must discuss what an artificial neural network (ANN) is. This is just a set of layers like we see in figure \ref{fig:ANNEx} which have neurons in each of the layers which each output one value. 
 
 \begin{figure}[ht]
     \centering
@@ -188,14 +187,38 @@ To talk about Convolutional Neural Networks, first we must discuss what a neural
     \label{fig:ANNEx}
 \end{figure}
 
+If we have that $\mathbf{x}$ is the input layer, $\mathbf{h_i}$ is the $i$th hidden layer and $\mathbf{y}$ is the output layer, then an ANN can be written as:
 
-A Convolutional Neural Network (CNN) is a type of neural network which is used to process data with a grid pattern such as images. As opposed to an artificial neural network which is just composed of fully-connected layers, a CNN also uses convolutional layers and pooling layers \cite{CNN1}. 
+\begin{align*}
+    \mathbf{h_1} &= f_1(\mathbf{W_1}\mathbf{x} + \mathbf{b_1}) \\
+    \mathbf{h_2} &= f_2(\mathbf{W_2}\mathbf{h_i} + \mathbf{b_2}) \\
+    ... &= ... \\
+    \mathbf{h_i} &= f_i(\mathbf{W_i}\mathbf{h_{i - 1}} + \mathbf{b_i}) \\
+    ... &= ... \\
+    \mathbf{y} &= f_{n + 1}(\mathbf{W_{n + 1}}\mathbf{h_n} + \mathbf{b_{n + 1}})
+\end{align*}
 
-\subsection{Fully-Connected Layers}
+Where $f_i$ represents the activation function for the corresponding layer and $\mathbf{W_i}$ and $\mathbf{b_i}$ are the weights and biases for the $i$th hidden layer which are the trainable parameters and $n$ is the number of hidden layers. 
+
+A Convolutional Neural Network (CNN) is a type of neural network which is used to process data with a grid pattern such as images. As opposed to an artificial neural network which is just composed of fully-connected layers, a CNN also uses convolutional layers and pooling layers \cite{CNN1}. Fully-connected layers have it so that each neuron in the layer have all of the connections to each of the input values, which is the same as in regular neural networks. 
+
+% \subsection{Fully-Connected Layers}
 
 \subsection{Convolutional Layers}
 
-A convolutional
+A convolutional layer takes an input image and, as hyperparameters, takes the number of output filters, kernel size and stride size in order to create a set of kernels and biases in order to create the output. 
+A kernel is a matrix which is usually small and has sizes less than that of the input image but expands the depth of the entire input image. So, for example, if the input to a convolutional layer was $32 \times 32 \times 64$, then a kernel could have size $3 \times 3 \times 64$ where the first two sizes are specified. 
+The kernel is then started in the top left of the input and the dot product of the kernel and the input sub-array is taken to be the output at that cell. Then the kernel is moved along as much as specified in the stride. So if the stride was $2 \times 2$, then the kernel would move 2 to the right and do the same thing. An illustration of this is seen in figure \ref{fig:ConvLayer}.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.5]{Prep/Convolution.png}
+    \caption{A convolution done on an input. Image sourced from Yakura et al. (2018) \cite{CNNFigure}}
+    \label{fig:ConvLayer}
+\end{figure}
+
+However, this produces a 2-dimensional array whereas we want a 3-dimensional volume as the output with a certain specified depth, which is the number of output filters. Thus, that many kernels are created and used for the layer to create the output. These 2-dimensional arrays are then stacked on top of each other to create a 3-dimensional output. 
+A bias is then applied and the activation function, which is usually ReLU, is applied to the output. 
 
 \subsection{Pooling Layers}
 
@@ -205,11 +228,10 @@ These pooling layers take an input of size $W_1 \times H_1 \times D_1$, have hyp
 
 \[\frac{W_1 - F}{S + 1} \times \frac{H_1 - F}{S + 1} \times D_1\]
 
-% TODO: Describe pooling better
 This output is calculated by taking each $F \times F$ subarray for each slice of the input and doing the corresponding operation on it and returning that as the output for that cell. So, max-pooling would take the max of each of the $F \times F$ cells and average-pooling would take the average. The stride is the same as the stride in the convolutional layer.
 We can see an example of this with a max pooling layer of stride 2 and has filter size $2 \times 2$ in figure \ref{fig:PoolEx}.
 
-\begin{figure}[ht]
+\begin{figure}[h!]
     \centering
     \includegraphics[scale=0.5]{Prep/poolingExample.jpeg}
     \caption{An example of the max pooling operation done on a single slice of the input}
@@ -218,13 +240,29 @@ We can see an example of this with a max pooling layer of stride 2 and has filte
 
 \subsection{Activation Functions}
 
+There are a multitude of functions which are applied to the output of a layer which have different effects. These are called activation functions and we'll talk about two of them here, ReLU and Softmax. 
+
+\subsubsection{ReLU}
+
+ReLU applies the following on each output of a layer:
+
+\[f(x) = \max(0, x)\]
+
+In otherwords, it makes sure that all negative values become 0. This is simple to calculate and has the property that the derivative is either 1 or 0 which makes the gradient computation simpler. Due to the simplicity of the activation function, this helps speed up training a neural network if it is used as the activation layer for some layers as opposed to other ones. 
+
 \subsubsection{Softmax}
+
+Another one if the softmax function which takes a vector, $\mathbf{z}$ and the component-wise output is:
+
+\[\sigma(\mathbf{z})_i = \frac{e^{z_i}}{\sum_{j = 1}^{N} e^{z_j}}\]
+
+Where $N$ is the dimension of the input vector. In other words, it takes a vector and outputs a vector of the same size where the sum of the values of the vector add up to 1 so it makes it so you can interpret the individual values as probabilities. This is a useful activation function for the last layer of a neural network that solves a classification problem. For example, in the CifarNet model in section \ref{sec:CFNExt}, the last layer has the softmax function applied to it in order for each of the 10 values to be interpreted as a probability that the input image was the corresponding class. 
 
 \section{Face Detection} \label{sec:FaceDetection}
 
 Face detection is the task of finding a face within a given image and returning the set of faces found. 
 %  as seen in Figure \ref{fig:FaceDetEx}. 
-This differs from face recognition since the task is only to find the faces and not to recognize who the faces belong to. 
+This differs from face recognition since the task is only to find the faces and not to recognize who the faces belong to. The project uses OpenCV's version of face detection which is a cascade classifier and is talked about in appendix \ref{sec:Cascade}. 
 
 % \begin{figure}[ht]
 %     \centering
@@ -234,14 +272,18 @@ This differs from face recognition since the task is only to find the faces and 
 
 \section{Face Descriptors} \label{sec:PrepFD}
 
-We wish to be able to create a mapping from a colored image into a vector to make computations easier and to be able to determine similarity between images, which we do using the distance. These are called image descriptors for general images. When we try and map face images to vectors, we call these face descriptors. 
+We wish to be able to create a mapping from a colored image into a vector to make computations easier and to be able to determine similarity between images, which we do using the cosine similarity in this project as seen in section \ref{sec:PredictionModule}. These are called image descriptors for general images. When we try and map face images to vectors, we call these face descriptors. 
 We want these face descriptor mappings to be able to match the same person in different poses and illuminant geometries to face descriptors that are close to each other in distance. Thus, these mappings try and capture color, texture, and shapes,
 for example. There are multiple face descriptors that can be made of a face image, each of which extracts different features from the face. We use the Local Binary Patterns, Histogram of Gradients, Scale-Invariant Feature Transform and VGG face descriptors to extract features from each face.
 
 \subsection{Local Binary Patterns}
 
 One such face descriptor is the Local Binary Patterns (LBP) visual descriptor which is adapted for faces. LBP is a texture descriptor \cite{LBPFace} which means that the algorithm attempts to describe the texture of the image, rather than anything to do with the color. 
-As such, given an image we want the descriptor of, we must first convert it to grayscale. Then, for each pixel in the image, a neighborhood of pixels is obtained from it. There are multiple ways to define this neighborhood, as shown in figure \ref{fig:LBPNeighborhood}. 
+As such, given an image we want the descriptor of, we must first convert it to grayscale. This can be done in various ways but in the project, the OpenCV method is used which maps each RGB pixel to the grayscale value\footnote{Information taken from \url{https://docs.opencv.org/3.4/de/d25/imgproc_color_conversions.html} using the RGB to Gray color conversion}:
+
+\[0.299\times R+0.587\times G+0.114\times B\]
+
+Then, for each pixel in the image, a neighborhood of pixels is obtained from it. There are multiple ways to define this neighborhood, as shown in figure \ref{fig:LBPNeighborhood}. 
 
 \begin{figure}[ht]
     \centering
@@ -274,7 +316,7 @@ With this extension, we have 58 possible uniform values that a pixel's LBP value
 Once each pixel in the image has an associated LBP value, we can split up the image into blocks. For our implementation, since our input images have size $64 \times 64$, we split it up into non-overlapping blocks of size $8 \times 8$, of which there are $8 \times 8$ of. 
 For each block, we obtain a histogram of the LBP values that were in the block, which gives us a $59$-dimensional vector. To obtain the vector for the entire image, each of these vectors are appended together and a 3776-dimensional LBP face descriptor is obtained for our case. 
 
-\subsection{Histogram of Gradients}
+\subsection{Histogram of Gradients}\label{sec:HOG}
 
 Another face descriptor is Histogram of Gradients (HOG) \cite{HOG}. Given a colored image, we can think of the image as a function, $I: \mathbb{N}_m \times \mathbb{N}_n \to \mathbb{R}^3$, which takes a coordinate in the image and returns a vector of values, which correspond to the red, green, and blue values of the pixel.
 This then means that we are able to calculate the gradient of the image. The gradient of an image can characterize local object appearance and shape due to the fact that the gradient of the image can be used to help find edges in the image. As such, it is useful to obtain such a histogram of gradients. 
@@ -403,7 +445,6 @@ If it is, then this is a proper keypoint. If it isn't then this is an edge so we
 We now have each of the keypoints which are scale-invariant so we need to make it rotation-invariant as well. This is done by assigning an orientation to the keypoints. A neighborhood is taken around the keypoint in which the gradient is obtained for each pixel in the area and a histogram of these gradients is created based on the angle, this time in bins of $0$ to $10$, 10 to 20, etc. until 350 to 360. The peak in this histogram is calculated and taken and any peak above 80\% of it is also considered to calculate the orientation. 
 
 Now, for each keypoint, we have the location, scale and orientation so we can finally create the descriptor. A $16 \times 16$ window is obtained around the keypoint and divided into 16 blocks. For each block, a histogram of the gradients is taken with 8 bins which are then appended together which gives a 128-dimensional vector for the keypoint. The SIFT descriptor of the image is then the vectors for each keypoint appended together to create a $128n$-dimensional vector where $n$ is the number of keypoints in the image. 
-% Talk about the difference between actual implementation in Implementation 
 
 The actual implementation of SIFT that is used differs from the original version which is talked about in section \ref{sec:SIFTImpl}.
 
@@ -415,14 +456,14 @@ There are 5 configurations of the network, which have varying depth and, as a re
 \begin{figure}[ht]
     \centering
     \includegraphics[scale=0.65]{Prep/VGGArch.png} 
-    \caption{The different configurations that VGG can have. Image reproduced from Simonyan et. al (2015) \cite{VGG}}
+    \caption{The different configurations that VGG can have. Image reproduced from Simonyan et al. (2015) \cite{VGG}}
     \label{fig:VGGArch}
 \end{figure}
 
 By training this model on the ImageNet dataset, the model is able to get a top-5 classification error of 7.5\%, which means that for 7.5\% of the entries in the test set, none of the top 5 classes that the image could be were the actual image. 
 
 However, in order to use the model for face description, we must change the output layer and the training dataset \cite{VGGFace}. Instead of training on general objects in an image, we train the model on faces, specifically celebrity faces. 
-The celebrities are curated to a list of 2622 people in which 2000 images are obtained for each celebrity and the images are then curated. The curated set of images constitutes the training set for the VGG model for faces. 
+The celebrities are curated to a list of 2622 people in which 2000 images are obtained for each celebrity and the images are then curated. The curated set of images constitutes the training set for the VGG model for faces. This dataset\footnote{The dataset is available at \url{https://www.robots.ox.ac.uk/~vgg/data/vgg_face/}} was created by the authors of \cite{VGGFace}.
 
 The VGG model for faces is then the model described above with the softmax layer having dimension of 2622. The model is then trained with the dataset we described which allows us to get rid of the softmax layer and use the output of the last fully-connected layer as our 4096-dimensional face descriptor for the image. 
 
@@ -469,16 +510,15 @@ We can visualize this in figure \ref{fig:MetricLearning}.
     \label{fig:MetricLearning}
 \end{figure}
 
-% TODO: Change name
-\section{Side Algorithms Used (Temp Name)} \label{sec:PCAandKNN}
+% \section{Side Algorithms Used (Temp Name)} \label{sec:PCAandKNN}
 
-Aside from the main algorithms that will be used which were described earlier, a couple of high-profile algorithms were used that deserve to be explained, although they are used only a few times at most in very specific places. 
+% Aside from the main algorithms that will be used which were described earlier, a couple of high-profile algorithms were used that deserve to be explained, although they are used only a few times at most in very specific places. 
 
-\subsection{K-Nearest Neighbors}
+\section{K-Nearest Neighbors}
 
 K-Nearest Neighbors is an algorithm that finds the $K$ nearest neighbors for each datum in a given set of data. Given a list of datapoints in Euclidean space, we wish to find, for each datapoint, the $K$ closest datapoints to it. 
 
-\subsection{Principal Component Analysis} \label{sec:PCA}
+\section{Principal Component Analysis} \label{sec:PCA}
 
 Principal Component Analysis (PCA) \cite{PCA} is a statistical tool that we can use to reduce the dimensionality of a dataset while maintaining as much of the variability as possible. The algorithm identifies \textit{principal components} which are the directions of maximum variance in the dataset, which can be visualized in figure \ref{fig:PCA}.
 
@@ -522,7 +562,7 @@ Which is a $p \times k$ matrix. Thus, to reduce the dimensions of the original d
 In which the $i$th row of $\mathbf{T}$ corresponds with the $i$th observation of $\mathbf{X}$ and this vector has is $k$-dimensional where $k \leq p$. 
 \section{Requirements Analysis} \label{sec:ReqAnal}
 
-The main requirement of the project is stated in Appendix \ref{chapter:Proposal} which is to replicate the results from Liang et al. (2019) \cite{WGEML} within a $15\%$ error range or to reject the results. In other words, the project should implement the Weighted Graph Embedding-Based Metric Learning (WGEML) algorithm for Kin Recognition. 
+The main requirement of the project is stated in appendix \ref{chapter:Proposal} which is to replicate the results from Liang et al. (2019) \cite{WGEML} within a $15\%$ error range or to reject the results. In other words, the project should implement the Weighted Graph Embedding-Based Metric Learning (WGEML) algorithm for Kin Recognition. 
 The core project can be broken down into the following requirements:
 \begin{itemize}
     \item \textbf{Face Detection}: Given an image, the faces in the image must be identified and saved as a $64 \times 64$ image on disk. 
@@ -605,72 +645,12 @@ and each of the modules are discussed in sections \ref{sec:FDModule}, \ref{sec:W
 The repository is shown in Figure \ref{fig:RepoOverview}
 
 \begin{figure}[h!]
-    % \begin{forest}
-    %     for tree={%
-    %       folder,
-    %       grow'=0,
-    %       fit=band,
-    %       font=\ttfamily\small
-    %     }
-    %     [KinRecognitionWGEML
-    %       [data
-    %       ]
-    %       [out
-    %         [ablation\_studies]
-    %         [pairwise\_accs]
-    %       ]
-    %       [src
-    %         [data\_preparation
-    %             % [\_\_init\_\_.py]
-    %             [PCA.py]
-    %             [prep\_cross\_valid.py]
-    %             [properly\_formatted\_inputs.py]
-    %             [save\_and\_load.py]
-    %         ]
-    %         [face\_descriptors
-    %             % [\_\_init\_\_.py]
-    %             [CifarNet.py]
-    %             [HOG.py]
-    %             [LBP.py]
-    %             [SIFT.py]
-    %             [VGG.py]
-    %         ]
-    %         [face\_detection/face\_detection.py
-    %             % [\_\_init\_\_.py]
-    %         ]
-    %         [prediction/predictor.py
-    %             % [\_\_init\_\_.py]
-    %         ]
-    %         [scripts
-    %             % [\_\_init\_\_.py]
-    %             [ablation\_study.py]
-    %             [preprocessing\_fds.py]
-    %             [preprocessing\_TSK.py]
-    %             [testing.py]
-    %             [training.py]
-    %             [get\_pairwise\_accuracies.py]
-    %         ]
-    %         [test]
-    %         [WGEML
-    %             % [\_\_init\_\_.py]
-    %             [constants.py]
-    %             [WGEML\_training.py]
-    %         ]
-    %       ]
-    %       [venv]
-    %       [.coveragerc]
-    %       [.gitignore]
-    %       [Makefile]
-    %       [README.md]
-    %       [requirements.txt]
-    %     ]
-    %   \end{forest}
     \dirtree{%
         .1 KinRecognitionWGEML.
         .2 data/.
         .2 out.
-        .3 ablation\_studies.
-        .3 pairwise\_accs.
+        .3 ablation\_studies/.
+        .3 pairwise\_accs/.
         .2 src.
         .3 data\_preparation.
         .4 PCA.py.
@@ -798,7 +778,7 @@ VGG takes images of size $224 \times 224$, the images needed to be resized to $2
 
 \subsection{CifarNet Extension} \label{sec:CFNExt}
 
-In the CifarNet extension, I replaced the VGG network with a smaller network that was trained on CIFAR-10 \cite{CIFAR10}, which is called CifarNet\footnote{Architecture taken from https://github.com/deep-fry/mayo/blob/master/models/cifarnet.yaml}, until it was able to achieve a 91\% accuracy with it. The architecture is shown in figure \ref{fig:CFNArch}. Aftter each of the convolutional layers, a batch normalization layer was applied with momentum 0.9997 and after the fourth and seventh batch normalization layer, a dropout layer was applied. The last layer after the flatten layer is a fully-connected layer with the softmax function as its activation function. 
+In the CifarNet extension, I replaced the VGG network with a smaller network that was trained on CIFAR-10 \cite{CIFAR10}, which is called CifarNet\footnote{Architecture taken from \url{https://github.com/deep-fry/mayo/blob/master/models/cifarnet.yaml}}, until it was able to achieve a 91\% accuracy with it. The architecture is shown in figure \ref{fig:CFNArch}. Aftter each of the convolutional layers, a batch normalization layer was applied with momentum 0.9997 and after the fourth and seventh batch normalization layer, a dropout layer was applied. The last layer after the flatten layer is a fully-connected layer with the softmax function as its activation function. 
 
 \begin{figure}[h!]
     \centering
@@ -1104,7 +1084,7 @@ When only positive pairs were used for the TSKinFace dataset for both training a
 \section{Success Criterion} \label{sec:SuccCriterionEval}
 
 As seen in section \ref{sec:MainResults}, I was able to replicate the accuracies from \cite{WGEML} within a $\pm 15\%$ accuracy by using the WGEML methodology which means that the project is a success according to appendix \ref{chapter:Proposal}. 
-Furthermore, referring to the requirements analysis in section \ref{sec:ReqAnal}, each of the core project requirements were completed. Furthermore, the extensions were also completed and the results of which are discussed in sections \ref{sec:Biases}, \ref{sec:AbStudies}, and \ref{sec:CFNResults}.
+Furthermore, referring to the requirements analysis in section \ref{sec:ReqAnal}, each of the core project requirements were completed, which were to implement face detection, the necessary face descriptors, WGEML, a prediction method and replicate the paper end-to-end. Furthermore, the extensions were also completed and the results of which are discussed in sections \ref{sec:Biases}, \ref{sec:AbStudies}, and \ref{sec:CFNResults}.
 
 \section{Potential Biases in Datasets} \label{sec:Biases}
 
@@ -1295,6 +1275,8 @@ Furthermore, the project can be extended such that the potential relationship do
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % the appendices
 \appendix
+
+\chapter{Cascade Classifier} \label{sec:Cascade}
 
 \chapter{Project Proposal}\label{chapter:Proposal}
 

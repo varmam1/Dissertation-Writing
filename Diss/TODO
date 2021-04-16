@@ -6,25 +6,17 @@ At a higher level, it would be nice to use something you've learned from your ex
 Did you find yourself with any new questions after seeing your results? One question I had was whether you could use the relative importance of the different face descriptors to focus on the best ones and extend them slightly to cover their weaknesses. This is a bit awkward if VGG is the best one, but there might be other options.
 
 Overall:
-- Look over captions of figures and placement of figures
+- Look over captions of figures
 
 Intro:
 * It might be useful to have a diagram to illustrate the problem. e.g. [image, image, "father-daughter"] -> ✓
 - Stronger hook sentence and motivations
 
 Prep:
-* 2.3: perhaps name the distance metric you're using, and include a forward reference to section 2.4?.
-* 2.3.1: it might be worth mentioning how you convert to greyscale. Again, there are multiple methods, and they probably have their own names. Perhaps too much detail for this section though?
-* 2.3.4 (and 2.7.3?): mention/cite the celebrity dataset you used - it currently sounds like you curated all the images.
-- Do the CNN and Face Detection sections
+* 2.3.4 (and 2.8.3?): mention/cite the celebrity dataset you used - it currently sounds like you curated all the images.
 - Redraw/source figures
-- Change name of "Side Algorithms Used (Temp Name)" section
 
 Implementation:
- * 3.3.1: it's not clear why you used a non-standard implementation of SIFT. I think you were following some other reference?
-          - but it's worth being explicit and reminding the reader that you were following the technique of a different paper.
-- Finish the figures (CFN Arch)
-- Figure out how to do the repository overview 
 - Maybe make requrements analysis a table?
 
 Evaluation:
@@ -32,8 +24,6 @@ Evaluation:
 - More in-depth analysis in certain places
 - Might want to put standard deviations in the CFN Extension
 - Might want to put the raw table data in the appendix?
-
-* 4.2: I want to suggest reminding the reader what the requirements were, instead of just saying they were all completed, but you had a lot of requirements, so I'm not sure how to make that work succinctly
 
 Conclusion:
 - Retouch
