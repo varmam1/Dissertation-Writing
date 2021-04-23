@@ -172,7 +172,9 @@ In this chapter, I discuss the necessary technical background information needed
 
 \section{Convolutional Neural Networks} \label{sec:CNN}
 
-To talk about Convolutional Neural Networks, first we must discuss what an artificial neural network (ANN) is. This is just a set of layers like we see in figure \ref{fig:ANNEx} which have neurons in each of the layers which each output one value. 
+To talk about Convolutional Neural Networks, first we must discuss what an artificial neural network (ANN) is. An ANN is a collection of connected nodes. These are organized into layers such that there is an input and output layer as well as multiple layers in between which do some computation. The layers are made up of the connected nodes. 
+
+A basic type of this is a Multilayer Perceptron (MLP) which is a set of layers like we see in figure \ref{fig:ANNEx} which have neurons in each of the layers which each output one value. 
 
 \begin{figure}[ht]
     \centering
@@ -190,7 +192,7 @@ To talk about Convolutional Neural Networks, first we must discuss what an artif
     \label{fig:ANNEx}
 \end{figure}
 
-If we have that $\mathbf{x}$ is the input layer, $\mathbf{h_i}$ is the $i$th hidden layer and $\mathbf{y}$ is the output layer, then an ANN can be written as:
+If we have that $\mathbf{x}$ is the input layer, $\mathbf{h_i}$ is the $i$th hidden layer and $\mathbf{y}$ is the output layer, then an MLP can be written as:
 
 \begin{align*}
     \mathbf{h_1} &= f_1(\mathbf{W_1}\mathbf{x} + \mathbf{b_1}) \\
@@ -203,13 +205,13 @@ If we have that $\mathbf{x}$ is the input layer, $\mathbf{h_i}$ is the $i$th hid
 
 Where $f_i$ represents the activation function for the corresponding layer and $\mathbf{W_i}$ and $\mathbf{b_i}$ are the weights and biases for the $i$th hidden layer which are the trainable parameters and $n$ is the number of hidden layers. 
 
-A Convolutional Neural Network (CNN) is a type of neural network which is used to process data with a grid pattern such as images. As opposed to an artificial neural network which is just composed of fully-connected layers, a CNN also uses convolutional layers and pooling layers \cite{CNN1}. Fully-connected layers have it so that each neuron in the layer have all of the connections to each of the input values, which is the same as in regular neural networks. 
+A Convolutional Neural Network (CNN) is a type of neural network which is used to process data with a grid pattern which have some spatial locality, such as images. As opposed to an artificial neural network which is just composed of fully-connected layers, a CNN also uses convolutional layers and pooling layers \cite{CNN1}. Fully-connected layers have it so that each neuron in the layer have all of the connections to each of the input values, which is the same as in regular neural networks. 
 
 \subsection{Convolutional Layers}
 
 A convolutional layer takes an input image and, as hyperparameters, takes the number of output filters, kernel size and stride size in order to create a set of kernels and biases in order to create the output. 
-A kernel is a matrix which is usually small and has sizes less than that of the input image but expands the depth of the entire input image. So, for example, if the input to a convolutional layer was $32 \times 32 \times 64$, then a kernel could have size $3 \times 3 \times 64$ where the first two sizes are specified. 
-The kernel is then started in the top left of the input and the dot product of the kernel and the input sub-array is taken to be the output at that cell. Then the kernel is moved along as much as specified in the stride. So, if the stride was $2 \times 2$, then the kernel would move 2 to the right and do the same thing. An illustration of this is seen in figure \ref{fig:ConvLayer}.
+A kernel is a matrix which is usually small and has sizes less than that of the input image but covers the depth of the entire input image. So, for example, if the input to a convolutional layer was $32 \times 32 \times 64$, then a kernel could have size $3 \times 3 \times 64$ where the first two sizes are specified. 
+The kernel is then started in the top left of the input and the dot product of the kernel and the input sub-array is taken to be the output at that cell. An illustration of this is seen in figure \ref{fig:ConvLayer}.
 
 \begin{figure}[h!]
     \centering
@@ -218,13 +220,15 @@ The kernel is then started in the top left of the input and the dot product of t
     \label{fig:ConvLayer}
 \end{figure}
 
+Then the kernel is moved along as much as specified in the stride. So, if the stride was $2 \times 2$, then the kernel would move 2 to the right and do the same thing. 
+
 However, this produces a 2-dimensional array whereas we want a 3-dimensional volume as the output with a certain specified depth, which is the number of output filters. Thus, that many kernels are created and used for the layer to create the output. These 2-dimensional arrays are then stacked on top of each other to create a 3-dimensional output. 
-A bias is then applied and the activation function, which is usually ReLU, is applied to the output. 
+A bias is then applied and the activation function is applied to the output, which is usually ReLU which is described in section \ref{sec:ReLU}. 
 
 \subsection{Pooling Layers}
 
-Pooling layers in a CNN tend to reduce the dimension of the representation. This then reduces the number of parameters in the representation. 
-There are multiple pooling layers, such as max-pooling and average-pooling, which are the two types that are used in this project in VGG and CifarNet which are discussed in sections \ref{sec:VGGPrep} and \ref{sec:CFNExt}. 
+Pooling layers in a CNN tend to reduce the dimension of the representation which, in turn, reduces the size of the representation. 
+There are multiple pooling layer types, such as max-pooling and average-pooling, which are the two types that are used in this project in VGG and CifarNet which are discussed in sections \ref{sec:VGGPrep} and \ref{sec:CFNExt}. 
 These pooling layers take an input of size $W_1 \times H_1 \times D_1$, have hyperparameters which are the stride, $S$, and filter size, $F$, and output a tensor of size:
 
 \[\frac{W_1 - F}{S + 1} \times \frac{H_1 - F}{S + 1} \times D_1\]
@@ -241,23 +245,23 @@ We can see an example of this with a max pooling layer of stride 2 and has filte
 
 \subsection{Activation Functions}
 
-There are a multitude of functions which are applied to the output of a layer which have different effects. These are called activation functions and we'll talk about two of them here, ReLU and Softmax. 
+There are a multitude of functions which are applied to the output of a layer which have different effects. These are called activation functions and we'll talk about two of them here, ReLU and Softmax. Only nonlinear activation functions are considered due to the fact that we want to be able to have nonlinear decision boundaries. If we had linear activation functions, the neural network would still be linear in nature and, thus, we wouldn't be able to deal with non-linear problems. 
 
-\subsubsection{ReLU}
+\subsubsection{ReLU} \label{sec:ReLU}
 
 ReLU applies the following on each output of a layer:
 
 \[f(x) = \max(0, x)\]
 
-In other words, it makes sure that all negative values become 0. This is simple to calculate and has the property that the derivative is either 1 or 0 which makes the gradient computation simpler. Due to the simplicity of the activation function, this helps speed up training a neural network if it is used as the activation layer for some layers as opposed to other ones. 
+In other words, it makes sure that all negative values become 0. This is simple to calculate and has the property that the derivative is either 1 or 0 which makes the gradient computation simpler. Due to the simplicity of the activation function, this helps speed up training a neural network. 
 
 \subsubsection{Softmax}
 
-Another one if the softmax function which takes a vector, $\mathbf{z}$ and the component-wise output is:
+Another one is the softmax function which takes a vector, $\mathbf{z}$ and the component-wise output is:
 
 \[\sigma(\mathbf{z})_i = \frac{e^{z_i}}{\sum_{j = 1}^{N} e^{z_j}}\]
 
-Where $N$ is the dimension of the input vector. In other words, it takes a vector and outputs a vector of the same size where the sum of the values of the vector adds up to 1 so it makes it so you can interpret the individual values as probabilities. This is a useful activation function for the last layer of a neural network that solves a classification problem. For example, in the CifarNet model in section \ref{sec:CFNExt}, the last layer has the softmax function applied to it in order for each of the 10 values to be interpreted as a probability that the input image was the corresponding class. 
+Where $N$ is the dimension of the input vector. In other words, it takes a vector and outputs a vector of the same size where the sum of the values of the vector adds up to 1, so you can interpret the individual values as probabilities. This is a useful activation function for the last layer of a neural network that solves a classification problem. For example, in the CifarNet model in section \ref{sec:CFNExt}, the last layer has the softmax function applied to it in order for each of the 10 values to be interpreted as a probability that the input image was the corresponding class. 
 
 \section{Face Detection} \label{sec:FaceDetection}
 
@@ -307,7 +311,7 @@ Where:
 Once we get the values of the pixel, an added extension, which we do for face description, is to check whether it is a \textit{uniform value} which we define as a value such that, in binary, there are only, at most, 2 bitwise transitions when traversed circularly. For example, 11000111 is a uniform value since it only transitions from 1 to 0 and 0 to 1 but 11001000 isn't since it has 4 bitwise transitions. 
 With this extension, we have 58 possible uniform values that a pixel's LBP value can be and an extra value for the LBP value not being uniform. In other words, there are 59 LBP values that a pixel in an image can take. 
 
-Once each pixel in the image has an associated LBP value, we can split up the image into blocks. For our implementation, since our input images have size $64 \times 64$, we split it up into non-overlapping blocks of size $8 \times 8$, of which there are $8 \times 8$ of. 
+Once each pixel in the image has an associated LBP value, we can split up the image into blocks. For our implementation, since our input images have size $64 \times 64$, we split it up into non-overlapping blocks of size $8 \times 8$, of which there are $8 \times 8$. 
 For each block, we obtain a histogram of the LBP values that were in the block, which gives us a $59$-dimensional vector. To obtain the vector for the entire image, each of these vectors are appended together and a 3776-dimensional LBP face descriptor is obtained for our case. 
 
 \subsection{Histogram of Gradients}\label{sec:HOG}
@@ -396,7 +400,7 @@ In the project, the image is split up into $16 \times 16$ blocks of size $4 \tim
 
 \subsection{Scale-Invariant Feature Transform} \label{sec:SIFTPrep}
 
-SIFT \cite{SIFT} is another way of obtaining face descriptors, although the original SIFT algorithm differs from how it is used in the project, though it is still important to briefly go over. 
+SIFT \cite{SIFT} is another way of obtaining face descriptors, although the original SIFT algorithm differs from how it is used in the project, though it is still important to briefly go over. The algorithm, generally, is split into finding the keypoints, fine tuning the keypoints, assigning an orientation to each keypoint and then getting a descriptor from each keypoint. 
 
 The first thing to do is to create octaves for the given image. An octave is a set of the given image being blurred multiple times. 
 For example, in the first octave, the original image is the first image, and then the next image is blurred slightly which is then blurred further for the next image in the octave, etc. In the second octave, the image is halved in size and the same blurring effect happens. So, if the original image was of size $64 \times 64$, then the images in the second octave will be $32 \times 32$ and in the third it would be $16 \times 16$ and so on. A specified number of octaves and blurred images are used for the SIFT algorithm. The way that the image is blurred is as follows:
@@ -405,7 +409,7 @@ Where $x, y$ is the coordinate in the image, $I$ is the function mapping coordin
 \[G(x, y, \sigma) = \frac{1}{2\pi\sigma^2}e^{-\frac{x^2 + y^2}{2\sigma^2}}\]
 Which is the Gaussian blur. 
 
-From here, for each octave, a difference of Gaussians is created to help find the keypoints of the image. The difference of Gaussians is just the difference between the consecutive Gaussians. This can be visualized in figure \ref{fig:DiffOfGauss}.
+From here, for each octave, a difference of Gaussians is created to help find the keypoints of the image, which are just points of interest which can be near important features of the image. The difference of Gaussians is just the difference between the consecutive Gaussians. This can be visualized in figure \ref{fig:DiffOfGauss}.
 
 \begin{figure}[ht]
     \centering
@@ -436,7 +440,7 @@ Where $r$ is the ratio of the eigenvalues. Thus, letting the maximum ratio that 
 \[\frac{\text{Tr}(\mathbf{H})^2}{\text{Det}(\mathbf{H})} < \frac{(r_0+1)^2}{r_0}\]
 If it is, then this is a proper keypoint. If it isn't then this is an edge so we can discard it. 
 
-We now have each of the keypoints which are scale-invariant, so we need to make it rotation-invariant as well. This is done by assigning an orientation to the keypoints. A neighborhood is taken around the keypoint in which the gradient is obtained for each pixel in the area and a histogram of these gradients is created based on the angle, this time in bins of $0$ to $10$, 10 to 20, etc. until 350 to 360. The peak in this histogram is calculated and taken and any peak above 80\% of it is also considered to calculate the orientation. 
+We now have each of the keypoints which are scale-invariant, so we need to make it rotation-invariant as well. This is done by assigning an orientation to the keypoints. A neighborhood is taken around the keypoint in which the gradient is obtained for each pixel in the area and a histogram of these gradients is created based on the angle, this time in bins of $0$ to $10$, 10 to 20, etc. until 350 to 360. The peak in this histogram is calculated and taken and any other peaks which have a value above 80\% of the original peak is also considered to calculate the orientation. 
 
 Now, for each keypoint, we have the location, scale, and orientation so we can finally create the descriptor. A $16 \times 16$ window is obtained around the keypoint and divided into 16 blocks. For each block, a histogram of the gradients is taken with 8 bins which are then appended together which gives a 128-dimensional vector for the keypoint. The SIFT descriptor of the image is then the vectors for each keypoint appended together to create a $128n$-dimensional vector where $n$ is the number of keypoints in the image. 
 
@@ -510,7 +514,7 @@ We can visualize this in figure \ref{fig:MetricLearning}.
 
 \section{K-Nearest Neighbors}
 
-K-Nearest Neighbors is an algorithm that finds the $K$ nearest neighbors for each datum in a given set of data. Given a list of datapoints in Euclidean space, we wish to find, for each datapoint, the $K$ closest datapoints to it. 
+K-Nearest Neighbors is an algorithm that finds the $K$ nearest neighbors for each datum in a given set of data. Given a list of datapoints in Euclidean space, we wish to find, for each datapoint, the $K$ closest datapoints to it. The \texttt{sklearn} library is used to implement it which either uses a brute force algorithm, a ball tree or a $kd$-tree, which is discussed in appendix \ref{sec:KNNAlgos}.
 
 \section{Principal Component Analysis} \label{sec:PCA}
 
@@ -591,13 +595,13 @@ I also used the following libraries:
     \item \textbf{Numpy}: Using numpy helped increase performance of many parallel computations, such as matrix multiplication, and provided a simple interface to do these with. 
     \item \textbf{Keras and Tensorflow}: I used Keras to create the VGG model and the CifarNet model. We then use it to train the CifarNet model and then make predictions for both models. The weights of VGG were already pre-computed so no training was necessary for VGG.
     \item \textbf{OpenCV}: I used OpenCV for general image processing, such as converting an image into grayscale or loading in images, and for face detection. 
-    \item \textbf{Sklearn}: This library provided an implementation for K-Nearest Neighbors and PCA. 
+    \item \textbf{Sklearn}: This library provided an implementation for K-Nearest Neighbors, PCA, and obtaining folds for cross-validation. 
     \item \textbf{Scipy}: This library provided a function that solved the general eigenvalue problem, given two numpy arrays which was used in the main WGEML algorithm. 
 \end{enumerate}
 
 Finally, Git and GitHub were used for version control and backups. Branches were created for each feature that was to be added to the project and I merged them into the master branch once enough testing was done, whether it was unit testing or integration testing.
 
-\subsection{Datasets}
+\subsection{Datasets} \label{sec:Datasets}
 
 I used the KinFaceW-I, KinFaceW-II, and TSKinFace datasets to train the model. 
 
@@ -694,16 +698,32 @@ Finally, the \texttt{out} folder contains CSVs that contain the accuracies of ce
 
 \subsection{Cross-Validation}
 
-We split the datasets for each relationship into 5 folds each in which each fold within a relationship has around the same number of pairs. 
-Each training set composed of $4$ of the folds and the last fold was designated as the test set, which composed of 5 training/testing set combinations.
-For the KinFaceW datasets, as the images were already split into folds by the dataset, that was used in the project, whereas with TSKinFace, it had to be generated randomly. 
+We split the datasets for each relationship into 5 folds in which each fold within a relationship has around the same number of pairs. 
+Once we have the 5 separate folds, we obtain 5 different train/test splits since we use each fold as a test set and the remaining 4 folds as the training set. For example, if we had the folds $\{A, B, C, D, E\}$, our splits are then shown in table \ref{table:Splits}.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{c|c}
+Training Set & Testing Set    \\\hline
+$B, C, D, E$ & $A$ \\
+$A, C, D, E$ & $B$ \\
+$A, B, D, E$ & $C$ \\
+$A, B, C, E$ & $D$ \\
+$A, B, C, D$ & $E$
+\end{tabular}
+\caption{Training/Testing Splits}
+\label{table:Splits}
+\end{table}    
+    
+We then run the algorithm end-to-end for each train/test split and average the accuracies in the end. 
+For the KinFaceW datasets, as the images were already split into folds by the dataset, that was used in the project, whereas with TSKinFace, it had to be generated randomly, which was done using \texttt{sklearn} which had a \texttt{KFold} function. 
 
 \subsection{Positive and Negative Pairs}
 
 Within each dataset, there are pairs of images which either have the kin relationship or don't, which we call positive and negative pairs respectively. 
 
 KinFaceW had these negative and positive pairs prepared in the \texttt{mat} files that came with the dataset. However, as TSKinFace only came with the images, only the positive images could be found from them. Thus, negative pairs for the dataset had to be created
-randomly. For each relationship, the number of negative pairs was set to be equal to the number of positive pairs in the corresponding set, which was 404 for the training set and 101 for the test set. Then, two images were picked out randomly such that they didn't belong to the same positive pair.
+randomly and the negative pairs generated were saved on disk. For each relationship, the number of negative pairs was set to be equal to the number of positive pairs in the corresponding set, which was 404 for the training set and 101 for the test set. Then, two images were picked out randomly such that they didn't belong to the same positive pair, which meant that they didn't have the same photo ID number, as explained in section \ref{sec:Datasets}.
 
 Finally, each of the KinFaceW datasets had a setting, restricted or unrestricted, in which the restricted setting meant that no negative pairs are used in the training splits and unrestricted means that they are used \cite{KinFaceCitation1}.
 TSKinFace didn't have this type of setting, however, but the differences in whether negative pairs were or weren't used in the training process was still explored. 
@@ -901,7 +921,7 @@ There are 3 main stages to running the project, which are, for each dataset, the
 
 \subsection{Preprocessing}
 
-Given a dataset, we wish to precompute the face descriptors for each image and set up the 5-fold cross validation for TSKinFace. The pipeline is shown in figure \ref{fig:PreprocessingPipeline}.
+Given a dataset, we wish to precompute the face descriptors for each image and set up the 5-fold cross-validation for TSKinFace. The pipeline is shown in figure \ref{fig:PreprocessingPipeline}.
 
 \begin{figure}[h!]
     \centering
@@ -1132,7 +1152,7 @@ However, as you increase the number of face descriptors, there are diminishing r
 % Could group the two ab study plots in one figure?
 \begin{figure}[h!]
     \centering
-    \includegraphics[scale=0.75]{Eval/KFWII-Unrestricted-AbStudy.png}
+    \includegraphics[scale=0.6]{Eval/KFWII-Unrestricted-AbStudy.png}
     \caption{The plot of accuracy versus number of face descriptors used for KinFaceW-II Unrestricted}
     \label{fig:KFW-IIUAbStudy}
 \end{figure}
@@ -1143,7 +1163,7 @@ increases it more, as seen in figure \ref{fig:KFW-IUAbStudy}.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[scale=0.75]{Eval/KFWI-Unrestricted-AbStudy.png}
+    \includegraphics[scale=0.6]{Eval/KFWI-Unrestricted-AbStudy.png}
     \caption{The plot of accuracy versus number of face descriptors used for KinFaceW-I Unrestricted}
     \label{fig:KFW-IUAbStudy}
 \end{figure}
@@ -1244,9 +1264,6 @@ I was able to discover that adding face descriptors to the algorithm has diminis
 
 \section{Lessons Learnt}
 
-% basic research skills (vagueness of papers + how to learn from online)
-% Dependencies
-
 One of the main lessons I learnt was with respect to how important testing is. By writing these unit tests, even for seemingly simple functions, I saved myself a lot of potential future problems as I was able to catch many of the bugs while I was writing the code instead of at the integration stage. Of course, there were still bugs when I tried running the project end-to-end, but these were much simpler to solve knowing that each individual function I wrote and used is correct. 
 For example, solving the eigenvalue problem and getting the top $d$ vectors with respect to WGEML is a fairly simple function to write. However, had I not created some non-trivial matrices to test that function with, I wouldn't have realized that the function was only returning $d$ elements of each eigenvector instead of $d$ eigenvectors. 
 
@@ -1262,11 +1279,8 @@ If I were to do the project over again, I think using more sophisticated softwar
 In the future, the model can be extended to work on videos. This was an extension at the beginning of the project which ended up not coming to fruition due to the fact that I couldn't obtain a dataset for it.  
 Furthermore, the project can be extended such that the potential relationship doesn't have to be specified in the input, which would answer whether two people are related at all rather than if they are related in a specific way. 
 
-% Could also look into how a proper SIFT implementation would affect things. 
-
-% Using WGEML on different datasets which dont have the bias that KFW-II has, 
-% Creating a proper application for it?
-
+Aside from extensions regarding the implementation, we can also further explore whether, in the ablation studies, the graph of accuracy versus the number of face descriptors continues in the way I'd expect with it leveling off after enough face descriptors or does it go down after a bit since the abundance of information could potentially interfere with each other? Furthermore, how would the different sets of face descriptors used affect this?
+Furthermore, in the original results, there wasn't much difference in accuracies between the unrestricted and restricted settings in many of the cases. In this case, the effect the negative pairs has on the algorithm can be further explored and whether different sets of negative pairs can give statistically significant differences in the accuracies. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % the bibliography
@@ -1278,7 +1292,13 @@ Furthermore, the project can be extended such that the potential relationship do
 % the appendices
 \appendix
 
-\chapter{Cascade Classifier} \label{sec:Cascade}
+\chapter{Algorithms Implemented in Libraries} 
+
+\section{Cascade Classifier} \label{sec:Cascade}
+
+\section{K-Nearest Neighbor Algorithms} \label{sec:KNNAlgos}
+
+\chapter{Sample Code}
 
 \chapter{Project Proposal}\label{chapter:Proposal}
 

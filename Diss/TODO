@@ -1,23 +1,16 @@
-For CifarNet images, this website looks useful (you may have already seen it). I had to set the "Spacing Between Filters" to the absolute minimum for it to look at all sensible with the number of channels we're using.
-http://alexlenail.me/NN-SVG/LeNet.html
-
-At a higher level, it would be nice to use something you've learned from your experiments to inspire a new experiment. It may be too late for this now, and it's certainly not a high priority.
-
-Did you find yourself with any new questions after seeing your results? One question I had was whether you could use the relative importance of the different face descriptors to focus on the best ones and extend them slightly to cover their weaknesses. This is a bit awkward if VGG is the best one, but there might be other options.
-
 Overall:
 - Look over captions of figures
 
 Intro:
-* It might be useful to have a diagram to illustrate the problem. e.g. [image, image, "father-daughter"] -> ✓
 - Stronger hook sentence and motivations
 
 Prep:
-* 2.3.4 (and 2.8.3?): mention/cite the celebrity dataset you used - it currently sounds like you curated all the images.
 - Redraw/source figures
+- Maybe move SIFT to appendix
 
 Implementation:
-- Maybe make requrements analysis a table?
+* SIFT implementation low priority
+* Flowchart for pipelines potentially
 
 Evaluation:
 - Create figures for the actual original results
@@ -32,3 +25,8 @@ Project:
 - ROC Curves
 - Ablation Studies by blocking image
 - Update README to be a proper README
+
+- Add appendices for KNN and cascade classifiers. 
+
+- need to edit my introduction again
+- read it over again while keeping the assessment guidelines in mind
