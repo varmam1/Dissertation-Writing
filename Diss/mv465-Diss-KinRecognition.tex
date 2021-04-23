@@ -724,6 +724,8 @@ Within each dataset, there are pairs of images which either have the kin relatio
 
 KinFaceW had these negative and positive pairs prepared in the \texttt{mat} files that came with the dataset. However, as TSKinFace only came with the images, only the positive images could be found from them. Thus, negative pairs for the dataset had to be created
 randomly and the negative pairs generated were saved on disk. For each relationship, the number of negative pairs was set to be equal to the number of positive pairs in the corresponding set, which was 404 for the training set and 101 for the test set. Then, two images were picked out randomly such that they didn't belong to the same positive pair, which meant that they didn't have the same photo ID number, as explained in section \ref{sec:Datasets}.
+As we wanted to create pairs for each relationship, if we had the relationship FS, then we'd want to pick a certain number of negative pairs from the FMS and FMSD image sets such that the ratio of negative pairs picked from each set is similar to the ratio of positive pairs in each set.
+To create a pair from a given set, a number was randomly picked from $1$ to $n$ where $n$ was the number of pairs in that set and another number was picked from 1 to $n - 1$. If the two numbers were equal, the second number became $n$, thus creating 2 random numbers that aren't equal. 
 
 Finally, each of the KinFaceW datasets had a setting, restricted or unrestricted, in which the restricted setting meant that no negative pairs are used in the training splits and unrestricted means that they are used \cite{KinFaceCitation1}.
 TSKinFace didn't have this type of setting, however, but the differences in whether negative pairs were or weren't used in the training process was still explored. 
@@ -1073,7 +1075,14 @@ TSK     & All Pairs In Test/Train             & 0.8409 & 0.8203 & 0.8242 & 0.836
 \end{tabular}
 \caption{Accuracies of WGEML applied to each dataset for each relationship}
 \label{table:Accs}
-\end{table}    
+\end{table} 
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.7]{Eval/OrigResults.png}
+    \caption{Accuracies of WGEML applied to each dataset for each relationship grouped by dataset}
+    \label{fig:Accs}
+\end{figure}
 
 \begin{table}[h!]
 \centering
@@ -1091,6 +1100,12 @@ TSK     & All Pairs In Test/Train             & 0.8409 & 0.8203 & 0.8242 & 0.836
 \label{table:diffInAccs}
 \end{table}    
 
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.7]{Eval/DiffOrigResults.png}
+    \caption{Differences in accuracies between my implementation and \cite{WGEML} in \%}
+    \label{fig:diffInAccs}
+\end{figure}
 % TODO: Add graphs cause ew tables yucky
 
 We can see that none of the absolute values of the differences go higher than $8.89\%$ which, as will be discussed in \ref{sec:SuccCriterionEval}, means that the success criterion is fulfilled. 
@@ -1193,7 +1208,6 @@ highest number of configurations which did better than using all 4 face descript
 relationship, with 11 of the 22 configurations. The other datasets had about 3-4 instances where 
 this occurred. 
 
-% \subsection{Blocking Parts of Images} \label{sec:ImageAbStudies}
 
 \section{CifarNet Extension} \label{sec:CFNResults}
 
