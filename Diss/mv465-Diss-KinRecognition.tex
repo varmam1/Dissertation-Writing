@@ -101,25 +101,29 @@ Supervisor:         & \bf Daniel Bates                    \\
 %%%%%%%%%%% Introduction %%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Intro comments:
-% * It might be useful to have a diagram to illustrate the problem. e.g. [image, image, "father-daughter"] -> ✓
-% * You will probably need to define terms like CNN and SVM the first time you use them
-
 \chapter{Introduction}
 % TODO: A stronger hook sentence is definitely needed here. 
 
-Kinship recognition is the way of recognizing whether two given people are related to each other or not based on how they look. This is an evolutionary trait in humans as it is advantageous to inclusive fitness for an organism to be able to recognize which of their neighbors were close relatives \cite{HamiltonGenetic}. Thus, it stands to reason that the ability to recognize kinship relationships has evolved in humans. 
+Kinship recognition is the way of recognizing whether two given people are related to each other or not based on how they look. This is an evolutionary trait in humans as it is advantageous to inclusive fitness for an organism to be able to recognize which of their neighbors are close relatives \cite{HamiltonGenetic}. Thus, it stands to reason that the ability to recognize kinship relationships has evolved in humans. 
 In humans, specifically, facial resemblance is expected to serve as an indicator of kinship as we have seen that strangers are able to match photographs of mothers to their infants without any prior contact with any of the family \cite{mateo2015}. 
 
 Computational kinship recognition is the field of computationally figuring out kinship relationships between people without any prior knowledge of the family. 
 
 \section{Problem Overview}
 
-There are multiple problems in the field of computational kin recognition, in which case I will focus on one of them. The first of which takes as input a pair of images and a proposed kinship relationship, for example father-daughter, and recognizes whether the relationship exists. 
-These relationships tend to be more commonly parent-child relationships as opposed to sibling-sibling relationships, for example, which are less commonly used. A further extension of the main kin recognition problem is Tri-Subject Kinship which takes 3 images, two parents and a child, and determines if they are related 
+There are multiple problems in the field of computational kin recognition, and I will focus on solving one of them. The first of which takes as input a pair of images and a proposed kinship relationship, for example mother-daughter, and recognizes whether the relationship exists. We can see an example set of images in figure \ref{fig:KinRecogEx}.
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics{Intro/face_example.png}
+    \caption{An example of an input into a classical kin recognition problem}
+    \label{fig:KinRecogEx}
+\end{figure}
+
+These relationships tend to be more commonly parent-child relationships as opposed to sibling-sibling relationships, for example. A further extension of the main kin recognition problem is Tri-Subject Kinship which takes 3 images, two parents and a child, and determines if they are related 
 or not. These problems are the ones that are being looked at in this dissertation. 
 
-However, some other major problems in the field include search-and-retrieval and family classification. Search-and-retrieval is the problem which takes an image of a person as input and searches through a database to find people with whom they are most likely to be related to. This outputs a list of these people that they could be related to. 
+Some other major problems in the field include search-and-retrieval and family classification. Search-and-retrieval is the problem which takes an image of a person as input and searches through a database to find people with whom they are most likely to be related to. This outputs a list of these people that they could be related to. 
 Family classification deals with a similar task of taking an image of a person as input and figuring out which family they may belong to. 
 
 \section{Motivation}
@@ -128,7 +132,7 @@ Accurate kinship recognition software has multiple applications in humanitarian 
 With regards to humanitarian issues, by using kin recognition, we can better recognize missing children and match them with their parents \cite{robinson2020visual}.
 It can also be used for stopping human traffickers from claiming they are family members of the victim or to reunite families across refugee camps. 
 
-Furthermore, there are potential use-cases in social media and also poses privacy protections. 
+Furthermore, there are potential use-cases in social media and it can also pose privacy protections. % ??????
 % TODO: Strengthen up the motivations here 
 \section{Related Work}     
 
@@ -168,7 +172,6 @@ In this chapter, I discuss the necessary technical background information needed
 
 \section{Convolutional Neural Networks} \label{sec:CNN}
 
-% TODO: what is a neural network
 To talk about Convolutional Neural Networks, first we must discuss what an artificial neural network (ANN) is. This is just a set of layers like we see in figure \ref{fig:ANNEx} which have neurons in each of the layers which each output one value. 
 
 \begin{figure}[ht]
@@ -202,13 +205,11 @@ Where $f_i$ represents the activation function for the corresponding layer and $
 
 A Convolutional Neural Network (CNN) is a type of neural network which is used to process data with a grid pattern such as images. As opposed to an artificial neural network which is just composed of fully-connected layers, a CNN also uses convolutional layers and pooling layers \cite{CNN1}. Fully-connected layers have it so that each neuron in the layer have all of the connections to each of the input values, which is the same as in regular neural networks. 
 
-% \subsection{Fully-Connected Layers}
-
 \subsection{Convolutional Layers}
 
 A convolutional layer takes an input image and, as hyperparameters, takes the number of output filters, kernel size and stride size in order to create a set of kernels and biases in order to create the output. 
 A kernel is a matrix which is usually small and has sizes less than that of the input image but expands the depth of the entire input image. So, for example, if the input to a convolutional layer was $32 \times 32 \times 64$, then a kernel could have size $3 \times 3 \times 64$ where the first two sizes are specified. 
-The kernel is then started in the top left of the input and the dot product of the kernel and the input sub-array is taken to be the output at that cell. Then the kernel is moved along as much as specified in the stride. So if the stride was $2 \times 2$, then the kernel would move 2 to the right and do the same thing. An illustration of this is seen in figure \ref{fig:ConvLayer}.
+The kernel is then started in the top left of the input and the dot product of the kernel and the input sub-array is taken to be the output at that cell. Then the kernel is moved along as much as specified in the stride. So, if the stride was $2 \times 2$, then the kernel would move 2 to the right and do the same thing. An illustration of this is seen in figure \ref{fig:ConvLayer}.
 
 \begin{figure}[h!]
     \centering
@@ -248,7 +249,7 @@ ReLU applies the following on each output of a layer:
 
 \[f(x) = \max(0, x)\]
 
-In otherwords, it makes sure that all negative values become 0. This is simple to calculate and has the property that the derivative is either 1 or 0 which makes the gradient computation simpler. Due to the simplicity of the activation function, this helps speed up training a neural network if it is used as the activation layer for some layers as opposed to other ones. 
+In other words, it makes sure that all negative values become 0. This is simple to calculate and has the property that the derivative is either 1 or 0 which makes the gradient computation simpler. Due to the simplicity of the activation function, this helps speed up training a neural network if it is used as the activation layer for some layers as opposed to other ones. 
 
 \subsubsection{Softmax}
 
@@ -256,30 +257,23 @@ Another one if the softmax function which takes a vector, $\mathbf{z}$ and the c
 
 \[\sigma(\mathbf{z})_i = \frac{e^{z_i}}{\sum_{j = 1}^{N} e^{z_j}}\]
 
-Where $N$ is the dimension of the input vector. In other words, it takes a vector and outputs a vector of the same size where the sum of the values of the vector add up to 1 so it makes it so you can interpret the individual values as probabilities. This is a useful activation function for the last layer of a neural network that solves a classification problem. For example, in the CifarNet model in section \ref{sec:CFNExt}, the last layer has the softmax function applied to it in order for each of the 10 values to be interpreted as a probability that the input image was the corresponding class. 
+Where $N$ is the dimension of the input vector. In other words, it takes a vector and outputs a vector of the same size where the sum of the values of the vector adds up to 1 so it makes it so you can interpret the individual values as probabilities. This is a useful activation function for the last layer of a neural network that solves a classification problem. For example, in the CifarNet model in section \ref{sec:CFNExt}, the last layer has the softmax function applied to it in order for each of the 10 values to be interpreted as a probability that the input image was the corresponding class. 
 
 \section{Face Detection} \label{sec:FaceDetection}
 
-Face detection is the task of finding a face within a given image and returning the set of faces found. 
-%  as seen in Figure \ref{fig:FaceDetEx}. 
-This differs from face recognition since the task is only to find the faces and not to recognize who the faces belong to. The project uses OpenCV's version of face detection which is a cascade classifier and is talked about in appendix \ref{sec:Cascade}. 
-
-% \begin{figure}[ht]
-%     \centering
-%     \caption{Face detection example}
-%     \label{fig:FaceDetEx}
-% \end{figure}
+Face detection is the task of finding faces within a given image and returning the set of faces found. 
+This differs from face recognition since the task is only to find the faces and not to recognize who the faces belong to. The project uses OpenCV's version of face detection which is a cascade classifier and is discussed in appendix \ref{sec:Cascade}. 
 
 \section{Face Descriptors} \label{sec:PrepFD}
 
-We wish to be able to create a mapping from a colored image into a vector to make computations easier and to be able to determine similarity between images, which we do using the cosine similarity in this project as seen in section \ref{sec:PredictionModule}. These are called image descriptors for general images. When we try and map face images to vectors, we call these face descriptors. 
+We wish to be able to create a mapping from a colored image into a vector to make computations easier and to be able to determine similarity between images. These are called image descriptors for general images. When we try and map face images to vectors, we call these face descriptors. 
 We want these face descriptor mappings to be able to match the same person in different poses and illuminant geometries to face descriptors that are close to each other in distance. Thus, these mappings try and capture color, texture, and shapes,
 for example. There are multiple face descriptors that can be made of a face image, each of which extracts different features from the face. We use the Local Binary Patterns, Histogram of Gradients, Scale-Invariant Feature Transform and VGG face descriptors to extract features from each face.
 
 \subsection{Local Binary Patterns}
 
-One such face descriptor is the Local Binary Patterns (LBP) visual descriptor which is adapted for faces. LBP is a texture descriptor \cite{LBPFace} which means that the algorithm attempts to describe the texture of the image, rather than anything to do with the color. 
-As such, given an image we want the descriptor of, we must first convert it to grayscale. This can be done in various ways but in the project, the OpenCV method is used which maps each RGB pixel to the grayscale value\footnote{Information taken from \url{https://docs.opencv.org/3.4/de/d25/imgproc_color_conversions.html} using the RGB to Gray color conversion}:
+The Local Binary Patterns (LBP) visual descriptor which is adapted for faces is a texture descriptor \cite{LBPFace} which means that the algorithm attempts to describe the texture of the image, rather than anything to do with the color. 
+As such, given an image, we must first convert it to grayscale. This can be done in various ways but in the project, the OpenCV method is used which maps each RGB pixel to the grayscale value\footnote{Information taken from \url{https://docs.opencv.org/3.4/de/d25/imgproc_color_conversions.html} using the RGB to Gray color conversion}:
 
 \[0.299\times R+0.587\times G+0.114\times B\]
 
@@ -293,7 +287,7 @@ Then, for each pixel in the image, a neighborhood of pixels is obtained from it.
 \end{figure}
 
 The simplest neighborhood, which is the neighborhood used in this project, is the direct neighbors of the pixel, which is the first neighborhood in figure \ref{fig:LBPNeighborhood}. 
-However, on the edges, some of the neighbors won't exist, due to the fact that it's on the edge of the image. To mitigate this, in the implementation, I pad the grayscale image with 0s on the outside of the image such that each pixel in the image has the same number of neighbors. 
+However, on the edges, some of the neighbors won't exist. To mitigate this, in the implementation, I pad the grayscale image with 0s on the outside of the image such that each pixel in the image has the same number of neighbors. 
 Once we have our neighborhood of the pixel, we compare the grayscale value of the main pixel with each of the grayscale values in the neighborhood. For each neighboring value, if it is greater than the main pixel, we make it a $1$, otherwise we make it a $0$. 
 We are then able to create a binary number from the neighboring values. In practice, where the number is started from doesn't matter but in my implementation, the number starts from the left cell and goes counterclockwise. 
 Applying this to figure \ref{fig:LBPExample}, we get that our LBP value for this pixel would be $01111000_2$ which, in decimal, is $120$. 
@@ -347,7 +341,7 @@ We get that the kernel convolved on the image is:
     6
 \end{bmatrix}\]
 
-We can then approximate the derivative of an image as a kernel being convolved on the image. To do so, we use the kernels:
+We can then approximate the derivative of an image using a kernel being convolved on the image. To do so, we use the kernels:
 \begin{align*}
     G_x &= \begin{bmatrix} -1 & 0 & 1\end{bmatrix} \\
     G_y &= \begin{bmatrix} -1 & 0 & 1\end{bmatrix}^T
@@ -365,7 +359,7 @@ And that the angles at each point are:
 However, there are two things that need to be addressed before we move on to the rest of the algorithm. Firstly, there are still 3 channels for the image, so we have obtained the gradient in the $x$ and $y$ direction for each pixel and each channel. As such, 
 we define the gradient of each pixel to be the gradient which has the maximum magnitude among the 3 channels and the corresponding angle is used as well. 
 
-Furthermore, the angles returned range between $0^{\circ}$ and $360^{\circ}$. However, we require that the angles be unsigned, so the angle at each pixel, $\theta_{(x, y)}$, becomes:
+Furthermore, the angles returned range between $0^{\circ}$ and $360^{\circ}$. However, we require that the angles be ``unsigned'', so the angle at each pixel, $\theta_{(x, y)}$, becomes:
 
 \begin{center}
 \texttt{$\theta_{(x, y)}$ := $\theta_{(x, y)}\mod{180}$}
@@ -442,9 +436,9 @@ Where $r$ is the ratio of the eigenvalues. Thus, letting the maximum ratio that 
 \[\frac{\text{Tr}(\mathbf{H})^2}{\text{Det}(\mathbf{H})} < \frac{(r_0+1)^2}{r_0}\]
 If it is, then this is a proper keypoint. If it isn't then this is an edge so we can discard it. 
 
-We now have each of the keypoints which are scale-invariant so we need to make it rotation-invariant as well. This is done by assigning an orientation to the keypoints. A neighborhood is taken around the keypoint in which the gradient is obtained for each pixel in the area and a histogram of these gradients is created based on the angle, this time in bins of $0$ to $10$, 10 to 20, etc. until 350 to 360. The peak in this histogram is calculated and taken and any peak above 80\% of it is also considered to calculate the orientation. 
+We now have each of the keypoints which are scale-invariant, so we need to make it rotation-invariant as well. This is done by assigning an orientation to the keypoints. A neighborhood is taken around the keypoint in which the gradient is obtained for each pixel in the area and a histogram of these gradients is created based on the angle, this time in bins of $0$ to $10$, 10 to 20, etc. until 350 to 360. The peak in this histogram is calculated and taken and any peak above 80\% of it is also considered to calculate the orientation. 
 
-Now, for each keypoint, we have the location, scale and orientation so we can finally create the descriptor. A $16 \times 16$ window is obtained around the keypoint and divided into 16 blocks. For each block, a histogram of the gradients is taken with 8 bins which are then appended together which gives a 128-dimensional vector for the keypoint. The SIFT descriptor of the image is then the vectors for each keypoint appended together to create a $128n$-dimensional vector where $n$ is the number of keypoints in the image. 
+Now, for each keypoint, we have the location, scale, and orientation so we can finally create the descriptor. A $16 \times 16$ window is obtained around the keypoint and divided into 16 blocks. For each block, a histogram of the gradients is taken with 8 bins which are then appended together which gives a 128-dimensional vector for the keypoint. The SIFT descriptor of the image is then the vectors for each keypoint appended together to create a $128n$-dimensional vector where $n$ is the number of keypoints in the image. 
 
 The actual implementation of SIFT that is used differs from the original version which is talked about in section \ref{sec:SIFTImpl}.
 
@@ -469,7 +463,7 @@ The VGG model for faces is then the model described above with the softmax layer
 
 \section{Metric Learning} \label{sec:MetricLearningPrimer}
 
-We wish to measure the similarity between a pair of faces in order to determine whether they are related or not. One way to approach this is to use similarity learning, which is a type of approach to the problem in which the goal is to learn a similarity function in order to measure how similar two objects are. 
+We wish to measure the similarity between a pair of faces in order to determine whether they are related or not. One way to approach this is to use similarity learning in which the goal is to learn a similarity function in order to measure how similar two objects are. 
 However, we often use distance to help measure the similarity between data points. By learning what this distance function ought to be, we would be able to find a better similarity function so finding this distance function is the goal of metric learning \cite{metricLearningPrimer}. To go more in depth, we must first define a few concepts.
 
 Given a non-empty set $A$, we define a \textit{distance} over $A$ as a function $d: A \times A \to \mathbb{R}$ such that the following holds:
@@ -488,7 +482,7 @@ If $M$ is positive semidefinite, then $M$ must be decomposable into $B^TB$ where
 \[d_M(x, y) = \sqrt{(x - y)^TM(x - y)} = \sqrt{(x - y)^TB^TB(x - y)} = \sqrt{(Bx - By)^T(Bx - By)}\]
 
 So the Mahalanobis distance is essentially a Euclidean distance after applying a linear transformation to each of the input vectors. 
-This makes it so that we only have to learn what this linear transformation is which is simpler to find than searching through the set of all possible distance functions to see which is the best overall distance function. 
+This makes it so that we only have to learn what this linear transformation is which is simpler to find than searching through the set of all possible distance functions to see which is the best overall. 
 
 The Mahalanobis distance is a \textit{pseudometric}, which is a distance function in which the coincidence property doesn't hold, when the matrix $M$ isn't full-rank. A matrix is \textit{full-rank} when the rank of the matrix is either equal to the number of rows or columns in the matrix.
 
@@ -601,7 +595,7 @@ I also used the following libraries:
     \item \textbf{Scipy}: This library provided a function that solved the general eigenvalue problem, given two numpy arrays which was used in the main WGEML algorithm. 
 \end{enumerate}
 
-Finally, Git and Github were used for version control and backups. Branches were created for each feature that was to be added to the project and I merged them into the master branch once enough testing was done, whether it was unit testing or integration testing.
+Finally, Git and GitHub were used for version control and backups. Branches were created for each feature that was to be added to the project and I merged them into the master branch once enough testing was done, whether it was unit testing or integration testing.
 
 \subsection{Datasets}
 
@@ -609,7 +603,7 @@ I used the KinFaceW-I, KinFaceW-II, and TSKinFace datasets to train the model.
 
 The KinFaceW datasets \cite{KinFaceCitation2} \cite{KinFaceCitation1} are composed of face images from the internet which include public figures as well as their parents or children. Both datasets contain no restriction on pose, lighting background, expression, age, ethnicity, or partial occlusion. 
 The main difference between the datasets is that the pairs of face images that have a kin relationship in KinFaceW-I are from different images whereas, in KinFaceW-II, they are from the same image. 
-In terms of the specifics of the datasets, they both support four kin relationships, Father-Son (FS), Father-Daughter (FD), Mother-Son (MS), and Mother-Daughter (MD). Each face image are images of size $64 \times 64$. The datasets also contain pre-computed 5 folds for cross-validation for each relationship which contained the names of the pairs of images that had the relationship and those that didn't, henceforth positive and negative pairs respectively. 
+In terms of the specifics of the datasets, they both support four kin relationships, Father-Son (FS), Father-Daughter (FD), Mother-Son (MS), and Mother-Daughter (MD). Each face image has size $64 \times 64$. The datasets also contain pre-computed 5 folds for cross-validation for each relationship which contained the names of the pairs of images that had the relationship and those that didn't, henceforth positive and negative pairs respectively. 
 Finally, the dataset has 2 main settings which are used: the restricted setting in which only positive pairs of images are used and the unrestricted setting in which negative pairs of images are used. 
 
 The TSKinFace dataset \cite{TSKinFace} contains images for the relationships, Father-Mother-Son (FMS), Father-Mother-Daughter (FMD), and Father-Mother-Son-Daughter (FMSD). 
@@ -637,8 +631,8 @@ Furthermore, I am able to use VGG for non-commercial purposes under the Creative
 
 \chapter{Implementation} \label{chapter:Implementation}
 
-In this chapter, the repository is examined in detail in section \ref{sec:RepositoryOverview}, how the project is run from end-to-end is discussed in section \ref{sec:Workflow}, 
-and each of the modules are discussed in sections \ref{sec:FDModule}, \ref{sec:WGEMLModule}, \ref{sec:PredictionModule}, and \ref{sec:DataPrep}. Finally, the extension to replace VGG with another face descriptor is discussed in section \ref{sec:CFNExt}.
+In this chapter, the repository is examined in detail in section \ref{sec:RepositoryOverview}, 
+each of the modules are discussed in sections \ref{sec:DataPrep}, \ref{sec:FDModule}, \ref{sec:WGEMLModule}, and \ref{sec:PredictionModule}, in which the extension to replace VGG with another face descriptor is discussed in section \ref{sec:CFNExt}, and how the project is run from end-to-end is discussed in section \ref{sec:Workflow}.
 
 \section{Repository Overview} \label{sec:RepositoryOverview}
 
@@ -720,7 +714,7 @@ In order to save on computation time for the training process as well as on disk
 
 \subsection{Saving Results to Disk} \label{sec:SaveDisk}
 
-Running the project end-to-end each time would take too long each time and, in order to better explore some of the results that were taken, the pipeline needed to be split into modules. This ended up being the preprocessing stage, the training stage and then the testing stage. These stages are explained in further detail in section \ref{sec:Workflow}. 
+Running the project end-to-end each time would take too long and, in order to better explore some of the results that were taken, the pipeline needed to be split into modules. This ended up being the preprocessing stage, the training stage and then the testing stage. These stages are explained in further detail in section \ref{sec:Workflow}. 
 What was saved to disk is as follows, split by stage:
 
 \begin{enumerate}
@@ -743,22 +737,14 @@ What was saved to disk is as follows, split by stage:
 
 \section{Face Descriptors} \label{sec:FDModule}
 
-Each of the LBP and HOG face descriptors were implemented exactly as mentioned in section \ref{sec:PrepFD} directly without the use of any libraries other than Numpy and OpenCV. However, there are some extra details that need to be explained for the SIFT and VGG face descriptors.
+Each of the LBP and HOG face descriptors were implemented exactly as mentioned in section \ref{sec:PrepFD} without the use of any libraries other than Numpy and OpenCV. However, there are some extra details that need to be explained for the SIFT and VGG face descriptors.
 
 \subsection{SIFT Implementation} \label{sec:SIFTImpl}
 
 The major difference between the original version of SIFT described in \cite{SIFT} and what was needed was that keypoints of each image weren't calculated. 
 Instead, the descriptor that was obtained from each keypoint, which is described in section \ref{sec:SIFTPrep}, is instead obtained from dividing the image into $7 \times 7$ overlapping
 patches on a $16 \times 16$ grid. 
-%  as shown in figure \ref{fig:Patches}.
 
-% \begin{figure}[ht]
-    
-%     % TODO: Change caption and provide an image to show what the overlapping patches look like
-%     \caption{The overlapping patches}
-%     \label{fig:Patches}
-% \end{figure}
-% Describe differences
 This leads to there being a 128-dimensional vector for each patch which leads to a $128 \times 7 \times 7 = 6272$-dimensional vector for each image. This also helps to standardize the dimension of the vector for each image
 as different images can have a different number of keypoints which would lead to different dimensionalities of the vectors. This decision was made by the WGEML paper in their description of what face descriptors were used. 
 
@@ -793,64 +779,8 @@ The face descriptor is then obtained in a similar manner to VGG where the softma
 \section{WGEML} \label{sec:WGEMLModule}
 
 The main algorithm used in the project is Weighted Graph Embedding-Based Metric Learning (WGEML) \cite{WGEML}. The algorithm is a form of metric learning which takes in, as input, a training positive set for each face descriptor, $\mathcal{S}^p = \{(\mathbf{x}_i^p, \mathbf{y}_i^p) \mid 1 \leq i \leq N\}$ where $N$ is the number of image pairs in the set and a negative pair set $\mathcal{D}^p = \{(\mathbf{x}_i^p, \mathbf{y}_j^p) \mid 1 \leq i \leq N, j \neq i\}$. Let there be $M$ face descriptors for each image in the set. 
-It also takes in a tuning parameter $r$ and a neighborhood size $K$ as input but those have been experimentally found to be 5 for each, each of which will be discussed later in this section. This section discusses the problem statement in section \ref{sec:WGEMLProblem} and then the specifics of the approach in section \ref{sec:WGEMLApproach} before summarizing the overall algorithm in Algorithm \ref{code:WGEMLPsuedocode}. 
+It also takes in a tuning parameter $r$ and a neighborhood size $K$ as input but those have been experimentally found to be 5 for each, each of which will be discussed later in this section. This section first gives an overview of the algorithm in Algorithm \ref{code:WGEMLPsuedocode} before discussing the problem statement in section \ref{sec:WGEMLProblem} and then the specifics of the approach in section \ref{sec:WGEMLApproach}. 
 
-\subsection{Problem} \label{sec:WGEMLProblem}
-
-Given these inputs, the goal is to find the distance metrics and weights for:
-\begin{align*}
-d^2(\mathbf{x}_i, \mathbf{y}_i) &= \sum_{p = 1}^{M} w_p(\mathbf{x}_i^p - \mathbf{y}_i^p)^T\mathbf{A}_p(\mathbf{x}_i^p - \mathbf{y}_i^p)\\ 
-&= \sum_{p = 1}^{M} w_p d^2_{\mathbf{A}_p}(\mathbf{x}_i^p, \mathbf{y}_j^p)
-\end{align*}
-
-Where $\mathbf{x}_i^p$ represents the $p$th face descriptor of the image $\mathbf{x}_i$, $w_p$ is a weight and $\mathbf{A}_p$ is a $D \times D$ semidefinite positive matrix, where $D$ is the dimensionality of the corresponding face descriptor. This distance function finds the distance between each pair of face descriptors and weights them accordingly.
-We wish to find $\mathbf{A}_p$ such that the between-class variance is maximized and the within-class variance is minimized. This can be formalized as the optimization problem:
-
-\begin{align*}
-    \max_{\mathbf{A}, \mathbf{w}} \mathcal{F} &= \sum_{p = 1}^{M} w_p^r[(\frac{1}{2}(\frac{1}{NK}\sum_{i = 1}^{N}\sum_{n_1 = 1}^{K} d^2_{\mathbf{A}_p}(\mathbf{x}_i^p, \mathbf{y}_{in_1}^p) + \frac{1}{NK}\sum_{i = 1}^{N}\sum_{n_2 = 1}^{K} d^2_{\mathbf{A}_p}(\mathbf{x}_{in_2}^p, \mathbf{y}_i^p)) \\
-    & + \frac{1}{N} \sum_{i = 1, j \neq i}^{N} d^2_{\mathbf{A}_p}(\mathbf{x}_i^p, \mathbf{y}_j^p))/\frac{1}{N} \sum_{i = 1}^{N} d^2_{\mathbf{A}_p}(\mathbf{x}_i^p, \mathbf{y}_i^p)]
-\end{align*}
-
-\[\text{s.t. } \sum_{p = 1}^{M} w_p = 1\]
-\[\forall p \in \{1, ..., M\}, w_p \geq 0\]
-Where $\mathbf{y}_{in_1}^p$ is the $n_1$th nearest neighbor of $\mathbf{y}_i$ and similarly for $\mathbf{x}_{in_2}$. We have $w_p^r$ in order to avoid over-fitting and use information from each face descriptor. 
-This optimization function tries to minimize the denominator which, in turn, pulls the samples that have the kin relationship together and maximizes the numerator which means that the pairs which don't have the kin relationship are pushed further away from each other as well as those of their neighbors.
-
-\subsection{Approach} \label{sec:WGEMLApproach}
-
-Now that the problem is defined, we break down $\mathbf{A}_p = \mathbf{U}_p\mathbf{U}_p^T$ since $\mathbf{A}_p$ is symmetric and positive semidefinite. $\mathbf{U}_p$ has size $D \times d$ such that $d \ll D$. In my project, $d$ was set to be $10$ by varying the value and seeing how it affects the accuracies and picking the best values.
-Thus, the optimization problem can be rewritten as:
-
-\[\max_{\mathbf{U}, \mathbf{w}}  \sum_{p = 1}^{M} w_p^r \frac{tr[\mathbf{U}_p^T(\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p)\mathbf{U}_p]}{tr[\mathbf{U}_p^T\mathbf{S}_p\mathbf{U}_p]}\]
-Such that $\mathbf{U}_P^T \mathbf{U}_p = I$, $\sum_{p = 1}^{M} w_p = 1$ and $\forall p \in \{1, ..., M\}, w_p \geq 0$, where:
-
-\[\mathbf{S}_p = \frac{1}{N} \sum_{(\mathbf{x}_i^p, \mathbf{y}_i^p) \in \mathcal{S}^p} (\mathbf{x}_i^p - \mathbf{y}_i^p)(\mathbf{x}_i^p - \mathbf{y}_i^p)^T\]
-\[\mathbf{D}_p = \frac{1}{N} \sum_{(\mathbf{x}_i^p, \mathbf{y}_j^p) \in \mathcal{D}^p} (\mathbf{x}_i^p - \mathbf{y}_j^p)(\mathbf{x}_i^p - \mathbf{y}_j^p)^T\]
-\[\mathbf{D}_{1p} = \frac{1}{NK} \sum_{\substack{(\mathbf{x}_i^p, \mathbf{y}_i^p) \in \mathcal{S}^p \\ \mathbf{y}_k^p \in \mathcal{N}_K(\mathbf{y}_i^p)}} (\mathbf{x}_i^p - \mathbf{y}_k^p)(\mathbf{x}_i^p - \mathbf{y}_k^p)^T\] 
-\[\mathbf{D}_{2p} = \frac{1}{NK} \sum_{\substack{(\mathbf{x}_i^p, \mathbf{y}_i^p) \in \mathcal{S}^p \\ \mathbf{x}_k^p \in \mathcal{N}_K(\mathbf{x}_i^p)}} (\mathbf{x}_k^p - \mathbf{y}_i^p)(\mathbf{x}_k^p - \mathbf{y}_i^p)^T\]
-
-Where $\mathcal{N}_K(\mathbf{x}_i^p)$ represents the $K$ nearest neighbors of $\mathbf{x}_i^p$. This is when K-nearest neighbors is used, and $K$ is set to 5 in the experiments.
-In order to solve this, we first let $\mathbf{w}$ be constant in order to solve $\mathbf{U}$ and then use that to find $\mathbf{w}$. By letting $\mathbf{w}$ be constant, the problem is reduced to:
-\[\max_{\mathbf{U}_p^T \mathbf{U}_p = I} \frac{\text{tr}[\mathbf{U}_p^T(\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p)\mathbf{U}_p]}{\text{tr}[\mathbf{U}_p^T\mathbf{S}_p\mathbf{U}_p]}\]
-For each $p \in \{1, ..., M\}$. This can then be converted to an alternative problem \cite{RatioTrace}:
-\[\max_{\mathbf{U}_p}  \text{ tr}\left[(\mathbf{U}_p^T\mathbf{S}_p\mathbf{U}_p)^{-1} \mathbf{U}_p^T\paren*{\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p}\mathbf{U}_p\right]\]
-Which can be solved by solving the following generalized eigenvalue problem:
-\[\paren*{\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p}\mathbf{u} = \lambda \mathbf{S}_p \mathbf{u}\]
-Thus, $\mathbf{U}_p = [u_1, u_2, ..., u_d]$ such that the corresponding eigenvalues for $u_1, .., u_d$ are the top $d$ largest eigenvalues (ie. $\lambda_1 \geq ... \geq \lambda_d$). However, this can be problematic in practice since $\mathbf{S}_p$ can be near singular when $D > N$. Thus, the identity matrix is added as a regularizer as follows:
-\[\mathbf{S}_p = (1 - \beta)\mathbf{S}_p + \beta \frac{\text{tr}(\mathbf{S}_p)}{N}\mathbf{I}\]
-Where $\beta$ is a regularization parameter which is set to 0.5 experimentally. This allows us to then not need to solve the generalized eigenvalue problem, as that takes more computation time, and we can solve:
-\[\mathbf{S}_p^{-1}\paren*{\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p}\mathbf{u} = \lambda \mathbf{u}\]
-Thus, we have found $\mathbf{U}_p, \forall p \in \{1, ..., M\}$. 
-
-To find the weights, $\mathbf{w}$, we can construct the Lagrangian:
-\[\mathcal{L}(\mathbf{w}, \lambda) = \sum_{p = 1}^{M} w_p^r \frac{\text{tr}[\mathbf{U}_p^T(\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p)\mathbf{U}_p]}{\text{tr}[\mathbf{U}_p^T\mathbf{S}_p\mathbf{U}_p]} - \lambda \paren*{\sum_{p = 1}^{M}w_p - 1}\]
-And thus, solve it:
-\[\frac{\partial \mathcal{L}}{\partial w_p} = rw_p^{r-1} \frac{\text{tr}[\mathbf{U}_p^T(\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p)\mathbf{U}_p]}{\text{tr}[\mathbf{U}_p^T\mathbf{S}_p\mathbf{U}_p]} - \lambda = 0\]
-\[\frac{\partial \mathcal{L}}{\partial \lambda} = \sum_{p = 1}^{M} w_p - 1 = 0\]
-Which means:
-\[w_p' = \paren*{\frac{\text{tr}[\mathbf{U}_p^T\mathbf{S}_p\mathbf{U}_p]}{\text{tr}[\mathbf{U}_p^T(\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p)\mathbf{U}_p]}}^{\frac{1}{r - 1}}\]
-\[w_p = \frac{w_p'}{\sum_{i = 1}^{M}w_i'}\]
-Thus, we now have the matrices to calculate the distance and the weights for each face descriptor. 
 The overall algorithm is written in psuedocode in Algorithm \ref{code:WGEMLPsuedocode} from \cite{WGEML}.
 \begin{algorithm}
 \caption{WGEML}\label{code:WGEMLPsuedocode}
@@ -862,15 +792,83 @@ The overall algorithm is written in psuedocode in Algorithm \ref{code:WGEMLPsued
 \State Initialize $\mathbf{U}$
 \For{$p \in \{1, ..., M\}$}{}
     \State Use KNN to find the nearest neighbors of each $\mathbf{x}_i^p$ and $\mathbf{y}_i^p$. 
-    \State Create the matrices $\mathbf{S}_p, \mathbf{D}_p, \mathbf{D}_{1p}, \mathbf{D}_{2p}$
-    \State Regularize the matrix $\mathbf{S}_p$
-    \State Solve the eigenvalue problem to get $\mathbf{U}_p$ and append it to $\mathbf{U}$
-    \State Compute $w_p'$ and append it to $\mathbf{w}$
+    \State Create the matrices $\mathbf{S}_p, \mathbf{D}_p, \mathbf{D}_{1p}, \mathbf{D}_{2p}$ using equations \ref{eqn:S_p}, \ref{eqn:D_p}, \ref{eqn:D_{1p}}, and \ref{eqn:D_{2p}}
+    \State Regularize the matrix $\mathbf{S}_p$ using equation \ref{eqn:Regularize}
+    \State Solve the eigenvalue problem in equation \ref{eqn:EigenvalueProblem} to get $\mathbf{U}_p$ and append it to $\mathbf{U}$
+    \State Compute $w_p'$ using equation \ref{eqn:w_p'}and append it to $\mathbf{w}$
 \EndFor
-\State Divide each $w_p'$ in $\mathbf{w}$ by $\sum_{i = 1}^{M} w_p'$ to get the vector $\mathbf{w}$ such that the values sum to 1
+\State Divide each $w_p'$ in $\mathbf{w}$ by $\sum_{i = 1}^{M} w_p'$, as in equation \ref{eqn:Normalize}, to get the vector $\mathbf{w}$ such that the values sum to 1
 \State Return $\mathbf{w}$ and $\mathbf{U}$. 
 \end{algorithmic}
 \end{algorithm}
+
+\subsection{Problem} \label{sec:WGEMLProblem}
+
+Given these inputs, the goal is to find the distance metrics and weights for:
+\begin{align*}
+d^2(\mathbf{x}_i, \mathbf{y}_i) &= \sum_{p = 1}^{M} w_p(\mathbf{x}_i^p - \mathbf{y}_i^p)^T\mathbf{A}_p(\mathbf{x}_i^p - \mathbf{y}_i^p)\\ 
+&= \sum_{p = 1}^{M} w_p d^2_{\mathbf{A}_p}(\mathbf{x}_i^p, \mathbf{y}_j^p)
+\end{align*}
+
+Where $\mathbf{x}_i^p$ represents the $p$th face descriptor of the image $\mathbf{x}_i$, $w_p$ is a weight and $\mathbf{A}_p$ is a $D \times D$ semidefinite positive matrix, where $D$ is the dimensionality of the corresponding face descriptor. This distance function finds the distance between each pair of face descriptors and weights them accordingly.
+We wish to find $\mathbf{A}_p$ such that the between-class variance is maximized, and the within-class variance is minimized. This can be formalized as the optimization problem:
+
+\begin{align*}
+    \max_{\mathbf{A}, \mathbf{w}} \mathcal{F} &= \sum_{p = 1}^{M} w_p^r[(\frac{1}{2}(\frac{1}{NK}\sum_{i = 1}^{N}\sum_{n_1 = 1}^{K} d^2_{\mathbf{A}_p}(\mathbf{x}_i^p, \mathbf{y}_{i,n_1}^p) + \frac{1}{NK}\sum_{i = 1}^{N}\sum_{n_2 = 1}^{K} d^2_{\mathbf{A}_p}(\mathbf{x}_{i,n_2}^p, \mathbf{y}_i^p)) \\
+    & + \frac{1}{N} \sum_{i = 1, j \neq i}^{N} d^2_{\mathbf{A}_p}(\mathbf{x}_i^p, \mathbf{y}_j^p))/\frac{1}{N} \sum_{i = 1}^{N} d^2_{\mathbf{A}_p}(\mathbf{x}_i^p, \mathbf{y}_i^p)]
+\end{align*}
+
+\[\text{s.t. } \sum_{p = 1}^{M} w_p = 1\]
+\[\forall p \in \{1, ..., M\}, w_p \geq 0\]
+Where $\mathbf{y}_{i, n_1}^p$ is the $n_1$th nearest neighbor of $\mathbf{y}_i$ and similarly for $\mathbf{x}_{i, n_2}$. We have $w_p^r$ in order to avoid over-fitting and use information from each face descriptor. 
+This optimization function tries to minimize the denominator which, in turn, pulls the samples that have the kin relationship together and maximizes the numerator which means that the pairs which don't have the kin relationship are pushed further away from each other as well as those of their neighbors.
+
+\subsection{Approach} \label{sec:WGEMLApproach}
+
+Now that the problem is defined, we break down $\mathbf{A}_p = \mathbf{U}_p\mathbf{U}_p^T$ since $\mathbf{A}_p$ is symmetric and positive semidefinite. $\mathbf{U}_p$ has size $D \times d$ such that $d \ll D$. In my project, $d$ was set to be $10$ by varying the value and seeing how it affects the accuracies and picking the best values.
+Thus, the optimization problem can be rewritten as:
+
+\[\max_{\mathbf{U}, \mathbf{w}}  \sum_{p = 1}^{M} w_p^r \frac{tr[\mathbf{U}_p^T(\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p)\mathbf{U}_p]}{tr[\mathbf{U}_p^T\mathbf{S}_p\mathbf{U}_p]}\]
+Such that $\mathbf{U}_P^T \mathbf{U}_p = I$, $\sum_{p = 1}^{M} w_p = 1$ and $\forall p \in \{1, ..., M\}, w_p \geq 0$, where:
+
+\begin{align} 
+\mathbf{S}_p &= \frac{1}{N} \sum_{(\mathbf{x}_i^p, \mathbf{y}_i^p) \in \mathcal{S}^p} (\mathbf{x}_i^p - \mathbf{y}_i^p)(\mathbf{x}_i^p - \mathbf{y}_i^p)^T \label{eqn:S_p} \\
+\mathbf{D}_p &= \frac{1}{N} \sum_{(\mathbf{x}_i^p, \mathbf{y}_j^p) \in \mathcal{D}^p} (\mathbf{x}_i^p - \mathbf{y}_j^p)(\mathbf{x}_i^p - \mathbf{y}_j^p)^T \label{eqn:D_p}\\
+\mathbf{D}_{1p} &= \frac{1}{NK} \sum_{\substack{(\mathbf{x}_i^p, \mathbf{y}_i^p) \in \mathcal{S}^p \\ \mathbf{y}_k^p \in \mathcal{N}_K(\mathbf{y}_i^p)}} (\mathbf{x}_i^p - \mathbf{y}_k^p)(\mathbf{x}_i^p - \mathbf{y}_k^p)^T \label{eqn:D_{1p}}\\
+\mathbf{D}_{2p} &= \frac{1}{NK} \sum_{\substack{(\mathbf{x}_i^p, \mathbf{y}_i^p) \in \mathcal{S}^p \\ \mathbf{x}_k^p \in \mathcal{N}_K(\mathbf{x}_i^p)}} (\mathbf{x}_k^p - \mathbf{y}_i^p)(\mathbf{x}_k^p - \mathbf{y}_i^p)^T \label{eqn:D_{2p}}
+\end{align}
+
+Where $\mathcal{N}_K(\mathbf{x}_i^p)$ represents the $K$ nearest neighbors of $\mathbf{x}_i^p$. This is when K-nearest neighbors is used, and $K$ is set to 5 in the experiments.
+In order to solve this, we first let $\mathbf{w}$ be constant in order to solve $\mathbf{U}$ and then use that to find $\mathbf{w}$. By letting $\mathbf{w}$ be constant, the problem is reduced to:
+\[\max_{\mathbf{U}_p^T \mathbf{U}_p = I} \frac{\text{tr}[\mathbf{U}_p^T(\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p)\mathbf{U}_p]}{\text{tr}[\mathbf{U}_p^T\mathbf{S}_p\mathbf{U}_p]}\]
+For each $p \in \{1, ..., M\}$. This can then be converted to an alternative problem \cite{RatioTrace}:
+\[\max_{\mathbf{U}_p}  \text{ tr}\left[(\mathbf{U}_p^T\mathbf{S}_p\mathbf{U}_p)^{-1} \mathbf{U}_p^T\paren*{\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p}\mathbf{U}_p\right]\]
+Which can be solved by solving the following generalized eigenvalue problem:
+\[\paren*{\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p}\mathbf{u} = \lambda \mathbf{S}_p \mathbf{u}\]
+Thus, $\mathbf{U}_p = [u_1, u_2, ..., u_d]$ such that the corresponding eigenvalues for $u_1, .., u_d$ are the top $d$ largest eigenvalues (ie. $\lambda_1 \geq ... \geq \lambda_d$). However, this can be problematic in practice since $\mathbf{S}_p$ can be near singular when $D > N$. Thus, the identity matrix is added as a regularizer as follows:
+\begin{equation}
+\mathbf{S}_p = (1 - \beta)\mathbf{S}_p + \beta \frac{\text{tr}(\mathbf{S}_p)}{N}\mathbf{I} \label{eqn:Regularize}
+\end{equation}
+Where $\beta$ is a regularization parameter which is set to 0.5 experimentally. This allows us to then not need to solve the generalized eigenvalue problem, as that takes more computation time, and we can solve:
+
+\begin{equation}
+\mathbf{S}_p^{-1}\paren*{\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p}\mathbf{u} = \lambda \mathbf{u} \label{eqn:EigenvalueProblem}
+\end{equation}
+Thus, we have found $\mathbf{U}_p, \forall p \in \{1, ..., M\}$. 
+
+To find the weights, $\mathbf{w}$, we can construct the Lagrangian:
+\[\mathcal{L}(\mathbf{w}, \lambda) = \sum_{p = 1}^{M} w_p^r \frac{\text{tr}[\mathbf{U}_p^T(\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p)\mathbf{U}_p]}{\text{tr}[\mathbf{U}_p^T\mathbf{S}_p\mathbf{U}_p]} - \lambda \paren*{\sum_{p = 1}^{M}w_p - 1}\]
+And thus, solve it:
+\[\frac{\partial \mathcal{L}}{\partial w_p} = rw_p^{r-1} \frac{\text{tr}[\mathbf{U}_p^T(\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p)\mathbf{U}_p]}{\text{tr}[\mathbf{U}_p^T\mathbf{S}_p\mathbf{U}_p]} - \lambda = 0\]
+\[\frac{\partial \mathcal{L}}{\partial \lambda} = \sum_{p = 1}^{M} w_p - 1 = 0\]
+Which means:
+\begin{equation}
+w_p' = \paren*{\frac{\text{tr}[\mathbf{U}_p^T\mathbf{S}_p\mathbf{U}_p]}{\text{tr}[\mathbf{U}_p^T(\frac{1}{2}(\mathbf{D}_{1p} + \mathbf{D}_{2p}) + \mathbf{D}_p)\mathbf{U}_p]}}^{\frac{1}{r - 1}} \label{eqn:w_p'}
+\end{equation}
+\begin{equation}
+w_p = \frac{w_p'}{\sum_{i = 1}^{M}w_i'} \label{eqn:Normalize}
+\end{equation}
+Thus, we now have the matrices to calculate the distance and the weights for each face descriptor. 
 
 \section{Prediction} \label{sec:PredictionModule}
 
@@ -943,7 +941,7 @@ Given a dataset, we wish to precompute the face descriptors for each image and s
 \end{figure}
 \subsection{Training}
 
-Once all of the face descriptors for each dataset is computed and, for each relationship in the dataset and for each setting (restricted or unrestricted), the cross-validation folds are created, the training set is properly made from the data and WGEML, which is described in section \ref{sec:WGEMLModule}, is run. The output of 
+Once all of the face descriptors for each dataset are computed and, for each relationship in the dataset and for each setting (restricted or unrestricted), the cross-validation folds are created, the training set is properly made from the data and WGEML, which is described in section \ref{sec:WGEMLModule}, is run. The output of 
 WGEML is then saved onto disk, which are the metrics and weights for each face descriptor for each fold. In the end, this is done for each relationship, setting and fold, so for KinFaceW-I, for example, there would be $4 \times 2 \times 5 = 40$ models saved. The pipeline is shown in figure \ref{fig:TrainingPipeline}.
 
 \begin{figure}[h!]
@@ -1077,14 +1075,16 @@ TSK     & All Pairs In Test/Train             & 0.8409 & 0.8203 & 0.8242 & 0.836
 
 We can see that none of the absolute values of the differences go higher than $8.89\%$ which, as will be discussed in \ref{sec:SuccCriterionEval}, means that the success criterion is fulfilled. 
 
-We also see that the Father-Son relationship does better than the other relationships for the same dataset except in the Mother-Son relationship for TSKinFace when there were only positive pairs in the training set and all pairs in the testing set. 
+% We also see that the Father-Son relationship does better than the other relationships for the same dataset except in the Mother-Son relationship for TSKinFace when there were only positive pairs in the training set and both positive and negative pairs in the testing set. 
+In general, we see that the accuracies of the Father-Son relationship for each dataset are higher than those of the other relationships. However, there is one exception to this which is in the TSKinFace dataset when we use only positive pairs in the training set and both positive and negative pairs in the testing set.
 
 When only positive pairs were used for the TSKinFace dataset for both training and testing, we get accuracies that are fairly close to that of the original paper with an average difference of $0.742\%$. However, when negative pairs were added to the test set, the accuracies drop by, on average, $8.29\%$. This led me to believe that the original paper had only used the positive pairs for the testing phase of TSKinFace as TSKinFace didn't come with any premade negative pairs. As a note, in the later sections of this chapter, TSKinFace refers to having all pairs in both the training and test set. 
 
 \section{Success Criterion} \label{sec:SuccCriterionEval}
 
 As seen in section \ref{sec:MainResults}, I was able to replicate the accuracies from \cite{WGEML} within a $\pm 15\%$ accuracy by using the WGEML methodology which means that the project is a success according to appendix \ref{chapter:Proposal}. 
-Furthermore, referring to the requirements analysis in section \ref{sec:ReqAnal}, each of the core project requirements were completed, which were to implement face detection, the necessary face descriptors, WGEML, a prediction method and replicate the paper end-to-end. Furthermore, the extensions were also completed and the results of which are discussed in sections \ref{sec:Biases}, \ref{sec:AbStudies}, and \ref{sec:CFNResults}.
+% Furthermore, referring to the requirements analysis in section \ref{sec:ReqAnal}, each of the core project requirements were completed, which were to implement face detection, the necessary face descriptors, WGEML, a prediction method and replicate the paper end-to-end. 
+Furthermore, the extensions were also completed and the results of which are discussed in sections \ref{sec:Biases}, \ref{sec:AbStudies}, and \ref{sec:CFNResults}.
 
 \section{Potential Biases in Datasets} \label{sec:Biases}
 
@@ -1208,7 +1208,9 @@ Unrestricted setting with the mother-son relationship had no difference whatsoev
 face descriptors. 
 
 Although VGG generally did better accuracy-wise, it might be useful to use the CFN descriptor instead due to the smaller model which means that there is less computation when it comes to prediction. The fact that it is a smaller model also means that there are less weights so the file the weights are saved to is smaller, which can be seen since the CFN weights are 5MB whereas the VGG weights are 566MB. 
-This means that using the CFN model can be useful in mobile and embedded systems whereas having the extra computation and size cost might not be worth it for the $5\%$ gain in some cases. However, the CFN model does need to be trained whereas, with the VGG model, the weights are just obtained from the website of the authors of the paper describing how to use VGG for faces \cite{VGGFace}. Thus, training time is essentially 0 for VGG but that doesn't help the fact that running the model will still, inevitably, take more computation time than CFN. 
+This means that using the CFN model can be useful in mobile and embedded systems whereas having the extra computation and size cost might not be worth it for the $5\%$ gain in some cases. 
+% However, the CFN model does need to be trained whereas, with the VGG model, the weights are just obtained from the website of the authors of the paper describing how to use VGG for faces \cite{VGGFace}. 
+% Thus, training time is essentially 0 for VGG but that doesn't help the fact that running the model will still, inevitably, take more computation time than CFN. 
  
 % With respect to why KinFaceW-II did better with the CFN face descriptor, I'm not entirely sure but I think it 
 % goes back to the fact that the pairs of images are taken from the same image in KFW-II but not in KFW-I. 
@@ -1245,7 +1247,7 @@ I was able to discover that adding face descriptors to the algorithm has diminis
 % basic research skills (vagueness of papers + how to learn from online)
 % Dependencies
 
-One of the main lessons I learnt was with respect to how important testing is. By writing these unit tests, even for seemingly simple functions, I saved myself a lot of potential future problems as I was able to catch many of the bugs while I was writing the code instead of at the integration stage. Of course, there were still bugs when I tried running the project end-to-end but these were much simpler to solve knowing that each individual function I wrote and used is correct. 
+One of the main lessons I learnt was with respect to how important testing is. By writing these unit tests, even for seemingly simple functions, I saved myself a lot of potential future problems as I was able to catch many of the bugs while I was writing the code instead of at the integration stage. Of course, there were still bugs when I tried running the project end-to-end, but these were much simpler to solve knowing that each individual function I wrote and used is correct. 
 For example, solving the eigenvalue problem and getting the top $d$ vectors with respect to WGEML is a fairly simple function to write. However, had I not created some non-trivial matrices to test that function with, I wouldn't have realized that the function was only returning $d$ elements of each eigenvector instead of $d$ eigenvectors. 
 
 As I hadn't had much experience with Computer Vision prior to this project, a lot of research had to be done into the intricacies of the original WGEML paper, such as what each face descriptor is and how they work. I was able to learn how to read multiple research papers and consolidate their information into my project. 
