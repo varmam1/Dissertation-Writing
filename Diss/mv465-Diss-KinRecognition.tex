@@ -74,12 +74,11 @@ extent for a comparable purpose.
 
 {\large
 \begin{tabular}{ll}
-Name:               & \bf Manu Varma                       \\
-College:            & \bf St John's College                     \\
-Project Title:      & \bf Kin Recognition Using Weighted Graph Embeddings \\
+Candidate Number:   & \bf 2356E                       \\
+Project Title:      & \bf Kin Recognition Using Weighted \\ & \bf Graph Embeddings \\
 Examination:        & \bf Computer Science Tripos -- Part II, June 2021  \\
 Word Count:         & \bf TBA  \\ % TODO: Change
-Line Count:         & \bf 2907  \\ % TODO: Change
+Line Count:         & \bf 3027  \\ % TODO: Change
 Project Originator: & \bf The Dissertation Author                   \\
 Supervisor:         & \bf Daniel Bates                    \\ 
 \end{tabular}
@@ -89,6 +88,7 @@ Supervisor:         & \bf Daniel Bates                    \\
 \section*{Work Completed}
 
 \section*{Special Difficulties}
+None.
 
 \tableofcontents
 
@@ -148,7 +148,7 @@ Furthermore, the paper that will be implemented in this dissertation, using Weig
 
 \section{Project Overview}
 
-The project deals with a 2019 method using Weighted Graph Embedding-Based Metric Learning \cite{WGEML}, or WGEML for short, and aims to implement the paper and verify the accuracies that were obtained. 
+The project aims to reproduce the results of the paper, Weighted Graph Embedding-Based Metric Learning \cite{WGEML}, or WGEML for short, and aims to implement the paper and verify the accuracies that were obtained. 
 The following is shown in the dissertation:
 
 \begin{enumerate}
@@ -400,49 +400,9 @@ In the project, the image is split up into $16 \times 16$ blocks of size $4 \tim
 
 \subsection{Scale-Invariant Feature Transform} \label{sec:SIFTPrep}
 
-SIFT \cite{SIFT} is another way of obtaining face descriptors, although the original SIFT algorithm differs from how it is used in the project, though it is still important to briefly go over. The algorithm, generally, is split into finding the keypoints, fine tuning the keypoints, assigning an orientation to each keypoint and then getting a descriptor from each keypoint. 
+SIFT \cite{SIFT} is another way of obtaining face descriptors, although the original SIFT algorithm differs from how it is used in the project,. The algorithm, generally, is split into finding the keypoints, fine tuning the keypoints, assigning an orientation to each keypoint and then getting a descriptor from each keypoint. The method of obtaining each of the keypoints in an image, which are just points of interest which can be near important features of the image, is explained in Appendix \ref{sec:AppendixSIFT}.
 
-The first thing to do is to create octaves for the given image. An octave is a set of the given image being blurred multiple times. 
-For example, in the first octave, the original image is the first image, and then the next image is blurred slightly which is then blurred further for the next image in the octave, etc. In the second octave, the image is halved in size and the same blurring effect happens. So, if the original image was of size $64 \times 64$, then the images in the second octave will be $32 \times 32$ and in the third it would be $16 \times 16$ and so on. A specified number of octaves and blurred images are used for the SIFT algorithm. The way that the image is blurred is as follows:
-\[L(x, y, \sigma) = G(x, y, \sigma) * I(x, y)\]
-Where $x, y$ is the coordinate in the image, $I$ is the function mapping coordinates to the value of the image at that coordinate, $\sigma$ is the amount of blurring, $*$ represents convolving $G$ on the image and:
-\[G(x, y, \sigma) = \frac{1}{2\pi\sigma^2}e^{-\frac{x^2 + y^2}{2\sigma^2}}\]
-Which is the Gaussian blur. 
-
-From here, for each octave, a difference of Gaussians is created to help find the keypoints of the image, which are just points of interest which can be near important features of the image. The difference of Gaussians is just the difference between the consecutive Gaussians. This can be visualized in figure \ref{fig:DiffOfGauss}.
-
-\begin{figure}[ht]
-    \centering
-    \includegraphics[scale=0.2]{Prep/DoG.png}
-    \caption{The Difference of Gaussians being created. Image reproduced from Lowe (2004) \cite{SIFT}}
-    \label{fig:DiffOfGauss}
-
-\end{figure}
-
-This is used to approximate the Laplacian of Gaussians as the LoG helps find the edges of the image by blurring the image a bit and then finding the second order derivatives. It is first blurred as taking the Laplacian straight away would be sensitive to noise. However, this is computationally expensive. The Difference of Gaussians is a good approximation of the scale invariant Laplacian, $\sigma^2\nabla^2G$.
-
-From here we look for the keypoints in the image using the Difference of Gaussians. This is done by finding the local maxima and minima of the DoG. Once the extrema of the Difference of Gaussians are obtained, we need to refine the approximation of the keypoint because the actual keypoint is more likely to be between pixels. Thus, we can use a Taylor expansion around the proposed keypoint of the scale-space function $D(\sigma, x, y)$ where $\sigma$ is the blur level in the DoG. This Taylor expansion looks like:
-\[D(\mathbf{x}) = D + \frac{\partial D}{\partial \mathbf{x}}^T\mathbf{x} + \frac{1}{2}\mathbf{x^T}\frac{\partial^2 D}{\partial \mathbf{x}^2}\mathbf{x}\]
-Where $D$ is the value of $D$ at the proposed keypoint, $\mathbf{x} = (\sigma, x, y)^T$, $\frac{\partial D}{\partial \mathbf{x}}^T = (\frac{\partial D}{\partial \sigma}, \frac{\partial D}{\partial x}, \frac{\partial D}{\partial y})$. Letting this equal 0, we get that the offset from our keypoint is:
-\[\hat{\mathbf{x}} = - \frac{\partial^2 D}{\partial \mathbf{x}^2}^{-1} \frac{\partial D}{\partial \mathbf{x}}\]
-If our offset is greater than 0.5 in any dimension, then we want to try again since that means it's closer to another sample point. We keep trying again until we get an offset which is close to the sample point. We then find the value at the subpixel extrema:
-\[D(\hat{\mathbf{x}}) = D + \frac{1}{2}\frac{\partial D}{\partial \mathbf{x}}^T\hat{\mathbf{x}}\]
-And if the value of the extrema is less than $0.03 \times 255$, then we throw it out since it is an unstable extrema and has low contrast. 
-
-Furthermore, we also eliminate any keypoints that are potentially on an edge. We can do this by looking at the Hessian of the keypoint. We have that the Hessian is:
-\[\mathbf{H} = \begin{bmatrix}
-        D_{xx} & D_{xy}\\
-        D_{yx} & D_{yy}
-    \end{bmatrix}\]
-To determine whether something is a corner, we care about the eigenvalues of $\mathbf{H}$, or more specifically, the ratio between the eigenvalues. Using the trace and determinant of $\mathbf{H}$, we can find that:
-\[\frac{\text{Tr}(\mathbf{H})^2}{\text{Det}(\mathbf{H})} = \frac{(r+1)^2}{r}\]
-Where $r$ is the ratio of the eigenvalues. Thus, letting the maximum ratio that the eigenvalues are allowed to be at be $r_0 = 10$, we just need to find if:
-\[\frac{\text{Tr}(\mathbf{H})^2}{\text{Det}(\mathbf{H})} < \frac{(r_0+1)^2}{r_0}\]
-If it is, then this is a proper keypoint. If it isn't then this is an edge so we can discard it. 
-
-We now have each of the keypoints which are scale-invariant, so we need to make it rotation-invariant as well. This is done by assigning an orientation to the keypoints. A neighborhood is taken around the keypoint in which the gradient is obtained for each pixel in the area and a histogram of these gradients is created based on the angle, this time in bins of $0$ to $10$, 10 to 20, etc. until 350 to 360. The peak in this histogram is calculated and taken and any other peaks which have a value above 80\% of the original peak is also considered to calculate the orientation. 
-
-Now, for each keypoint, we have the location, scale, and orientation so we can finally create the descriptor. A $16 \times 16$ window is obtained around the keypoint and divided into 16 blocks. For each block, a histogram of the gradients is taken with 8 bins which are then appended together which gives a 128-dimensional vector for the keypoint. The SIFT descriptor of the image is then the vectors for each keypoint appended together to create a $128n$-dimensional vector where $n$ is the number of keypoints in the image. 
+Once we have the keypoints in the image, a $16 \times 16$ window is obtained around the keypoint and divided into 16 blocks. For each block, a histogram of the gradients is taken with 8 bins which are then appended together which gives a 128-dimensional vector for the keypoint. The SIFT descriptor of the image is then the vectors for each keypoint appended together to create a $128n$-dimensional vector where $n$ is the number of keypoints in the image. 
 
 The actual implementation of SIFT that is used differs from the original version which is talked about in section \ref{sec:SIFTImpl}.
 
@@ -508,13 +468,9 @@ We can visualize this in figure \ref{fig:MetricLearning}.
     \label{fig:MetricLearning}
 \end{figure}
 
-% \section{Side Algorithms Used (Temp Name)} \label{sec:PCAandKNN}
-
-% Aside from the main algorithms that will be used which were described earlier, a couple of high-profile algorithms were used that deserve to be explained, although they are used only a few times at most in very specific places. 
-
 \section{K-Nearest Neighbors}
 
-K-Nearest Neighbors is an algorithm that finds the $K$ nearest neighbors for each datum in a given set of data. Given a list of datapoints in Euclidean space, we wish to find, for each datapoint, the $K$ closest datapoints to it. The \texttt{sklearn} library is used to implement it which either uses a brute force algorithm, a ball tree or a $kd$-tree, which is discussed in appendix \ref{sec:KNNAlgos}.
+K-Nearest Neighbors is an algorithm that finds the $K$ nearest neighbors for each datum in a given set of data. Given a list of datapoints in Euclidean space, we wish to find, for each datapoint, the $K$ closest datapoints to it. The \texttt{sklearn} library is used to implement it which uses a brute force algorithm, a ball tree or a $kd$-tree depending on the input.
 
 \section{Principal Component Analysis} \label{sec:PCA}
 
@@ -586,6 +542,8 @@ The last requirement constituted of a medley of scripts which were used to integ
 
 Before I started my project, I had knowledge in Python and surface-level knowledge of Keras and Tensorflow. I had also worked with face recognition before. Furthermore, I had used Numpy many times before, so I had 
 enough knowledge about it to use it comfortably in my project. However, I hadn't ventured into computer vision before the project aside from knowing very generally what a face descriptor is. 
+
+In terms of what was already available, face detection had been done by OpenCV already, thus my code used the classifier that they had already trained. 
 
 \subsection{Tools Used}
 
@@ -665,11 +623,12 @@ The repository is shown in Figure \ref{fig:RepoOverview}
         .3 prediction/predictor.py.
         .3 scripts.
         .4 ablation\_study.py.
+        .4 get\_pairwise\_accuracies.py.
         .4 preprocessing\_fds.py.
         .4 preprocessing\_TSK.py.
+        .4 ROC\_curves.py.
         .4 testing.py.
         .4 training.py.
-        .4 get\_pairwise\_accuracies.py.
         .3 test/.
         .3 WGEML.
         .4 constants.py.
@@ -687,8 +646,8 @@ The repository is shown in Figure \ref{fig:RepoOverview}
 \end{figure}  
 
 The \texttt{src} folder is split up into the different overarching modules which contain the functions needed, \texttt{data\_preparation}, \texttt{face\_descriptors}, \texttt{face\_detection}, \texttt{prediction} and \texttt{WGEML}. The face detection module implements face detection by using OpenCV which uses the method described in section \ref{sec:FaceDetection}.
-The rest of the modules are discussed in sections \ref{sec:DataPrep}, \ref{sec:FDModule}, \ref{sec:WGEMLModule}, and \ref{sec:PredictionModule}. The \texttt{test} folder contains all of the unit tests for each of the files in the aforementioned modules. 
-The \texttt{scripts} folder contains any scripts that would be run directly with Python which integrate the modules together in order to run the overall project. The majority of the computation is done in the modules and the scripts mainly run the functions from the modules with the proper data. 
+The rest of the modules are discussed in sections \ref{sec:DataPrep}, \ref{sec:FDModule}, \ref{sec:WGEMLModule}, and \ref{sec:PredictionModule} in which each of these modules were implemented mainly from scratch, aside from the VGG implementation in which a pretrained model was used and modified for my purposes. The \texttt{test} folder contains all of the unit tests for each of the files in the aforementioned modules. 
+The \texttt{scripts} folder contains the scripts I wrote that would be run directly with Python which integrate the modules together in order to run the overall project. The majority of the computation is done in the modules and the scripts mainly run the functions from the modules with the proper data. 
 
 The \texttt{data} folder contains the three datasets which contain the images and the meta data about the images, such as which are positive and negative pairs. Certain extra information is saved to these folders as well which is discussed in section \ref{sec:SaveDisk}. 
 
@@ -1059,54 +1018,21 @@ Then, the potential biases in these datasets are discussed in section \ref{sec:B
 
 \section{Original Results} \label{sec:MainResults}
 
-The project is run end-to-end for each dataset, setting and relationship and the raw accuracies are displayed in table \ref{table:Accs}. For the success criterion, we look at the difference between the accuracies my implementation had obtained, and the original paper had obtained, which is displayed in table \ref{table:diffInAccs} where a positive number means my accuracies were better. 
-
-\begin{table}[h!]
-\centering
-\begin{tabular}{c|c|c|c|c|c|c|c}
-Dataset & Setting                       & fs     & fd     & ms     & md     & fms    & fmd    \\\hline
-KFWI    & Unrestricted                  & 0.8015 & 0.7166 & 0.7628 & 0.7921 &        &        \\
-KFWI    & Restricted                    & 0.811  & 0.7391 & 0.7405 & 0.769  &        &        \\
-KFWII   & Unrestricted                  & 0.838  & 0.778  & 0.832  & 0.78   &        &        \\
-KFWII   & Restricted                    & 0.848  & 0.768  & 0.802  & 0.814  &        &        \\
-TSK     & Only Positive Pairs           & 0.9201 & 0.8826 & 0.9162 & 0.9182 & 0.9571 & 0.9343 \\
-TSK     & All Pairs In Test/Pos Pairs in Train      & 0.8409 & 0.8282 & 0.8448 & 0.8193 & 0.8566 & 0.86   \\
-TSK     & All Pairs In Test/Train             & 0.8409 & 0.8203 & 0.8242 & 0.8362 & 0.8664 & 0.8431
-\end{tabular}
-\caption{Accuracies of WGEML applied to each dataset for each relationship}
-\label{table:Accs}
-\end{table} 
+As mentioned in section \ref{sec:Datasets}, we have that ``F'' stands for father, ``M'' stands for mother, ``S'' stands for son, and ``D'' stands for daughter so the relationships are noted as a combination of these acronyms, so ``FS'' stands for the Father-Son relationship, etc. The project is run end-to-end for each dataset, setting and relationship and the accuracies are shown in figure \ref{fig:Accs}. For the success criterion, we look at the difference between the accuracies my implementation had obtained, and the original paper had obtained, which is shown in figure \ref{fig:diffInAccs} where a positive number means my accuracies were better. 
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[scale=0.7]{Eval/OrigResults.png}
+    \includegraphics[scale=0.68]{Eval/OrigResults.png}
     \caption{Accuracies of WGEML applied to each dataset for each relationship grouped by dataset}
     \label{fig:Accs}
 \end{figure}
 
-\begin{table}[h!]
-\centering
-\begin{tabular}{c|c|c|c|c|c|c|c}
-    Dataset & Setting                  & fs    & fd    & ms    & md    & fms   & fmd   \\\hline
-    KFWI    & Unrestricted             & 1.65  & -2.24 & -4.32 & -2.69 &       &       \\
-    KFWI    & Restricted               & 2.2   & 0.71  & -5.35 & -3.8  &       &       \\
-    KFWII   & Unrestricted             & -4.8  & 0.4   & -0.2  & -3.6  &       &       \\
-    KFWII   & Restricted               & -3.4  & -0.6  & -3    & -1    &       &       \\
-    TSK     & Only Positive Pairs      & 1.71  & -1.54 & 0.22  & 1.42  & \textbf{2.21}  & 0.43  \\
-    TSK     & All Pairs In Test/Pos Pairs in Train & -6.21 & -6.98 & -6.92 & -8.47 & -7.84 & -7    \\
-    TSK     & All Pairs In Test/Train        & -6.21 & -7.77 & \textbf{-8.98} & -6.78 & -6.86 & -8.69
-\end{tabular}
-\caption{Differences in accuracies between my implementation and \cite{WGEML} in \%}
-\label{table:diffInAccs}
-\end{table}    
-
 \begin{figure}[h!]
     \centering
-    \includegraphics[scale=0.7]{Eval/DiffOrigResults.png}
+    \includegraphics[scale=0.65]{Eval/DiffOrigResults.png}
     \caption{Differences in accuracies between my implementation and \cite{WGEML} in \%}
     \label{fig:diffInAccs}
 \end{figure}
-% TODO: Add graphs cause ew tables yucky
 
 We can see that none of the absolute values of the differences go higher than $8.89\%$ which, as will be discussed in \ref{sec:SuccCriterionEval}, means that the success criterion is fulfilled. 
 
@@ -1115,6 +1041,16 @@ In general, we see that the accuracies of the Father-Son relationship for each d
 
 When only positive pairs were used for the TSKinFace dataset for both training and testing, we get accuracies that are fairly close to that of the original paper with an average difference of $0.742\%$. However, when negative pairs were added to the test set, the accuracies drop by, on average, $8.29\%$. This led me to believe that the original paper had only used the positive pairs for the testing phase of TSKinFace as TSKinFace didn't come with any premade negative pairs. As a note, in the later sections of this chapter, TSKinFace refers to having all pairs in both the training and test set. 
 
+We can also examine the ROC curves for each dataset in figure \ref{fig:ROCCurves}.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.6]{Eval/ROC.png}
+    \caption{The mean ROC curve for each dataset averaged over each fold, relationship and setting}
+    \label{fig:ROCCurves}
+\end{figure}
+
+Here, we see that the area under the curve is the most for the TSKinFace dataset and the least for the KinFaceW-I dataset, though both curves are far from that of a classifier that is luck-based. 
 \section{Success Criterion} \label{sec:SuccCriterionEval}
 
 As seen in section \ref{sec:MainResults}, I was able to replicate the accuracies from \cite{WGEML} within a $\pm 15\%$ accuracy by using the WGEML methodology which means that the project is a success according to appendix \ref{chapter:Proposal}. 
@@ -1163,25 +1099,18 @@ Ablation studies were done by using each possible subset of the $4$ face descrip
 After obtaining each accuracy for each dataset, setting, relationship and subset of face descriptors, I decided to group up the accuracies by the amount of face descriptors used by averaging the accuracies for each subset of that number.
 
 As expected, in general, as the number of face descriptors are increased, the accuracy increases as well. 
-However, as you increase the number of face descriptors, there are diminishing returns on the accuracy (ie. the second derivative is negative). An example of this is shown with KinFaceW-II unrestricted which is shown in figure \ref{fig:KFW-IIUAbStudy}.
-% Could group the two ab study plots in one figure?
+However, as you increase the number of face descriptors, there are diminishing returns on the accuracy (ie. the second derivative is negative). An example of this is shown with KinFaceW-II unrestricted which is shown in figure \ref{fig:AbStudy}.
+
 \begin{figure}[h!]
     \centering
-    \includegraphics[scale=0.6]{Eval/KFWII-Unrestricted-AbStudy.png}
-    \caption{The plot of accuracy versus number of face descriptors used for KinFaceW-II Unrestricted}
-    \label{fig:KFW-IIUAbStudy}
+    \includegraphics[scale=0.6]{Eval/AbStudy.png}
+    \caption{The plot of accuracy versus number of face descriptors used for each unrestricted dataset}
+    \label{fig:AbStudy}
 \end{figure}
 
 The only dataset this doesn't seem to apply to is KinFaceW-I unrestricted in which adding a second 
 face descriptor increases the accuracy quite a bit but the third doesn't increase it too much and then the fourth 
-increases it more, as seen in figure \ref{fig:KFW-IUAbStudy}.
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[scale=0.6]{Eval/KFWI-Unrestricted-AbStudy.png}
-    \caption{The plot of accuracy versus number of face descriptors used for KinFaceW-I Unrestricted}
-    \label{fig:KFW-IUAbStudy}
-\end{figure}
+increases it more, as seen in figure \ref{fig:AbStudy}.
 
 However, this is mainly due to two outliers, for the FD relationship, 
 increasing from 2 to 3 face descriptors only increased the accuracy by 0.2\% and for the MS relationship, 
@@ -1243,16 +1172,6 @@ face descriptors.
 
 Although VGG generally did better accuracy-wise, it might be useful to use the CFN descriptor instead due to the smaller model which means that there is less computation when it comes to prediction. The fact that it is a smaller model also means that there are less weights so the file the weights are saved to is smaller, which can be seen since the CFN weights are 5MB whereas the VGG weights are 566MB. 
 This means that using the CFN model can be useful in mobile and embedded systems whereas having the extra computation and size cost might not be worth it for the $5\%$ gain in some cases. 
-% However, the CFN model does need to be trained whereas, with the VGG model, the weights are just obtained from the website of the authors of the paper describing how to use VGG for faces \cite{VGGFace}. 
-% Thus, training time is essentially 0 for VGG but that doesn't help the fact that running the model will still, inevitably, take more computation time than CFN. 
- 
-% With respect to why KinFaceW-II did better with the CFN face descriptor, I'm not entirely sure but I think it 
-% goes back to the fact that the pairs of images are taken from the same image in KFW-II but not in KFW-I. 
-% My guess is that, since the input to the CFN network is a 32 x 32 image, potentially it could be 
-% generalizing the lighting and other non-face related features more which could be exacerbating 
-% the problem we saw earlier with the bias. The main reason I'm unsure about this is since I 
-% would've imagined something similar would have occurred with TSKinFace if this was the case 
-% but it doesn't seem to have happened, or at least not with the same magnitude of effect. 
 
 \section{Unit Tests} \label{sec:UnitTests}
 
@@ -1310,7 +1229,83 @@ Furthermore, in the original results, there wasn't much difference in accuracies
 
 \section{Cascade Classifier} \label{sec:Cascade}
 
-\section{K-Nearest Neighbor Algorithms} \label{sec:KNNAlgos}
+\section{SIFT Keypoint Extraction} \label{sec:AppendixSIFT}
+
+The first thing to do is to create octaves for the given image. An octave is a set of the given image being blurred multiple times. 
+For example, in the first octave, the original image is the first image, and then the next image is blurred slightly which is then blurred further for the next image in the octave, etc. In the second octave, the image is halved in size and the same blurring effect happens. So, if the original image was of size $64 \times 64$, then the images in the second octave will be $32 \times 32$ and in the third it would be $16 \times 16$ and so on. A specified number of octaves and blurred images are used for the SIFT algorithm. The way that the image is blurred is as follows:
+\[L(x, y, \sigma) = G(x, y, \sigma) * I(x, y)\]
+Where $x, y$ is the coordinate in the image, $I$ is the function mapping coordinates to the value of the image at that coordinate, $\sigma$ is the amount of blurring, $*$ represents convolving $G$ on the image and:
+\[G(x, y, \sigma) = \frac{1}{2\pi\sigma^2}e^{-\frac{x^2 + y^2}{2\sigma^2}}\]
+Which is the Gaussian blur. 
+
+From here, for each octave, a difference of Gaussians is created to help find the keypoints of the image. The difference of Gaussians is just the difference between the consecutive Gaussians. This can be visualized in figure \ref{fig:DiffOfGauss}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.2]{Prep/DoG.png}
+    \caption{The Difference of Gaussians being created. Image reproduced from Lowe (2004) \cite{SIFT}}
+    \label{fig:DiffOfGauss}
+
+\end{figure}
+
+This is used to approximate the Laplacian of Gaussians as the LoG helps find the edges of the image by blurring the image a bit and then finding the second order derivatives. It is first blurred as taking the Laplacian straight away would be sensitive to noise. However, this is computationally expensive. The Difference of Gaussians is a good approximation of the scale invariant Laplacian, $\sigma^2\nabla^2G$.
+
+From here we look for the keypoints in the image using the Difference of Gaussians. This is done by finding the local maxima and minima of the DoG. Once the extrema of the Difference of Gaussians are obtained, we need to refine the approximation of the keypoint because the actual keypoint is more likely to be between pixels. Thus, we can use a Taylor expansion around the proposed keypoint of the scale-space function $D(\sigma, x, y)$ where $\sigma$ is the blur level in the DoG. This Taylor expansion looks like:
+\[D(\mathbf{x}) = D + \frac{\partial D}{\partial \mathbf{x}}^T\mathbf{x} + \frac{1}{2}\mathbf{x^T}\frac{\partial^2 D}{\partial \mathbf{x}^2}\mathbf{x}\]
+Where $D$ is the value of $D$ at the proposed keypoint, $\mathbf{x} = (\sigma, x, y)^T$, $\frac{\partial D}{\partial \mathbf{x}}^T = (\frac{\partial D}{\partial \sigma}, \frac{\partial D}{\partial x}, \frac{\partial D}{\partial y})$. Letting this equal 0, we get that the offset from our keypoint is:
+\[\hat{\mathbf{x}} = - \frac{\partial^2 D}{\partial \mathbf{x}^2}^{-1} \frac{\partial D}{\partial \mathbf{x}}\]
+If our offset is greater than 0.5 in any dimension, then we want to try again since that means it's closer to another sample point. We keep trying again until we get an offset which is close to the sample point. We then find the value at the subpixel extrema:
+\[D(\hat{\mathbf{x}}) = D + \frac{1}{2}\frac{\partial D}{\partial \mathbf{x}}^T\hat{\mathbf{x}}\]
+And if the value of the extrema is less than $0.03 \times 255$, then we throw it out since it is an unstable extrema and has low contrast. 
+
+Furthermore, we also eliminate any keypoints that are potentially on an edge. We can do this by looking at the Hessian of the keypoint. We have that the Hessian is:
+\[\mathbf{H} = \begin{bmatrix}
+        D_{xx} & D_{xy}\\
+        D_{yx} & D_{yy}
+    \end{bmatrix}\]
+To determine whether something is a corner, we care about the eigenvalues of $\mathbf{H}$, or more specifically, the ratio between the eigenvalues. Using the trace and determinant of $\mathbf{H}$, we can find that:
+\[\frac{\text{Tr}(\mathbf{H})^2}{\text{Det}(\mathbf{H})} = \frac{(r+1)^2}{r}\]
+Where $r$ is the ratio of the eigenvalues. Thus, letting the maximum ratio that the eigenvalues are allowed to be at be $r_0 = 10$, we just need to find if:
+\[\frac{\text{Tr}(\mathbf{H})^2}{\text{Det}(\mathbf{H})} < \frac{(r_0+1)^2}{r_0}\]
+If it is, then this is a proper keypoint. If it isn't then this is an edge so we can discard it. 
+
+We now have each of the keypoints which are scale-invariant, so we need to make it rotation-invariant as well. This is done by assigning an orientation to the keypoints. A neighborhood is taken around the keypoint in which the gradient is obtained for each pixel in the area and a histogram of these gradients is created based on the angle, this time in bins of $0$ to $10$, 10 to 20, etc. until 350 to 360. The peak in this histogram is calculated and taken and any other peaks which have a value above 80\% of the original peak is also considered to calculate the orientation. Now, for each keypoint, we have the location, scale, and orientation.
+
+\chapter{Raw Table Data}
+
+The tables for figures \ref{fig:Accs} and \ref{fig:diffInAccs} is as follows:
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{c|c|c|c|c|c|c|c}
+    Dataset & Setting                       & FS     & FD     & MS     & MD     & FMS    & FMD    \\\hline
+    KFWI    & Unrestricted                  & 0.8015 & 0.7166 & 0.7628 & 0.7921 &        &        \\
+    KFWI    & Restricted                    & 0.811  & 0.7391 & 0.7405 & 0.769  &        &        \\
+    KFWII   & Unrestricted                  & 0.838  & 0.778  & 0.832  & 0.78   &        &        \\
+    KFWII   & Restricted                    & 0.848  & 0.768  & 0.802  & 0.814  &        &        \\
+    TSK     & Only Positive Pairs           & 0.9201 & 0.8826 & 0.9162 & 0.9182 & 0.9571 & 0.9343 \\
+    TSK     & All Pairs In Test/Pos Pairs in Train      & 0.8409 & 0.8282 & 0.8448 & 0.8193 & 0.8566 & 0.86   \\
+    TSK     & All Pairs In Test/Train             & 0.8409 & 0.8203 & 0.8242 & 0.8362 & 0.8664 & 0.8431
+\end{tabular}
+\caption{Accuracies of WGEML applied to each dataset for each relationship}
+\label{table:Accs}
+\end{table} 
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{c|c|c|c|c|c|c|c}
+    Dataset & Setting                  & FS    & FD    & MS    & MD    & FMS   & FMD   \\\hline
+    KFWI    & Unrestricted             & 1.65  & -2.24 & -4.32 & -2.69 &       &       \\
+    KFWI    & Restricted               & 2.2   & 0.71  & -5.35 & -3.8  &       &       \\
+    KFWII   & Unrestricted             & -4.8  & 0.4   & -0.2  & -3.6  &       &       \\
+    KFWII   & Restricted               & -3.4  & -0.6  & -3    & -1    &       &       \\
+    TSK     & Only Positive Pairs      & 1.71  & -1.54 & 0.22  & 1.42  & \textbf{2.21}  & 0.43  \\
+    TSK     & All Pairs In Test/Pos Pairs in Train & -6.21 & -6.98 & -6.92 & -8.47 & -7.84 & -7    \\
+    TSK     & All Pairs In Test/Train        & -6.21 & -7.77 & \textbf{-8.98} & -6.78 & -6.86 & -8.69
+\end{tabular}
+\caption{Differences in accuracies between my implementation and \cite{WGEML} in \%}
+\label{table:diffInAccs}
+\end{table}    
 
 \chapter{Sample Code}
 
