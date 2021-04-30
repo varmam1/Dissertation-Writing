@@ -4,28 +4,105 @@ Overall:
 Intro:
 - Stronger hook sentence and motivations
 
+ROB:
+* "Kinship recognition is the way of recognizing whether two given people are related to each other or not based on how they look."
+Doesn't sound 100% right perhaps? 
+"Kinship recognition is the ability to detect the relationship between two people based on their visual appearance" ? or something like that? 
+
+* Second/third sentences - are they slightly self-defining, is the "This is an evolutionary trait in humans" not required if you have the third sentence? reword slightly?
+"as we have seen" -> "and it has been demonstrated" ? 
+
+*1.1 - "There are multiple problems in the field of computational kin recognition, and I will focus on solving one of them. The first of which…" - reword perhaps? 
+        Just reads a little strangely at the moment (why is this problem the "first" etc.). 
+
+* "in humanitarian issues. With regards to humanitarian issues," - repetitive.
+
+* better recognize missing children and match them with their parents 
+    - in the case where we have no photo? or the child has aged beyond recognition? 
+
+* - I guess reunite families when photographs are not available for comparison?
+
+* "also pose privacy protections." - what do you mean by this?
+(is there a little more to say here given comments such as "been aware of the social and ethical impact of your work." in the marking criteria) 
+
+* 1.3 related work - what is the typical accuracy of a human? 
+
+* Could you group the approaches taken in some way and represent this visually even? a taxonomy? "One paper…" sounds like the related work might be incomplete. 
+
+e.g. "Approaches to kinship recognition can be broadly grouped…."??
+
+* Is the technique you chose state-of-the-art? Is there very recent work you could cite?
+
+* How do the techniques compare beyond accuracy? 
+  One thing that springs to mind is predictions of confidence, might this be important in this sort of application? 
+  Have people explored getting such metrics? 
+
+1.4 
+
+"The project deals with a 2019 method" - feels a little vague…
+
+how about "The project aims to reproduce the work of ….. from their paper "Weighted…" [10], or WGEML for short. 
+
+Might it be possible to tease out what you did, what your results/successes were? 
+
+e.g., "I demonstrated that…."
+
+Were you able to report data that the paper didn't? If so, say so.
+
+Is it more than simply reproducing results, you wanted to understand something, verify their results perhaps using additional techniques that they did not report?
+
+Perhaps make the nature of the biases more explicit? 
+
+"and find out the impact that has overall in section 4.3." - reword/clarify slightly? you can just summarise what you discovered perhaps?
+
+Why is it sensible to include images from the same photograph in the dataset? It seems like you would be asking for trouble? Is there no way to pre-process the data set to remove backgrounds or normalise lighting on the face? Is this not done typically? Could you highlight this sort of thing as an issue? (sorry, I may have asked this before perhaps)
+
+
 Prep:
 - Redraw/source figures
 - Maybe move SIFT to appendix
 
+ROB:
+* A thought: do you fulfill the requirements listed here: 
+https://www.cs.mcgill.ca/~jpineau/ReproducibilityChecklist-v2.0.pdf
+(Machine Learning Reproducibility Checklist from the NeurIPS 2020 conference)
+If so, perhaps you could claim it, or add it as a requirement in Chapter 2 if it sounds useful?
+
+* The first paragraph of Chapter 2 doesn't add a huge amount IMHO. 
+"In this chapter…."
+
+* Chapter 2 is quite long perhaps.  
+
+* 2.7 - do you analyse the problem and formulate a strategy for how you are going to tackle it? 
+        perhaps determine the difficulty/risk associated with each part of the project too? a strategy for managing risk perhaps? 
+
 Implementation:
 * SIFT implementation low priority
 * Flowchart for pipelines potentially
+- Do you know if the same person/people appear(s) in multiple (pairs of) images? If so, then it's possible that different images of the same person could end up in different folds, and then the model could be tested on someone that it remembers from the training set.
 
 Evaluation:
+- Rewrite some stuff in the original results to refer to the figures and not the tables
+- ROC Curves
 - More in-depth analysis in certain places
-- Might want to put standard deviations in the CFN Extension
-- Might want to put the raw table data in the appendix?
 
-Conclusion:
-- Retouch
+ROB:
+Not sure about the first introductory paragraph. Is there a way to make more interesting at the moment it is a short table of contents.
+
+4.1. 
+
+p.38 "this led me to believe…" - could you confirm with authors?
+
+Is the work in [4] worth discussing/highlighting better somewhere? (do you only cite on p.41?)
+
+4.5 - so the Y axis is absolute accuracy (on a 0 to 1 scale). 
+
+Given the sort of applications you outlined, isn't accuracy very important? This would be more important than saving disk space or computation etc.? or not? I guess it depends on the application. The biggest difference is 5%, i.e. 65 vs. 70% or similar?
+
 
 Project:
-- ROC Curves
-- Ablation Studies by blocking image
 - Update README to be a proper README
 
-- Add appendices for KNN and cascade classifiers. 
+- Add appendices for cascade classifiers. 
 
-- need to edit my introduction again
 - read it over again while keeping the assessment guidelines in mind

@@ -78,7 +78,7 @@ Candidate Number:   & \bf 2356E                       \\
 Project Title:      & \bf Kin Recognition Using Weighted \\ & \bf Graph Embeddings \\
 Examination:        & \bf Computer Science Tripos -- Part II, June 2021  \\
 Word Count:         & \bf TBA  \\ % TODO: Change
-Line Count:         & \bf 3027  \\ % TODO: Change
+Line Count:         & \bf 3027 \footnote{Calculated using \texttt{find . -name '*.py' | xargs wc -l}}  \\ % TODO: Change
 Project Originator: & \bf The Dissertation Author                   \\
 Supervisor:         & \bf Daniel Bates                    \\ 
 \end{tabular}
@@ -104,7 +104,7 @@ None.
 \chapter{Introduction}
 % TODO: A stronger hook sentence is definitely needed here. 
 
-Kinship recognition is the way of recognizing whether two given people are related to each other or not based on how they look. This is an evolutionary trait in humans as it is advantageous to inclusive fitness for an organism to be able to recognize which of their neighbors are close relatives \cite{HamiltonGenetic}. Thus, it stands to reason that the ability to recognize kinship relationships has evolved in humans. 
+Kinship recognition is the ability to recognize how two people are related to each other based on how their faces. This is an evolutionary trait in humans as it is advantageous to inclusive fitness for an organism to be able to recognize which of their neighbors are close relatives \cite{HamiltonGenetic}. Thus, it stands to reason that the ability to recognize kinship relationships has evolved in humans. 
 In humans, specifically, facial resemblance is expected to serve as an indicator of kinship as we have seen that strangers are able to match photographs of mothers to their infants without any prior contact with any of the family \cite{mateo2015}. 
 
 Computational kinship recognition is the field of computationally figuring out kinship relationships between people without any prior knowledge of the family. 
@@ -140,7 +140,7 @@ One of the first papers in the field of computational kinship recognition used c
 Using these features, K-Nearest-Neighbors and a Support Vector Machine (SVM) were used in order to classify the image pairs into true and false parent-child pairs \cite{fang2010}. A classification accuracy of $70.67\%$ was obtained overall and an SVM with a radial basis kernel obtained an accuracy of $68.6\%$. 
 
 Other approaches include using deep learning to solve the problem. One paper used a Siamese Convolutional Neural Network (CNN) approach by putting both of the face images in the pair through a SqueezeNet network which was trained on VGGFace2 which creates a feature vector for each image \cite{DeepSiameseCNN}. Using a similarity criterion, a new feature vector is created using the two feature vectors and a fully connected layer and a sigmoid activation function creates the predicted similarity score. This approach yielded an average test accuracy of $67.66\%$ over all of the relationships that were in the dataset. 
-Another paper that used a Siamese approach aimed to solve both the standard kinship verification problem and the Tri-Subject problem \cite{DeepFusion}. Both networks for the problems had three stages, a feature extraction stage, which used the ResNet50 or SENet50 models pretrained on VGGFace2 to extract the features from each face into a vector, a feature fusion stage which combines the feature vectors together, and a similarity quantization stage to get the similarity score. 
+Another paper that used a Siamese approach aimed to solve both the standard kinship verification problem and the Tri-Subject problem \cite{DeepFusion}. Both networks for the problems had three stages, a feature extraction stage, which used the ResNet50 or SENet50 models pre-trained on VGGFace2 to extract the features from each face into a vector, a feature fusion stage which combines the feature vectors together, and a similarity quantization stage to get the similarity score. 
 They then use a jury system to fuse together models which allows them to achieve an accuracy of $75.9\%$. 
 
 However, a prominent approach that is taken includes using metric learning to solve the problem. For example, the paper on Neighborhood Repulsed Metric Learning \cite{KinFaceCitation1} uses a supervised metric learning approach. Using the approach, they aim to find a metric which minimizes the distance between the vectors of images that have a kinship relationship and maximize the distances between the vectors of pairs of images that don't have a kinship relationship. 
@@ -168,7 +168,7 @@ Chapter \ref{chapter:Evaluation} then discusses all of the results that were obt
 
 \chapter{Preparation} \label{chapter:Prep}
 
-In this chapter, I discuss the necessary technical background information needed for the project in sections \ref{sec:CNN} through \ref{sec:PCA}, then the requirements of the project are elaborated on in section \ref{sec:ReqAnal} before the starting point and Software Engineering practices are discussed in section \ref{sec:SEPractices}. 
+In this chapter, I discuss the necessary technical background information needed for the project in sections \ref{sec:CNN} through \ref{sec:KNN}, then the requirements of the project are elaborated on in section \ref{sec:ReqAnal} before the starting point and Software Engineering practices are discussed in section \ref{sec:SEPractices}. 
 
 \section{Convolutional Neural Networks} \label{sec:CNN}
 
@@ -468,52 +468,10 @@ We can visualize this in figure \ref{fig:MetricLearning}.
     \label{fig:MetricLearning}
 \end{figure}
 
-\section{K-Nearest Neighbors}
+\section{K-Nearest Neighbors} \label{sec:KNN}
 
 K-Nearest Neighbors is an algorithm that finds the $K$ nearest neighbors for each datum in a given set of data. Given a list of datapoints in Euclidean space, we wish to find, for each datapoint, the $K$ closest datapoints to it. The \texttt{sklearn} library is used to implement it which uses a brute force algorithm, a ball tree or a $kd$-tree depending on the input.
 
-\section{Principal Component Analysis} \label{sec:PCA}
-
-Principal Component Analysis (PCA) \cite{PCA} is a statistical tool that we can use to reduce the dimensionality of a dataset while maintaining as much of the variability as possible. The algorithm identifies \textit{principal components} which are the directions of maximum variance in the dataset, which can be visualized in figure \ref{fig:PCA}.
-
-\begin{figure}[ht]
-    \centering
-    \includegraphics[scale=0.5]{Prep/PCAComps.jpeg}
-    \caption{Principal components of an arbitrary 2 dimensional dataset}
-    \label{fig:PCA}
-\end{figure}
-
-Let $p$ be the number of variables that are being measured in the dataset, which in our case is the dimension of the face descriptor. Let $\mathbf{X}$ be the matrix $n \times p$ data matrix that is composed of the $p$ $n$-dimensional vectors $\mathbf{x_1}, ..., \mathbf{x_p}$ in which $x_i$ represents the $n$ observations of the $i$th variable.
-The goal of PCA is then to create a $p \times k$ matrix $\mathbf{W}$, where $k \leq p$, which maps each row-vector of $\mathbf{X}$ from the original $p$-dimensional feature space to a new $k$-dimensional feature subspace such that the variability of the dataset is kept intact, as much as possible. 
-
-First, the dataset must be standardized which means that the mean of each feature must be $0$, which we denote as the matrix $\mathbf{X'}$ and the column vectors as $\mathbf{x_1'}, ..., \mathbf{x_p'}$. From there, the covariance matrix is obtained. This matrix is the following:
-
-\[\Sigma = \begin{bmatrix}
-    Cov(\mathbf{x_1'}, \mathbf{x_1'}) & ... & Cov(\mathbf{x_1'}, \mathbf{x_p'}) \\
-    \vdots & \ddots & \vdots \\
-    Cov(\mathbf{x_p'}, \mathbf{x_1'}) & ... & Cov(\mathbf{x_p'}, \mathbf{x_p'})
-\end{bmatrix}\]
-
-Where:
-
-\[\Sigma_{ij} = Cov(\mathbf{x_i'}, \mathbf{x_j'}) = \frac{1}{n}(\mathbf{x_i'}\cdot \mathbf{x_j'})\]
-
-Since we have that the mean of both are $0$ now, after standardization. Thus:
-
-\[\Sigma = \frac{1}{N} \mathbf{X'}\mathbf{X'}^T\]
-
-We then find the eigenvalues and eigenvectors of $\Sigma$, of which we get $p$ of them. The eigenvalues get sorted from largest to smallest and, thus, the first principal component is the eigenvector that corresponds to the largest eigenvalue, the second principal component is the eigenvector with the second largest eigenvalue, etc. 
-Denoting $\mathbf{w_i}$ as the $i$th principal component, we can make the matrix $\mathbf{W}$ as:
-
-\[\mathbf{W} = \begin{bmatrix}
-    \mathbf{w_1} & ... & \mathbf{w_k}
-\end{bmatrix}\]
-
-Which is a $p \times k$ matrix. Thus, to reduce the dimensions of the original dataset, we can create the matrix:
-
-\[\mathbf{T} = \mathbf{X}\mathbf{W}\]
-
-In which the $i$th row of $\mathbf{T}$ corresponds with the $i$th observation of $\mathbf{X}$ and this vector has is $k$-dimensional where $k \leq p$. 
 \section{Requirements Analysis} \label{sec:ReqAnal}
 
 The main requirement of the project is stated in appendix \ref{chapter:Proposal} which is to replicate the results from Liang et al. (2019) \cite{WGEML} within a $15\%$ error range or to reject the results. In other words, the project should implement the Weighted Graph Embedding-Based Metric Learning (WGEML) algorithm for Kin Recognition. 
@@ -543,7 +501,7 @@ The last requirement constituted of a medley of scripts which were used to integ
 Before I started my project, I had knowledge in Python and surface-level knowledge of Keras and Tensorflow. I had also worked with face recognition before. Furthermore, I had used Numpy many times before, so I had 
 enough knowledge about it to use it comfortably in my project. However, I hadn't ventured into computer vision before the project aside from knowing very generally what a face descriptor is. 
 
-In terms of what was already available, face detection had been done by OpenCV already, thus my code used the classifier that they had already trained. 
+In terms of what was already available, face detection had been done by OpenCV already, thus my code used the classifier was pre-trained by OpenCV. Furthermore, VGG was also already pre-trained, though I had to modify it slightly to work with my implementation. However, the rest of the project was created from scratch in terms of the code and how the project was structured. 
 
 \subsection{Tools Used}
 
@@ -575,7 +533,7 @@ The dataset only contained the images in this form so negative pairs of images a
 I examine the effects of the WGEML algorithm on the FS, FD, MS, MD, FMS and FMD relationships, as defined above. 
 \subsection{Testing}
 
-Throughout the project, I created unit tests for any modules and for each function in the module. I would only end up merging a feature branch into the master branch if all of the unit tests passed for that feature. 
+Throughout the project, I created unit tests for any modules and for each function in the module. I would only end up merging a feature branch into the master branch if all of the unit tests passed for that feature. There were minor problems with unit testing the modules that created the VGG model and CifarNet model which is talked about in section \ref{sec:UnitTests}. However, though there were problems with testing the neural networks, I was able to unit test WGEML fully due to the nature of the algorithm being deterministic given the same training dataset.
 
 Along with this, I did integration tests in the form of feeding the scripts small, controlled inputs to see if the scripts would output what was expected. These scripts each used functions from different modules and did a part of the workflow. 
 
@@ -607,6 +565,7 @@ The repository is shown in Figure \ref{fig:RepoOverview}
         .2 out.
         .3 ablation\_studies/.
         .3 pairwise\_accs/.
+        .3 ROC.png.
         .2 src.
         .3 data\_preparation.
         .4 PCA.py.
@@ -619,7 +578,9 @@ The repository is shown in Figure \ref{fig:RepoOverview}
         .4 LBP.py.
         .4 SIFT.py.
         .4 VGG.py.
-        .3 face\_detection/face\_detection.py.
+        .3 face\_detection.
+        .4 face\_detection.py.
+        .4 haarcascade\_frontalface\_default.xml.
         .3 prediction/predictor.py.
         .3 scripts.
         .4 ablation\_study.py.
@@ -645,13 +606,18 @@ The repository is shown in Figure \ref{fig:RepoOverview}
     \label{fig:RepoOverview}
 \end{figure}  
 
-The \texttt{src} folder is split up into the different overarching modules which contain the functions needed, \texttt{data\_preparation}, \texttt{face\_descriptors}, \texttt{face\_detection}, \texttt{prediction} and \texttt{WGEML}. The face detection module implements face detection by using OpenCV which uses the method described in section \ref{sec:FaceDetection}.
-The rest of the modules are discussed in sections \ref{sec:DataPrep}, \ref{sec:FDModule}, \ref{sec:WGEMLModule}, and \ref{sec:PredictionModule} in which each of these modules were implemented mainly from scratch, aside from the VGG implementation in which a pretrained model was used and modified for my purposes. The \texttt{test} folder contains all of the unit tests for each of the files in the aforementioned modules. 
+The \texttt{src} folder is split up into the different overarching modules which contain the functions needed, \texttt{data\_preparation}, \texttt{face\_descriptors}, \texttt{face\_detection}, \texttt{prediction} and \texttt{WGEML}. The face detection module implements face detection by using OpenCV which uses the method described in Appendix \ref{sec:Cascade}. 
+A pre-trained OpenCV Haar Cascade Classifier was used\footnote{\scriptsize \url{https://github.com/opencv/opencv/blob/master/data/haarcascades/haarcascade_frontalface_default.xml}} and the \texttt{CascadeClassifier} class was utilized to take advantage of the pre-trained model. 
+
+The rest of the modules are discussed in sections \ref{sec:DataPrep}, \ref{sec:FDModule}, \ref{sec:WGEMLModule}, and \ref{sec:PredictionModule} in which each of these modules were implemented mainly from scratch, aside from the VGG implementation in which a pre-trained model was used and modified for my purposes. The \texttt{test} folder contains all of the unit tests I wrote for each of the files in the aforementioned modules. 
+
 The \texttt{scripts} folder contains the scripts I wrote that would be run directly with Python which integrate the modules together in order to run the overall project. The majority of the computation is done in the modules and the scripts mainly run the functions from the modules with the proper data. 
+
+Each folder in the \texttt{src} folder includes an \texttt{\_\_init\_\_.py} file in order for it to be able to be referenced by other folders in the project. The \texttt{.coveragerc} file was used to make sure the test files, \texttt{venv} and \texttt{\_\_init\_\_.py} weren't included in the coverage report. The \texttt{Makefile} was mainly used as a way to create shortcuts to run certain scripts multiple times, such as training on a given dataset for each relationship, or running all of my unit tests and creating a coverage report. 
 
 The \texttt{data} folder contains the three datasets which contain the images and the meta data about the images, such as which are positive and negative pairs. Certain extra information is saved to these folders as well which is discussed in section \ref{sec:SaveDisk}. 
 
-Finally, the \texttt{out} folder contains CSVs that contain the accuracies of certain experiments which are also discussed in section \ref{sec:SaveDisk}. 
+Finally, the \texttt{out} folder contains CSVs that contain the accuracies of certain experiments which are also discussed in section \ref{sec:SaveDisk} as well as the ROC curves created from the \texttt{ROC\_curves.py} script. 
 
 \section{Data Preparation} \label{sec:DataPrep}
 
@@ -689,9 +655,10 @@ To create a pair from a given set, a number was randomly picked from $1$ to $n$ 
 Finally, each of the KinFaceW datasets had a setting, restricted or unrestricted, in which the restricted setting meant that no negative pairs are used in the training splits and unrestricted means that they are used \cite{KinFaceCitation1}.
 TSKinFace didn't have this type of setting, however, but the differences in whether negative pairs were or weren't used in the training process was still explored. 
 
-\subsection{PCA}
+\subsection{Dimensionality Reduction}
 
-In order to save on computation time for the training process as well as on disk space, PCA is used in order to reduce the dimensions of each of the face descriptors. In the implementation, after each image had its face descriptors obtained for a dataset, for each type of face descriptor, PCA is used to reduce the dimensions to $100$ through the method defined in Section \ref{sec:PCA}. 
+In order to save on computation time for the training process as well as on disk space, Principal Component Analysis (PCA) is used in order to reduce the dimensions of each of the face descriptors, which is described in detail in Appendix \ref{sec:PCA}. In the implementation, after each image had its face descriptors obtained for a dataset, for each type of face descriptor, PCA is used to reduce the dimension of each face descriptor to $100$. This is done using the \texttt{sklearn} function which implements the probabilistic PCA model \cite{ProbPCA}. 
+Although the dimensionality of the face descriptor decreases, we are still able to keep the most important features of the original dataset which means that the face descriptors are still usable, even though the dimensionality has been vastly decreased. 
 
 \subsection{Saving Results to Disk} \label{sec:SaveDisk}
 
@@ -733,15 +700,19 @@ Due to the differences, this version of SIFT had to be implemented directly rath
 
 \subsection{VGG Implementation} \label{sec:VGGImpl}
 
-The original VGG network that was trained on ImageNet had 138 million parameters \cite{VGG} which would then increase if we were to increase the number of outputs of the softmax layer for the face network. This would take too long to train in practice and 
-the pretrained weights were uploaded to their site\footnote{\url{https://www.robots.ox.ac.uk/~vgg/software/vgg_face/}}. Therefore, it was easier to download the weights from the website and reformat it as needed. 
+The original VGG network that was trained on ImageNet had 138 million parameters \cite{VGG} which would then increase if we were to increase the number of outputs of the softmax layer for the face network. This would take too long to train in practice. However, 
+the pre-trained weights for the VGG face network were uploaded to the authors' site\footnote{\url{https://www.robots.ox.ac.uk/~vgg/software/vgg_face/}}. Therefore, it was easier to download the weights from the website and reformat it as needed than to train the model myself. 
 
-Firstly, due to the fact that the weights were used 566MB, this wasn't something that could just be uploaded to GitHub. Thus, when predicting, I made sure to check if there was a weights file with a specific name in the \texttt{src/face\_descriptors} folder path. If there wasn't, then the weights would be 
-downloaded from the site. Due to the fact that I was using the Torch weights, but I was implementing this in Keras, I needed to reshape a few of the fully-connected layers. For example, one layer had the shape $(7, 7, 512, 4096)$ for the weights but for Keras, it needed to be in the shape $(7\times 7\times 512, 4096)$. 
-This was easily solved by using the \texttt{np.reshape} function for each of the fully-connected layers and these slightly modified weights were saved to an \texttt{h5} file on disk. 
+The VGG face model was implemented using \texttt{keras} to create the base model without the weights. In order to create the pre-trained model, it had to be checked whether the weights were already on disk or not. If they weren't, they would be downloaded and modified in order to fit in the model and then saved onto disk in the proper file. 
+The modification that was required was to reshape the weights to the dimension that \texttt{keras} wanted rather than what they originally were, since the weights were originally to be used with Torch.
 
-From there, the weights would be on disk so, to get a face descriptor for a set of images, I would create the VGG face model with the softmax layer, then load the weights into the model before returning the model without the softmax layer. This model then was used to get the face descriptors for the set of images given. Due to the fact that 
-VGG takes images of size $224 \times 224$, the images needed to be resized to $224 \times 224$ before it could be used as an input into the model. Thus, the model took a \texttt{numpy} array of size $(n, 224, 224, 3)$ and outputted a list of face descriptors which had size $(n, 4096)$. 
+% Firstly, since the size of the weights was 566MB, this wasn't something that could just be uploaded to GitHub. 
+% When predicting, I made sure to check if there was a weights file with a specific name in the \texttt{src/face\_descriptors} folder path. If there wasn't, then the weights would be 
+% downloaded from the site. Due to the fact that I was using the Torch weights, but I was implementing this in Keras, I needed to reshape a few of the fully-connected layers. For example, one layer had the shape $(7, 7, 512, 4096)$ for the weights but for Keras, it needed to be in the shape $(7\times 7\times 512, 4096)$. 
+% This was easily solved by using the \texttt{np.reshape} function for each of the fully-connected layers and these slightly modified weights were saved to an \texttt{h5} file on disk. 
+
+From there, the weights would be on disk so, to get a face descriptor for a set of images, the VGG face model with the softmax layer was instantiated, then the weights were loaded into the model before the model without the softmax layer is returned. This model is then used to get the face descriptors for a given set of images. Since 
+VGG takes images of size $224 \times 224$, the images need to be resized to $224 \times 224$ before they could be used as an input into the model. Thus, the model took a \texttt{numpy} array of size $(n, 224, 224, 3)$ and outputted a list of face descriptors that had size $(n, 4096)$. 
 
 \subsection{CifarNet Extension} \label{sec:CFNExt}
 
@@ -1016,7 +987,7 @@ the average accuracy is outputted for the given configuration along with each of
 In this chapter, I will discuss the accuracies that were obtained from the project in section \ref{sec:MainResults} whether the success criterion was achieved in section \ref{sec:SuccCriterionEval}. 
 Then, the potential biases in these datasets are discussed in section \ref{sec:Biases}, the ablation studies are discussed in section \ref{sec:AbStudies}, the CifarNet extension results will be discussed in section \ref{sec:CFNResults} and finally the unit tests and their coverage will be briefly discussed in section \ref{sec:UnitTests}. 
 
-\section{Original Results} \label{sec:MainResults}
+\section{Overall Accuracies of the Model} \label{sec:MainResults}
 
 As mentioned in section \ref{sec:Datasets}, we have that ``F'' stands for father, ``M'' stands for mother, ``S'' stands for son, and ``D'' stands for daughter so the relationships are noted as a combination of these acronyms, so ``FS'' stands for the Father-Son relationship, etc. The project is run end-to-end for each dataset, setting and relationship and the accuracies are shown in figure \ref{fig:Accs}. For the success criterion, we look at the difference between the accuracies my implementation had obtained, and the original paper had obtained, which is shown in figure \ref{fig:diffInAccs} where a positive number means my accuracies were better. 
 
@@ -1041,6 +1012,14 @@ In general, we see that the accuracies of the Father-Son relationship for each d
 
 When only positive pairs were used for the TSKinFace dataset for both training and testing, we get accuracies that are fairly close to that of the original paper with an average difference of $0.742\%$. However, when negative pairs were added to the test set, the accuracies drop by, on average, $8.29\%$. This led me to believe that the original paper had only used the positive pairs for the testing phase of TSKinFace as TSKinFace didn't come with any premade negative pairs. As a note, in the later sections of this chapter, TSKinFace refers to having all pairs in both the training and test set. 
 
+\section{Success Criterion} \label{sec:SuccCriterionEval}
+
+As seen in section \ref{sec:MainResults}, I was able to replicate the accuracies from \cite{WGEML} within a $\pm 15\%$ accuracy by using the WGEML methodology which means that the project is a success according to appendix \ref{chapter:Proposal}. 
+% Furthermore, referring to the requirements analysis in section \ref{sec:ReqAnal}, each of the core project requirements were completed, which were to implement face detection, the necessary face descriptors, WGEML, a prediction method and replicate the paper end-to-end. 
+Furthermore, the extensions were also completed and the results of which are discussed in sections \ref{sec:Biases}, \ref{sec:AbStudies}, and \ref{sec:CFNResults}.
+
+\section{Receiver Operating Characteristic (ROC) Curves}
+
 We can also examine the ROC curves for each dataset in figure \ref{fig:ROCCurves}.
 
 \begin{figure}[h!]
@@ -1051,11 +1030,6 @@ We can also examine the ROC curves for each dataset in figure \ref{fig:ROCCurves
 \end{figure}
 
 Here, we see that the area under the curve is the most for the TSKinFace dataset and the least for the KinFaceW-I dataset, though both curves are far from that of a classifier that is luck-based. 
-\section{Success Criterion} \label{sec:SuccCriterionEval}
-
-As seen in section \ref{sec:MainResults}, I was able to replicate the accuracies from \cite{WGEML} within a $\pm 15\%$ accuracy by using the WGEML methodology which means that the project is a success according to appendix \ref{chapter:Proposal}. 
-% Furthermore, referring to the requirements analysis in section \ref{sec:ReqAnal}, each of the core project requirements were completed, which were to implement face detection, the necessary face descriptors, WGEML, a prediction method and replicate the paper end-to-end. 
-Furthermore, the extensions were also completed and the results of which are discussed in sections \ref{sec:Biases}, \ref{sec:AbStudies}, and \ref{sec:CFNResults}.
 
 \section{Potential Biases in Datasets} \label{sec:Biases}
 
@@ -1146,7 +1120,7 @@ it does better in the KinFaceW-II dataset, and it doesn't have a huge effect on 
 found that the father-son relationship had the least change in accuracy with an average 0.092\% 
 accuracy difference. This is shown in figure \ref{fig:CFNRelationshipGrouping} where a positive number implies that the original face descriptors did better. There is more variation in the other relationships than there is in the father-son relationship, 
 and this is reflected in the standard deviations for each relationship, ignoring the tri-kin relationships as there is only one dataset for this. 
-% TODO: Might want to put the standard deviations here as a graph or a table?
+
 The differences grouped by dataset is shown in figure \ref{fig:CFNDatasetGrouping}.
 
 \begin{figure}[h!]
@@ -1270,6 +1244,50 @@ Where $r$ is the ratio of the eigenvalues. Thus, letting the maximum ratio that 
 If it is, then this is a proper keypoint. If it isn't then this is an edge so we can discard it. 
 
 We now have each of the keypoints which are scale-invariant, so we need to make it rotation-invariant as well. This is done by assigning an orientation to the keypoints. A neighborhood is taken around the keypoint in which the gradient is obtained for each pixel in the area and a histogram of these gradients is created based on the angle, this time in bins of $0$ to $10$, 10 to 20, etc. until 350 to 360. The peak in this histogram is calculated and taken and any other peaks which have a value above 80\% of the original peak is also considered to calculate the orientation. Now, for each keypoint, we have the location, scale, and orientation.
+
+\section{Principal Component Analysis} \label{sec:PCA}
+
+Principal Component Analysis (PCA) \cite{PCA} is a statistical tool that we can use to reduce the dimensionality of a dataset while maintaining as much of the variability as possible. The algorithm identifies \textit{principal components} which are the directions of maximum variance in the dataset, which can be visualized in figure \ref{fig:PCA}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.5]{Prep/PCAComps.jpeg}
+    \caption{Principal components of an arbitrary 2 dimensional dataset}
+    \label{fig:PCA}
+\end{figure}
+
+Let $p$ be the number of variables that are being measured in the dataset, which in our case is the dimension of the face descriptor. Let $\mathbf{X}$ be the matrix $n \times p$ data matrix that is composed of the $p$ $n$-dimensional vectors $\mathbf{x_1}, ..., \mathbf{x_p}$ in which $x_i$ represents the $n$ observations of the $i$th variable.
+The goal of PCA is then to create a $p \times k$ matrix $\mathbf{W}$, where $k \leq p$, which maps each row-vector of $\mathbf{X}$ from the original $p$-dimensional feature space to a new $k$-dimensional feature subspace such that the variability of the dataset is kept intact, as much as possible. 
+
+First, the dataset must be standardized which means that the mean of each feature must be $0$, which we denote as the matrix $\mathbf{X'}$ and the column vectors as $\mathbf{x_1'}, ..., \mathbf{x_p'}$. From there, the covariance matrix is obtained. This matrix is the following:
+
+\[\Sigma = \begin{bmatrix}
+    Cov(\mathbf{x_1'}, \mathbf{x_1'}) & ... & Cov(\mathbf{x_1'}, \mathbf{x_p'}) \\
+    \vdots & \ddots & \vdots \\
+    Cov(\mathbf{x_p'}, \mathbf{x_1'}) & ... & Cov(\mathbf{x_p'}, \mathbf{x_p'})
+\end{bmatrix}\]
+
+Where:
+
+\[\Sigma_{ij} = Cov(\mathbf{x_i'}, \mathbf{x_j'}) = \frac{1}{n}(\mathbf{x_i'}\cdot \mathbf{x_j'})\]
+
+Since we have that the mean of both are $0$ now, after standardization. Thus:
+
+\[\Sigma = \frac{1}{N} \mathbf{X'}\mathbf{X'}^T\]
+
+We then find the eigenvalues and eigenvectors of $\Sigma$, of which we get $p$ of them. The eigenvalues get sorted from largest to smallest and, thus, the first principal component is the eigenvector that corresponds to the largest eigenvalue, the second principal component is the eigenvector with the second largest eigenvalue, etc. 
+Denoting $\mathbf{w_i}$ as the $i$th principal component, we can make the matrix $\mathbf{W}$ as:
+
+\[\mathbf{W} = \begin{bmatrix}
+    \mathbf{w_1} & ... & \mathbf{w_k}
+\end{bmatrix}\]
+
+Which is a $p \times k$ matrix. Thus, to reduce the dimensions of the original dataset, we can create the matrix:
+
+\[\mathbf{T} = \mathbf{X}\mathbf{W}\]
+
+In which the $i$th row of $\mathbf{T}$ corresponds with the $i$th observation of $\mathbf{X}$ and this vector has is $k$-dimensional where $k \leq p$. 
+
 
 \chapter{Raw Table Data}
 
