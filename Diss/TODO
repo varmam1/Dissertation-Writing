@@ -13,16 +13,13 @@ ROB:
 
 * - I guess reunite families when photographs are not available for comparison?
 
-* "also pose privacy protections." - what do you mean by this?
 (is there a little more to say here given comments such as "been aware of the social and ethical impact of your work." in the marking criteria) 
 
-* 1.3 related work - what is the typical accuracy of a human? 
+* 1.3 related work
 
 * Could you group the approaches taken in some way and represent this visually even? a taxonomy? "One paper…" sounds like the related work might be incomplete. 
 
 e.g. "Approaches to kinship recognition can be broadly grouped…."??
-
-* Is the technique you chose state-of-the-art? Is there very recent work you could cite?
 
 * How do the techniques compare beyond accuracy? 
   One thing that springs to mind is predictions of confidence, might this be important in this sort of application? 
@@ -30,16 +27,11 @@ e.g. "Approaches to kinship recognition can be broadly grouped…."??
 
 1.4 
 
-Might it be possible to tease out what you did, what your results/successes were? 
-
-e.g., "I demonstrated that…."
-
 Is it more than simply reproducing results, you wanted to understand something, verify their results perhaps using additional techniques that they did not report?
 
 Perhaps make the nature of the biases more explicit? 
 
 Why is it sensible to include images from the same photograph in the dataset? It seems like you would be asking for trouble? Is there no way to pre-process the data set to remove backgrounds or normalise lighting on the face? Is this not done typically? Could you highlight this sort of thing as an issue? (sorry, I may have asked this before perhaps)
-
 
 Prep:
 - Redraw/source figures
