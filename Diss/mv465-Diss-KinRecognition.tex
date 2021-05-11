@@ -79,17 +79,21 @@ extent for a comparable purpose.
 Candidate Number:   & \bf 2356E                       \\
 Project Title:      & \bf Kin Recognition Using Weighted \\ & \bf Graph Embeddings \\
 Examination:        & \bf Computer Science Tripos -- Part II, June 2021  \\
-Word Count:         & \bf 11999 \\ % TODO: Change
-Line Count:         & \bf 3027 \footnote{Calculated using \texttt{find . -name '*.py' | xargs wc -l}} \\ % TODO: Change
+Word Count:         & \bf 11999\footnotemark[1] \\ % TODO: Change
+Line Count:         & \bf 3027\footnotemark[2] \\ 
 Project Originator: & \bf The Dissertation Author                   \\
 Supervisor:         & \bf Daniel Bates                    \\ 
 \end{tabular}
 }
+\footnotetext[1]{Calculated using \texttt{texcount}}
+\footnotetext[2]{Calculated using \texttt{find . -name '*.py' | xargs wc -l}}
+\stepcounter{footnote}
+
 \section*{Original Aims of the Project}
 Kin recognition is the ability to recognize whether two people are related to each other just by looking at them. 
 The goal of the project was to implement a state of the art model, Weighted Graph Embedding-Based Metric Learning (WGEML), to solve the Kin Verification problem and to verify the accuracies obtained. I also wanted to further evaluate the models obtained by looking at potential biases in the datasets used in the paper.
 \section*{Work Completed}
-I successfully implemented WGEML and was able to recreate the original accuracies within an acceptable range, thus fulfilling my success criterion. ROC curves were also created in order to have another method of evaluation aside from just using the accuracies. Furthermore, I performed ablation studies in order to determine if there is a relationship between the number of face descriptors used and the accuracy of the model and replaced one face descriptor with a less expensive one.  
+I successfully implemented WGEML and was able to recreate the original accuracies within an acceptable range, thus fulfilling my success criterion. Furthermore, I performed ablation studies in order to determine if there is a relationship between the number of face descriptors used and the accuracy of the model and replaced one face descriptor with a less expensive one.  
 I explored biases in the datasets used using the model that was created and discussed the implications of such biases on the results. 
 \section*{Special Difficulties}
 None.
@@ -108,7 +112,7 @@ None.
 \pagenumbering{arabic}
 
 % TODO: A stronger hook sentence is definitely needed here. 
-Kinship recognition is the ability to recognize how two people are related to each other based on their facial features. In organisms, it is advantageous to inclusive fitness to be able to recognize which of their neighbors are close relatives \cite{HamiltonGenetic}. Thus, it stands to reason that the ability to recognize kinship relationships has evolved in humans. 
+Kinship recognition is the ability to recognize how two people are related to each other based on visual cues. In organisms, it is advantageous to inclusive fitness to be able to recognize which of their neighbors are close relatives \cite{HamiltonGenetic}. Thus, it stands to reason that the ability to recognize kinship relationships has evolved in humans. 
 In humans, specifically, facial resemblance is expected to serve as an indicator of kinship and it has been demonstrated that strangers are able to match photographs of mothers to their infants without any prior contact with any of the family \cite{mateo2015}. 
 
 This idea can be modeled which gives rise to computational kinship recognition. This is the field of studying how kinship relationships between people can be identified without any prior knowledge of the family. 
@@ -118,7 +122,6 @@ This idea can be modeled which gives rise to computational kinship recognition. 
 In the field of computational kinship recognition, there are a variety of problems that can be explored. 
 The most common problem, kinship verification, takes as input a pair of images and a proposed kinship relationship, for example, mother-daughter, and recognizes whether the relationship exists. We can see an example set of images in figure \ref{fig:KinRecogEx}.
 
-% TODO: change pic plz shitlord
 \begin{figure}[!ht]
     \centering
     \includegraphics{Intro/face_example.png}
@@ -137,14 +140,14 @@ Family classification deals with a similar task of taking an image of a person a
 Applications of accurate kinship recognition software include being able to better recognize missing children and match them with their parents \cite{robinson2020visual}. As the models tend to focus on facial features, even as the missing child ages, as long as the right face descriptors are used, it is still possible to find missing children. 
 Furthermore, it can also be used for stopping human traffickers from claiming they are family members of a victim or to reunite families across refugee camps. These humanitarian issues can be solved by using an application of one of the problems discussed in section \ref{sec:ProbOverview}. For example, to reunite families across refugee camps, we can use a method that solves the search and retrieval problem. 
 
-In the field of computer vision, there is a goal ``to investigate the bi- or tri- relationship among multiple visual entities'' \cite{TSKinFace} rather than just looking at one entity. 
+In the field of computer vision, there is a goal to investigate the relationships among multiple images \cite{TSKinFace} rather than just looking at one entity. 
 % Maybe make it to investigate the relationships among multiple images?
 Advancements in kinship verification and tri-subject kinship verification help further this goal as we are directly investigating the relationships among multiple people. 
 
 \section{Related Work}     
 
 The first paper in this field used handcrafted features such as color, facial features, and distances as well as a Histogram of Gradients vector \cite{fang2010}. A classification accuracy of $70.67\%$ was obtained overall using K-Nearest Neighbors and $68.6\%$ when a Support Vector Machine was used. 
-It was also found that the average accuracy of human performance for the dataset used in the paper was $67.19\%$ and the accuracies ranged from $50\%$ to $90\%$ \cite{fang2010}. As such, the classifiers were doing better than the humans that were tested in the paper. 
+It was also found that the average accuracy of human performance for the dataset used in the paper was $67.19\%$ and the accuracies ranged from $50\%$ to $90\%$ \cite{fang2010}. As such, the classifiers were performing better than the humans that were tested in the paper. 
 
 Following this paper, approaches to the problems can be generally grouped into methods that use deep learning and those that use metric learning. 
 
@@ -167,7 +170,7 @@ I was able to achieve the following:
     Furthermore, I also used ROC curves in section \ref{sec:ROC} to further evaluate the models that were created. The mean ROC curves are created for each dataset as well as for each relationship.
     \item I performed ablation studies on the face descriptors and the results show diminishing returns as more face descriptors are used for the model, which is in section \ref{sec:FDAbStudies}.
     \item I used the models that were created to discover biases in the datasets that were used. These biases came from the fact that that the pairs of images in the KinFaceW-II and TSKinFace datasets came from the same photograph. 
-    We then explore the consequences of these biases that were found to be present in KinFaceW-II and TSKinFace in section \ref{sec:Biases}.
+    I then explore the consequences of these biases that were found to be present in KinFaceW-II and TSKinFace in section \ref{sec:Biases}.
     \item I further tested the face descriptors by replacing VGG with a smaller CNN in which the implementation is discussed in section \ref{sec:CFNExt} and found that the model does worse but only by $5\%$ at most in section \ref{sec:CFNResults}. 
 \end{enumerate}
 
@@ -197,7 +200,7 @@ A basic type of this is a Multilayer Perceptron (MLP) which is a set of layers l
         \newcommand{\y}[2]{$\hat{y}_#2$}
         \newcommand{\hfirst}[2]{\small $h^{(1)}_#2$}
         \newcommand{\hsecond}[2]{\small $h^{(2)}_#2$}
-        \inputlayer[count=3, bias=true, title=Input\\layer, text=\x]
+        \inputlayer[count=4, bias=false, title=Input\\layer, text=\x]
         \hiddenlayer[count=3, bias=false, title=Hidden\\layer 1, text=\hfirst] \linklayers
         \hiddenlayer[count=3, bias=false, title=Hidden\\layer 2, text=\hsecond] \linklayers
         \outputlayer[count=2, title=Output\\layer, text=\y] \linklayers
@@ -230,7 +233,7 @@ The kernel is then started in the top left of the input and the dot product of t
 \begin{figure}[h!]
     \centering
     \includegraphics[scale=0.5]{Prep/Convolution.png}
-    \caption{A convolution done on an input. Image sourced from Yakura et al. (2018) \cite{CNNFigure}}
+    \caption[A visualization of a convolution]{A convolution done on an input. Image sourced from Yakura et al. (2018) \cite{CNNFigure}}
     \label{fig:ConvLayer}
 \end{figure}
 
@@ -253,7 +256,7 @@ We can see an example of this with a max-pooling layer of stride 2 and has filte
 \begin{figure}[h!]
     \centering
     \includegraphics[scale=0.5]{Prep/poolingExample.jpeg}
-    \caption{An example of the max-pooling operation done on a single slice of the input}
+    \caption[Max-pooling operation]{An example of the max-pooling operation done on a single slice of the input. Image sourced from Karpathy \cite{CNNKarpathy}}
     \label{fig:PoolEx}
 \end{figure}
 
@@ -300,7 +303,7 @@ Then, for each pixel in the image, a neighborhood of pixels is obtained from it.
 \begin{figure}[ht]
     \centering
     \includegraphics[scale=0.2]{Prep/Lbp_neighbors.png}
-    \caption{Potential neighborhoods of the pixel}
+    \caption[Local Binary Patterns neighborhoods]{Potential neighborhoods of the pixel. Image sourced from Xiawi \cite{LBPNeighbors}}
     \label{fig:LBPNeighborhood}
 \end{figure}
 
@@ -313,7 +316,7 @@ Applying this to figure \ref{fig:LBPExample}, we get that our LBP value for this
 \begin{figure}[ht]
     \centering
     \includegraphics[scale=0.75]{Prep/LBPExample.png}
-    \caption{Example of LBP operator on a pixel}
+    \caption[Example of the LBP operator on a pixel]{Example of the LBP operator on a pixel. Image sourced from Matti Pietikäinen \cite{LBPEx}}
     \label{fig:LBPExample}
 \end{figure}
 
@@ -422,13 +425,13 @@ The actual implementation of SIFT that is used differs from the original version
 
 \subsection{VGG} \label{sec:VGGPrep}
 
-Another way of getting face descriptors for an image is to use the VGG network. The original VGG network \cite{VGG} is a CNN which takes in a $224 \times 224$ colored image and outputs a probability vector of size 1000 for the ImageNet classes. In other words, if \texttt{out} is the output of the model, \texttt{out[i]} corresponds to the probability that the \texttt{i}$^{\text{th}}$ ImageNet class is the class of the input image. 
+Another way of getting face descriptors for an image is to use a CNN. One CNN we can use is VGG. The original VGG network \cite{VGG} is a CNN which takes in a $224 \times 224$ colored image and outputs a probability vector of size 1000 for the ImageNet classes. In other words, if \texttt{out} is the output of the model, \texttt{out[i]} corresponds to the probability that the \texttt{i}$^{\text{th}}$ ImageNet class is the class of the input image. 
 There are 5 configurations of the network, which have varying depth and, as a result, varying parameters. The architecture of the second deepest configuration is configuration D in Figure \ref{fig:VGGArch} which is used in this implementation.
 
 \begin{figure}[ht]
     \centering
     \includegraphics[scale=0.65]{Prep/VGGArch.png} 
-    \caption{The different configurations that VGG can have. Image reproduced from Simonyan et al. (2015) \cite{VGG}}
+    \caption[VGG network configurations]{The different configurations that VGG can have. Image reproduced from Simonyan et al. (2015) \cite{VGG}}
     \label{fig:VGGArch}
 \end{figure}
 
@@ -620,7 +623,7 @@ The repository is shown in Figure \ref{fig:RepoOverview}
         .2 requirements.txt.
     }
 
-    \caption{Folder Structure of the project}
+    \caption{Folder structure of the project}
     \label{fig:RepoOverview}
 \end{figure}  
 
@@ -641,8 +644,8 @@ Finally, the \texttt{out} folder contains CSVs that contain the accuracies of ce
 
 \subsection{Cross-Validation}
 
-We split the datasets for each relationship into 5 folds in which each fold within a relationship has around the same number of pairs. 
-Once we have the 5 separate folds, we obtain 5 different train/test splits since we use each fold as a test set and the remaining 4 folds as the training set. For example, if we had the folds $\{A, B, C, D, E\}$, our splits are then shown in table \ref{table:Splits}.
+I split the datasets for each relationship into 5 folds in which each fold within a relationship has around the same number of pairs. 
+Once I have the 5 separate folds, I obtain 5 different train/test splits since I use each fold as a test set and the remaining 4 folds as the training set. For example, if we had the folds $\{A, B, C, D, E\}$, our splits are then shown in table \ref{table:Splits}.
 
 \begin{table}[h!]
 \centering
@@ -658,7 +661,7 @@ $A, B, C, D$ & $E$
 \label{table:Splits}
 \end{table}    
     
-We then run the algorithm end-to-end for each train/test split and average the accuracies in the end. 
+I then run the algorithm end-to-end for each train/test split and average the accuracies in the end. 
 For the KinFaceW datasets, as the images were already split into folds by the dataset, that was used in the project, whereas with TSKinFace, it had to be generated randomly, which was done using \texttt{sklearn} which had a \texttt{KFold} function. 
 
 \subsection{Positive and Negative Pairs}
@@ -735,7 +738,7 @@ In the CifarNet extension, I replaced the VGG network with a smaller network tha
 \begin{figure}[h!]
     \centering
     \includegraphics[scale=0.46]{Implementation/CFNArch.png}
-    \caption{The Architecture of the CifarNet model}
+    \caption{The architecture of the CifarNet model}
     \label{fig:CFNArch}
 \end{figure}
 
@@ -1052,6 +1055,7 @@ The ROC curves can also be created for each relationship averaged over each fold
 \begin{figure}[h!]
     \centering
     \includegraphics[scale=0.6]{Eval/ROC_rel.png}
+    % \resizebox{16cm}{!}{\includegraphics{Eval/ROC_rel.png}}
     \caption{The mean ROC curve for each relationship averaged over each fold, dataset and setting}
     \label{fig:ROCRel}
 \end{figure}
@@ -1240,7 +1244,7 @@ For face detection using Haar-based cascade classifiers \cite{CascadeClassifier}
 \begin{figure}[!ht]
     \centering
     \includegraphics{Appendix/HaarFeatures.png}
-    \caption{Haar-based features to be applied on an image. Sourced from Viola et al. \cite{CascadeClassifier}}
+    \caption[Haar-based features]{Haar-based features to be applied on an image. Sourced from Viola et al. \cite{CascadeClassifier}}
     \label{fig:HaarFeatures}
 \end{figure}
 
@@ -1262,7 +1266,7 @@ From here, for each octave, a difference of Gaussians is created to help find th
 \begin{figure}[ht]
     \centering
     \includegraphics[scale=0.2]{Prep/DoG.png}
-    \caption{The Difference of Gaussians being created. Image reproduced from Lowe (2004) \cite{SIFT}}
+    \caption[Difference of Gaussians]{The Difference of Gaussians being created. Image reproduced from Lowe (2004) \cite{SIFT}}
     \label{fig:DiffOfGauss}
 
 \end{figure}
@@ -1292,14 +1296,15 @@ We now have each of the keypoints which are scale-invariant, so we need to make 
 
 \section{Principal Component Analysis} \label{sec:PCA}
 
-Principal Component Analysis (PCA) \cite{PCA} is a statistical tool that we can use to reduce the dimensionality of a dataset while maintaining as much of the variability as possible. The algorithm identifies \textit{principal components} which are the directions of maximum variance in the dataset, which can be visualized in figure \ref{fig:PCA}.
+Principal Component Analysis (PCA) \cite{PCA} is a statistical tool that we can use to reduce the dimensionality of a dataset while maintaining as much of the variability as possible. The algorithm identifies \textit{principal components} which are the directions of maximum variance in the dataset.
+% , which can be visualized in figure \ref{fig:PCA}.
 
-\begin{figure}[ht]
-    \centering
-    \includegraphics[scale=0.5]{Prep/PCAComps.jpeg}
-    \caption{Principal components of an arbitrary 2 dimensional dataset}
-    \label{fig:PCA}
-\end{figure}
+% \begin{figure}[ht]
+%     \centering
+%     \includegraphics[scale=0.5]{Prep/PCAComps.jpeg}
+%     \caption{Principal components of an arbitrary 2 dimensional dataset}
+%     \label{fig:PCA}
+% \end{figure}
 
 Let $p$ be the number of variables that are being measured in the dataset, which in our case is the dimension of the face descriptor. Let $\mathbf{X}$ be the matrix $n \times p$ data matrix that is composed of the $p$ $n$-dimensional vectors $\mathbf{x_1}, ..., \mathbf{x_p}$ in which $x_i$ represents the $n$ observations of the $i$th variable.
 The goal of PCA is then to create a $p \times k$ matrix $\mathbf{W}$, where $k \leq p$, which maps each row-vector of $\mathbf{X}$ from the original $p$-dimensional feature space to a new $k$-dimensional feature subspace such that the variability of the dataset is kept intact, as much as possible. 
@@ -1374,7 +1379,8 @@ The tables for figures \ref{fig:Accs} and \ref{fig:diffInAccs} is as follows:
 
 \chapter{Project Proposal}\label{chapter:Proposal}
 
-% \includepdf{proposal.pdf}
-% \input{proposal}
+The proposal is available on the next page.
+
+\includepdf[pages=-]{proposal.pdf}
 
 \end{document}
