@@ -79,7 +79,7 @@ extent for a comparable purpose.
 Candidate Number:   & \bf 2356E                       \\
 Project Title:      & \bf Kin Recognition Using Weighted \\ & \bf Graph Embeddings \\
 Examination:        & \bf Computer Science Tripos -- Part II, June 2021  \\
-Word Count:         & \bf 11999\footnotemark[1] \\ % TODO: Change
+Word Count:         & \bf 11998\footnotemark[1] \\ % TODO: Change
 Line Count:         & \bf 3027\footnotemark[2] \\ 
 Project Originator: & \bf The Dissertation Author                   \\
 Supervisor:         & \bf Daniel Bates                    \\ 
@@ -91,9 +91,9 @@ Supervisor:         & \bf Daniel Bates                    \\
 
 \section*{Original Aims of the Project}
 Kin recognition is the ability to recognize whether two people are related to each other just by looking at them. 
-The goal of the project was to implement a state of the art model, Weighted Graph Embedding-Based Metric Learning (WGEML), to solve the Kin Verification problem and to verify the accuracies obtained. I also wanted to further evaluate the models obtained by looking at potential biases in the datasets used in the paper.
+The goal of the project was to implement a state-of-the-art model, Weighted Graph Embedding-Based Metric Learning (WGEML), to solve the Kin Verification problem and to verify the accuracies obtained. I also wanted to further evaluate the models obtained by looking at potential biases in the datasets used in the paper.
 \section*{Work Completed}
-I successfully implemented WGEML and was able to recreate the original accuracies within an acceptable range, thus fulfilling my success criterion. Furthermore, I performed ablation studies in order to determine if there is a relationship between the number of face descriptors used and the accuracy of the model and replaced one face descriptor with a less expensive one.  
+I successfully implemented WGEML and was able to recreate the original accuracies within an acceptable range, thus fulfilling my success criterion. Furthermore, I performed ablation studies in order to determine if there is a relationship between the number of face descriptors used and the accuracy of the model. I also replaced one face descriptor with a less computationally expensive one.  
 I explored biases in the datasets used using the model that was created and discussed the implications of such biases on the results. 
 \section*{Special Difficulties}
 None.
@@ -111,8 +111,7 @@ None.
 \chapter{Introduction}
 \pagenumbering{arabic}
 
-% TODO: A stronger hook sentence is definitely needed here. 
-Kinship recognition is the ability to recognize how two people are related to each other based on visual cues. In organisms, it is advantageous to inclusive fitness to be able to recognize which of their neighbors are close relatives \cite{HamiltonGenetic}. Thus, it stands to reason that the ability to recognize kinship relationships has evolved in humans. 
+Kinship recognition is the ability to recognize how two people are related to each other without prior information about who they are. In organisms, it is advantageous to inclusive fitness to be able to recognize which of their neighbors are close relatives \cite{HamiltonGenetic}. Thus, it stands to reason that the ability to recognize kinship relationships has evolved in humans. 
 In humans, specifically, facial resemblance is expected to serve as an indicator of kinship and it has been demonstrated that strangers are able to match photographs of mothers to their infants without any prior contact with any of the family \cite{mateo2015}. 
 
 This idea can be modeled which gives rise to computational kinship recognition. This is the field of studying how kinship relationships between people can be identified without any prior knowledge of the family. 
@@ -125,11 +124,11 @@ The most common problem, kinship verification, takes as input a pair of images a
 \begin{figure}[!ht]
     \centering
     \includegraphics{Intro/face_example.png}
-    \caption{An example of an input into a classical kin recognition problem}
+    \caption{An example of an input into the kin verification problem}
     \label{fig:KinRecogEx}
 \end{figure}
 
-These relationships are conventionally parent-child relationships as opposed to sibling-sibling relationships. A further extension of the main kin verification problem is Tri-Subject Kinship Verification which takes 3 images, two parents and a child, and determines if they are related 
+These relationships are conventionally parent-child relationships as opposed to sibling-sibling relationships. A further extension of the main kin verification problem is Tri-Subject Kinship Verification which takes three images, two parents and a child, and determines if they are related 
 or not. These are the problems that I consider in this dissertation. 
 
 Some other major problems in the field include search and retrieval and family classification. Search and retrieval takes an image of a person as input and searches through a database to find who they are most likely related to. This outputs a list of people they could be related to. 
@@ -141,7 +140,6 @@ Applications of accurate kinship recognition software include being able to bett
 Furthermore, it can also be used for stopping human traffickers from claiming they are family members of a victim or to reunite families across refugee camps. These humanitarian issues can be solved by using an application of one of the problems discussed in section \ref{sec:ProbOverview}. For example, to reunite families across refugee camps, we can use a method that solves the search and retrieval problem. 
 
 In the field of computer vision, there is a goal to investigate the relationships among multiple images \cite{TSKinFace} rather than just looking at one entity. 
-% Maybe make it to investigate the relationships among multiple images?
 Advancements in kinship verification and tri-subject kinship verification help further this goal as we are directly investigating the relationships among multiple people. 
 
 \section{Related Work}     
@@ -158,11 +156,11 @@ These networks have three stages, a feature extraction stage, which uses a pre-t
 
 A widely-used approach for the problem is to use metric learning. One of the first papers that used metric learning was the paper on Neighborhood Repulsed Metric Learning \cite{KinFaceCitation1}. It aims to find a metric that minimizes the distance between the vectors of images that have a kinship relationship and maximize the distances between the vectors of pairs of images that don't have a kinship relationship. 
 The Discriminative Multimetric Learning method \cite{DMML} extends this model to use multiple feature vectors instead of just one for each image in the training and testing set.
-The paper that will be implemented in this dissertation, Weighted Graph Embedding-Based Metric Learning, is a state-of-the-art metric learning approach to the problem \cite{WGEML}. 
+The paper that will be implemented in this dissertation, Weighted Graph Embedding-Based Metric Learning for Kinship Verification, is a state-of-the-art metric learning approach to the problem \cite{WGEML}. 
 
 \section{Project Overview}
 
-The project aims to reproduce the results of the paper, Weighted Graph Embedding-Based Metric Learning \cite{WGEML}, or WGEML for short, and to verify the accuracies that were obtained. I also aim to explore the environments the model could work under and infer properties of the model and the datasets used from these environments. 
+The project aims to reproduce the results of the paper, Weighted Graph Embedding-Based Metric Learning for Kinship Verification \cite{WGEML}, or WGEML for short, and to verify the accuracies that were obtained. I also aim to explore the environments the model could work under and infer properties of the model and the datasets used from these environments. 
 I was able to achieve the following:
 
 \begin{enumerate}
@@ -185,7 +183,7 @@ Chapter \ref{chapter:Evaluation} then discusses all of the results that were obt
 \chapter{Preparation} \label{chapter:Prep}
 
 % In this chapter, I discuss the necessary technical background information needed for the project in sections \ref{sec:CNN} through \ref{sec:KNN}, then the requirements of the project are elaborated on in section \ref{sec:ReqAnal} before the starting point and Software Engineering practices are discussed in section \ref{sec:SEPractices}. 
-The approach that I'm using requires the use of metric learning, which is discussed in section \ref{sec:MetricLearningPrimer}, as well as the use of multiple face descriptors, which is discussed in section \ref{sec:PrepFD}. I then discuss the core requirements and the extension in \ref{sec:ReqAnal} and the major setup of the project.
+The approach that I'm using requires the use of metric learning, which is discussed in section \ref{sec:MetricLearningPrimer}, as well as the use of multiple face descriptors, which is discussed in section \ref{sec:PrepFD}. I then discuss the core requirements and the extension in \ref{sec:ReqAnal} and the prerequisites for the project.
 
 \section{Convolutional Neural Networks} \label{sec:CNN}
 
@@ -226,9 +224,9 @@ A Convolutional Neural Network (CNN) is a type of neural network which is used t
 
 \subsection{Convolutional Layers}
 
-A convolutional layer takes an input image and, as hyperparameters, takes the number of output filters, kernel size, and stride size in order to create a set of kernels and biases in order to create the output. 
+A convolutional layer takes an input image and, as hyperparameters, takes the number of output filters, kernel size, and stride size in order to create a set of kernels and biases to create the output. 
 A kernel is a matrix that is, usually, small and has sizes less than that of the input image but covers the depth of the entire input image. So, for example, if the input to a convolutional layer was $32 \times 32 \times 64$, then a kernel could have size $3 \times 3 \times 64$ where the first two sizes are specified. 
-The kernel is then started in the top left of the input and the dot product of the kernel and the input sub-array is taken to be the output at that cell. An illustration of this is seen in figure \ref{fig:ConvLayer}.
+The kernel is then applied to the image and, for each sub-array, the dot product of the kernel and the input sub-array is taken to be the output at that cell. An illustration of this is seen in figure \ref{fig:ConvLayer}.
 
 \begin{figure}[h!]
     \centering
@@ -237,7 +235,7 @@ The kernel is then started in the top left of the input and the dot product of t
     \label{fig:ConvLayer}
 \end{figure}
 
-Then the kernel is moved along as much as specified in the stride. So, if the stride was $2 \times 2$, then the kernel would move 2 to the right and do the same thing. 
+The sub-arrays the kernel must work on are separated by however much the stride is. So, if the stride was $2 \times 2$, then the sub-arrays would be separated from each other by 2 cells in each direction. 
 
 However, this produces a 2-dimensional array whereas we want a 3-dimensional volume as the output with a certain specified depth, which is the number of output filters. Thus, that many kernels are created and used for the layer to create the output. These 2-dimensional arrays are then stacked on top of each other to create a 3-dimensional output. 
 A bias is then applied and the activation function is applied to the output, which is usually ReLU which is described in section \ref{sec:ReLU}. 
@@ -250,7 +248,7 @@ These pooling layers take an input of size $W_1 \times H_1 \times D_1$, have hyp
 
 \[\frac{W_1 - F}{S + 1} \times \frac{H_1 - F}{S + 1} \times D_1\]
 
-This output is calculated by taking each $F \times F$ subarray for each slice of the input and doing the corresponding operation on it and returning that as the output for that cell. So, max-pooling would take the max of each of the $F \times F$ cells and average-pooling would take the average. The stride is the same as the stride in the convolutional layer.
+This output is calculated by taking each $F \times F$ sub-array for each slice of the input and doing the corresponding operation on it and returning that as the output for that cell. So, max-pooling would take the max of each of the $F \times F$ cells and average-pooling would take the average. The stride is the same as the stride in the convolutional layer.
 We can see an example of this with a max-pooling layer of stride 2 and has filter size $2 \times 2$ in figure \ref{fig:PoolEx}.
 
 \begin{figure}[h!]
@@ -262,7 +260,7 @@ We can see an example of this with a max-pooling layer of stride 2 and has filte
 
 \subsection{Activation Functions}
 
-There are a multitude of functions that can be applied to the output of a layer which each have different effects. These are called activation functions and we'll talk about two of them here, ReLU and Softmax. Only nonlinear activation functions are considered since we want to be able to have nonlinear decision boundaries. If we had linear activation functions, the neural network would still be linear in nature and, thus, we wouldn't be able to deal with non-linear problems. 
+There are a multitude of functions that can be applied to the output of a layer which each have different effects. These are called activation functions, two of them being ReLU and Softmax. Only nonlinear activation functions are considered since we want to be able to have nonlinear decision boundaries. If we had linear activation functions, the neural network would still be linear in nature and, thus, we wouldn't be able to deal with non-linear problems. 
 
 \subsubsection{ReLU} \label{sec:ReLU}
 
@@ -333,12 +331,12 @@ For each block, we obtain a histogram of the LBP values that were in the block, 
 
 \subsection{Histogram of Gradients}\label{sec:HOG}
 
-Another face descriptor is the Histogram of Gradients (HOG) \cite{HOG}. Given a colored image, we can think of the image as a function, $I: \mathbb{N}_m \times \mathbb{N}_n \to \mathbb{R}^3$, which takes a coordinate in the image and returns a vector of values, which correspond to the red, green, and blue values of the pixel.
+Histogram of Gradients (HOG) \cite{HOG} is a face descriptor that uses the gradients of an image at each point to form a face descriptor. Given a colored image, we can think of the image as a function, $I: \mathbb{N}_m \times \mathbb{N}_n \to \mathbb{R}^3$, which takes a coordinate in the image and returns a vector of values, which correspond to the red, green, and blue values of the pixel.
 This then means that we are able to calculate the gradient of the image. The gradient of an image can characterize local object appearance and shape since the gradient of the image can be used to help find edges in the image. As such, it is useful to obtain such a histogram of gradients. 
 
 \subsubsection{Calculating the Gradients}
 
-First, we need to calculate the gradients of the image. As the image function is discrete, so we cannot analytically find the gradients, we must find approximations to do so. This is done by convolving specific kernels on the image. 
+In order to compute the HOG vector for an image, we must compute the gradients of the image. As the image function is discrete, so we cannot analytically find the gradients, we must find approximations to do so. This is done by convolving specific kernels on the image. 
 What this means is that the kernel, $K$ which is a matrix, is applied to each pixel in the image and its neighbors and the values are multiplied with the corresponding value in the kernel and all of the values are then summed up to create the new value for the convolved image. 
 For example, if we had the kernel:
 
@@ -377,8 +375,8 @@ And that the angles at each point are:
 
 \[\tan^{-1}((G_y * I)/(G_x * I))\]
 
-However, there are two things that need to be addressed before we move on to the rest of the algorithm. Firstly, there are still 3 channels for the image, so we have obtained the gradient in the $x$ and $y$ direction for each pixel and each channel. As such, 
-we define the gradient of each pixel to be the gradient vector that has the maximum magnitude among the 3 channels. 
+However, there are two things that need to be addressed before we move on to the rest of the algorithm. Firstly, there are still three channels for the image, so we have obtained the gradient in the $x$ and $y$ direction for each pixel and each channel. As such, 
+we define the gradient of each pixel to be the gradient vector that has the maximum magnitude among the three channels. 
 
 Furthermore, the angles returned range between $0^{\circ}$ and $360^{\circ}$. However, we require that the angles be ``unsigned'', so the angle at each pixel, $\theta_{(x, y)}$, becomes:
 
@@ -435,10 +433,10 @@ There are 5 configurations of the network, which have varying depth and, as a re
     \label{fig:VGGArch}
 \end{figure}
 
-By training this model on the ImageNet dataset, the model is able to get a top-5 classification error of 7.5\%, which means that for 7.5\% of the entries in the test set, none of the top 5 classes that the image could be were the actual image. 
+By training this model on the ImageNet dataset, the model is able to get a top-5 classification error of $7.5\%$, which means that for $7.5\%$ of the entries in the test set, none of the top 5 classes that the image could be were the actual image. 
 
 However, in order to use the model for face description, we must change the output layer and the training dataset \cite{VGGFace}. Instead of training on general objects in an image, we train the model on faces, specifically celebrity faces. 
-The celebrities are curated to a list of 2622 people in which 2000 images are obtained for each celebrity and the images are then curated. The curated set of images constitutes the training set for the VGG model for faces. This dataset\footnote{The dataset is available at \url{https://www.robots.ox.ac.uk/~vgg/data/vgg_face/}} was created by the authors of \cite{VGGFace}.
+The celebrities are curated to a list of 2622 people in which 2000 images are obtained for each celebrity and the images are then curated. The curated set of images constitutes the training set for the VGG model for faces. This dataset\footnote{The dataset is available at \url{https://www.robots.ox.ac.uk/~vgg/data/vgg_face/}} was created by the authors of the VGG model for faces paper \cite{VGGFace}.
 
 The VGG model for faces is then the model described above with the softmax layer having a dimension of 2622. The model is then trained with the dataset we described which allows us to get rid of the softmax layer and use the output of the last fully-connected layer as our 4096-dimensional face descriptor for the image. 
 
@@ -491,7 +489,7 @@ K-Nearest Neighbors is an algorithm that finds the $K$ nearest neighbors for eac
 
 \section{Requirements Analysis} \label{sec:ReqAnal}
 
-The main requirement of the project is stated in Appendix \ref{chapter:Proposal} which is to replicate the results from Liang et al. (2019) \cite{WGEML} within a $15\%$ error range or to reject the results. In other words, the project should implement the Weighted Graph Embedding-Based Metric Learning (WGEML) algorithm for Kin Recognition. 
+The main requirement of the project is stated in Appendix \ref{chapter:Proposal} which is to replicate the results from Liang et al. (2019) \cite{WGEML} within a $15\%$ error range or to reject the results. In other words, the project should implement the Weighted Graph Embedding-Based Metric Learning (WGEML) algorithm. 
 The core project can be broken down into the following requirements:
 \begin{itemize}
     \item \textbf{Face Detection}: Given an image, the faces in the image must be identified and saved as a $64 \times 64$ image on disk. This is a low risk and low priority requirement as this is mainly just using OpenCV methods and isn't necessary for testing the model, as the images are already faces of size $64 \times 64$. 
@@ -588,12 +586,12 @@ The repository is shown in Figure \ref{fig:RepoOverview}
         .3 ROC\_dataset.png.
         .3 ROC\_rel.png.
         .2 src.
-        .3 data\_preparation.
+        .3 data\_preparation {\small \textnormal{\textcolor{darkgray}{(The folder the data preparation functions as explained in section \ref{sec:DataPrep})}}}.
         .4 PCA.py.
         .4 prep\_cross\_valid.py.
-        .4 properly\_formatted\_inputs.py.
+        .4 properly\_formatted\_inputs.py {\small \textnormal{\textcolor{darkgray}{(Helps create the inputs for training WGEML)}}}.
         .4 save\_and\_load.py.
-        .3 face\_descriptors.
+        .3 face\_descriptors  {\small \textnormal{\textcolor{darkgray}{(The folder has the implementations of each of the face descriptors)}}}.
         .4 CifarNet.py.
         .4 HOG.py.
         .4 LBP.py.
@@ -601,20 +599,20 @@ The repository is shown in Figure \ref{fig:RepoOverview}
         .4 VGG.py.
         .3 face\_detection.
         .4 face\_detection.py.
-        .4 haarcascade\_frontalface\_default.xml.
+        .4 haarcascade\_frontalface\_default.xml {\small \textnormal{\textcolor{darkgray}{(The classifier obtained from OpenCV)}}}.
         .3 prediction/predictor.py.
         .3 scripts.
         .4 ablation\_study.py.
         .4 get\_pairwise\_accuracies.py.
-        .4 preprocessing\_fds.py.
-        .4 preprocessing\_TSK.py.
+        .4 preprocessing\_fds.py {\small \textnormal{\textcolor{darkgray}{(Obtains face descriptors for each image in a dataset)}}}.
+        .4 preprocessing\_TSK.py {\small \textnormal{\textcolor{darkgray}{(Creates TSKinFace negative pairs and the folds)}}}.
         .4 ROC\_curves.py.
-        .4 testing.py.
-        .4 training.py.
+        .4 testing.py {\small \textnormal{\textcolor{darkgray}{(Used to test a set of models with the corresponding test images)}}}.
+        .4 training.py {\small \textnormal{\textcolor{darkgray}{(Used to train the models for each fold)}}}.
         .3 test/.
         .3 WGEML.
         .4 constants.py.
-        .4 WGEML\_training.py.
+        .4 WGEML\_training.py {\small \textnormal{\textcolor{darkgray}{(Contains the functions to create and train WGEML)}}}.
         .2 venv/.
         .2 .coveragerc.
         .2 .gitignore.
@@ -711,7 +709,7 @@ Each of the LBP and HOG face descriptors were implemented exactly as mentioned i
 
 \subsection{SIFT Implementation} \label{sec:SIFTImpl}
 
-The major difference between the original version of SIFT described in \cite{SIFT} and what was needed was that keypoints of each image weren't calculated. 
+The major difference between the original version of SIFT described in the original SIFT paper \cite{SIFT} and what was needed was that keypoints of each image weren't calculated. 
 Instead, the descriptor that was obtained from each keypoint, which is described in section \ref{sec:SIFTPrep}, is obtained from dividing the image into $7 \times 7$ overlapping
 patches on a $16 \times 16$ grid. 
 
@@ -733,7 +731,7 @@ VGG takes images of size $224 \times 224$, the images need to be resized to $224
 
 \subsection{CifarNet Extension} \label{sec:CFNExt}
 
-In the CifarNet extension, I replaced the VGG network with a smaller network that was trained on CIFAR-10 \cite{CIFAR10}, which is called CifarNet\footnote{Architecture taken from \url{https://github.com/deep-fry/mayo/blob/master/models/cifarnet.yaml}}, until it was able to achieve a 91\% accuracy with it. The architecture is shown in figure \ref{fig:CFNArch}. After each of the convolutional layers, a batch normalization layer was applied with momentum 0.9997 and after the fourth and seventh batch normalization layer, a dropout layer was applied. The last layer after the flatten layer is a fully-connected layer with the softmax function as its activation function. 
+In the CifarNet extension, I replaced the VGG network with a smaller network that was trained on CIFAR-10 \cite{CIFAR10}, which is called CifarNet\footnote{Architecture taken from \url{https://github.com/deep-fry/mayo/blob/master/models/cifarnet.yaml}}, until it was able to achieve a $91\%$ accuracy with it. The architecture is shown in figure \ref{fig:CFNArch}. After each of the convolutional layers, a batch normalization layer was applied with momentum 0.9997 and after the fourth and seventh batch normalization layer, a dropout layer was applied. The last layer after the flatten layer is a fully-connected layer with the softmax function as its activation function. 
 
 \begin{figure}[h!]
     \centering
@@ -858,7 +856,7 @@ As this value $\theta$ wasn't mentioned in \cite{WGEML}, it had to be found expe
 
 \subsection{Tri-kin Relationship Prediction}
 
-Due to the fact that tri-kin relationships have 3 images as the input, two parents and one child, the similarity is defined as the mean similarity between each of the parents and the child. In other words:
+Since tri-kin relationships have three images as the input, two parents and one child, the similarity is defined as the mean similarity between each of the parents and the child. In other words:
 
 \[sim(\mathbf{p_1}, \mathbf{p_2}, \mathbf{c}) = \frac{sim(\mathbf{p_1}, \mathbf{c}) + sim(\mathbf{p_2}, \mathbf{c})}{2}\]
 
@@ -866,7 +864,7 @@ Where $\mathbf{p_1}, \mathbf{p_2}$ represent the face descriptors for each paren
 
 \section{Overview of Workflow} \label{sec:Workflow}
 
-There are 3 main stages to running the project, which are, for each dataset, the preprocessing stage, the training stage, and the testing stage. The important outputs of each of these stages are saved onto disk so that each stage doesn't have to be run right after another. 
+There are three main stages to running the project, which are, for each dataset, the preprocessing stage, the training stage, and the testing stage. The important outputs of each of these stages are saved onto disk so that each stage doesn't have to be run right after another. 
 
 \subsection{Preprocessing}
 
@@ -1008,23 +1006,23 @@ Finally, the results of using CifarNet instead of VGG are found to be, generally
 
 \section{Overall Accuracies of the Model} \label{sec:MainResults}
 
-As mentioned in section \ref{sec:Datasets}, for the sake of brevity, we abbreviate ``father'' as ``F'', ``mother'' as ``M'' , ``son'' as ``S'', and ``daughter'' as ``D'' so the relationships are noted as a combination of these acronyms, so ``FS'' stands for the Father-Son relationship, etc. The project is run end-to-end for each dataset, setting, and relationship, and the accuracies are shown in figure \ref{fig:Accs}. For the success criterion, we look at the difference between the accuracies my implementation had obtained, and the original paper had obtained, which is shown in figure \ref{fig:diffInAccs} where a positive number means my accuracies were better. 
+We abbreviate ``father'' as ``F'', ``mother'' as ``M'' , ``son'' as ``S'', and ``daughter'' as ``D'' so the relationships are noted as a combination of these acronyms, so ``FS'' stands for the Father-Son relationship, etc., as discussed in section \ref{sec:Datasets}. The project is run end-to-end for each dataset, setting, and relationship, and the accuracies are shown in figure \ref{fig:Accs}. For the success criterion, we look at the difference between the accuracies my implementation had obtained, and the original paper had obtained, which is shown in figure \ref{fig:diffInAccs} where a positive number means my accuracies were better. 
 
 \begin{figure}[h!]
     \centering
     \includegraphics[scale=0.68]{Eval/OrigResults.png}
-    \caption{Accuracies of WGEML applied to each dataset for each relationship grouped by dataset}
+    \caption[WGEML implementation accuracies]{Accuracies of WGEML applied to each dataset for each relationship grouped by dataset}
     \label{fig:Accs}
 \end{figure}
 
 \begin{figure}[h!]
     \centering
     \includegraphics[scale=0.65]{Eval/DiffOrigResults.png}
-    \caption{Differences in accuracies between my implementation and \cite{WGEML} in \%}
+    \caption[Difference in WGEML accuracies]{Differences in accuracies between my implementation and \cite{WGEML} in \%}
     \label{fig:diffInAccs}
 \end{figure}
 
-We can see that none of the absolute values of the differences go higher than $8.89\%$ which, as will be discussed in \ref{sec:SuccCriterionEval}, means that the success criterion is fulfilled. 
+We can see that none of the absolute values of the differences are above $8.89\%$ which, as will be discussed in \ref{sec:SuccCriterionEval}, means that the success criterion is fulfilled. 
 
 % We also see that the Father-Son relationship does better than the other relationships for the same dataset except in the Mother-Son relationship for TSKinFace when there were only positive pairs in the training set and both positive and negative pairs in the testing set. 
 In general, we see that the accuracies of the Father-Son relationship for each dataset are higher than those of the other relationships. However, there is one exception to this which is in the TSKinFace dataset when we use only positive pairs in the training set and both positive and negative pairs in the testing set.
@@ -1033,8 +1031,8 @@ When only positive pairs were used for the TSKinFace dataset for both training a
 
 \section{Success Criterion} \label{sec:SuccCriterionEval}
 
-As seen in section \ref{sec:MainResults}, I was able to replicate the accuracies from \cite{WGEML} within a $\pm 15\%$ accuracy by using the WGEML methodology which means that the project is a success according to Appendix \ref{chapter:Proposal}. 
-% Furthermore, referring to the requirements analysis in section \ref{sec:ReqAnal}, each of the core project requirements were completed, which were to implement face detection, the necessary face descriptors, WGEML, a prediction method and replicate the paper end-to-end. 
+As seen in section \ref{sec:MainResults}, I was able to replicate the accuracies from the paper by Liang et al \cite{WGEML} within a $\pm 15\%$ accuracy by using the WGEML methodology which means that the project is a success according to 
+the goals defined in my proposal. 
 Furthermore, the extensions were also completed and the results of which are discussed in sections \ref{sec:Biases}, \ref{sec:AbStudies}, and \ref{sec:CFNResults}.
 
 \section{Receiver Operating Characteristic (ROC) Curves} \label{sec:ROC}
@@ -1044,7 +1042,7 @@ We can also examine the ROC curves for each dataset in figure \ref{fig:ROCCurves
 \begin{figure}[h!]
     \centering
     \includegraphics[scale=0.6]{Eval/ROC.png}
-    \caption{The mean ROC curve for each dataset averaged over each fold, relationship and setting}
+    \caption[ROC curves for each dataset]{The mean ROC curve for each dataset averaged over each fold, relationship and setting}
     \label{fig:ROCCurves}
 \end{figure}
 
@@ -1056,7 +1054,7 @@ The ROC curves can also be created for each relationship averaged over each fold
     \centering
     \includegraphics[scale=0.6]{Eval/ROC_rel.png}
     % \resizebox{16cm}{!}{\includegraphics{Eval/ROC_rel.png}}
-    \caption{The mean ROC curve for each relationship averaged over each fold, dataset and setting}
+    \caption[ROC curves for each relationship]{The mean ROC curve for each relationship averaged over each fold, dataset and setting}
     \label{fig:ROCRel}
 \end{figure}
 
@@ -1065,25 +1063,25 @@ Other than that, we can also see that the models for the FS relationship tend to
 
 \section{Potential Biases in Datasets} \label{sec:Biases}
 
-In order to look at potential biases that could occur in each of the datasets, each model was tested on all of the available datasets. So, for example, the model that was returned from training on the KinFaceW-I unrestricted dataset for the Father-Son relationship will have been tested on all of the 3 datasets that were used. 
+In order to look at potential biases that could occur in each of the datasets, each model was tested on all of the available datasets. So, for example, the model that was returned from training on the KinFaceW-I unrestricted dataset for the Father-Son relationship will have been tested on all of the three datasets that were used. 
 
 In every case, the accuracies went down when the test set that was used came from a different dataset than the training set. This is to be expected as the model might be overfitting to small biases that are inherent in every dataset. 
-The models trained with the KinFaceW-I dataset generalizes fairly well, compared to KinFaceW-II and TSKinFace, since it seems to have the lowest differences of the 3 datasets 
-with an average of an 8\% decrease in accuracy compared to the accuracies when it is tested with itself. 
-Then, KinFaceW-II was worse at a difference of 11.7\% and then TSKinFace was by far the worst with an 
-average difference of 15.7\%. The average accuracy difference across the two test datasets for each training dataset and relationship is shown in figure \ref{fig:PairwiseAccByRel} and the average accuracy differences for each dataset across all relationships and test datasets is shown in figure \ref{fig:AvgPairwiseAcc}.
+The models trained with the KinFaceW-I dataset generalizes fairly well, compared to KinFaceW-II and TSKinFace, since it seems to have the lowest differences of the three datasets 
+with an average of an $8\%$ decrease in accuracy compared to the accuracies when it is tested with itself. 
+Then, KinFaceW-II was worse at a difference of $11.7\%$ and then TSKinFace was by far the worst with an 
+average difference of $15.7\%$. The average accuracy difference across the two test datasets for each training dataset and relationship is shown in figure \ref{fig:PairwiseAccByRel} and the average accuracy differences for each dataset across all relationships and test datasets is shown in figure \ref{fig:AvgPairwiseAcc}.
 
 \begin{figure}[h!]
     \centering
     \includegraphics[scale=0.6]{Eval/AvgPairwiseAccByRelationship.png}
-    \caption{The average accuracy differences of the two test datasets for each training dataset and relationship}
+    \caption[Differences in accuracy when a the test dataset is different from the training set]{The average accuracy differences of the two test datasets for each training dataset and relationship}
     \label{fig:PairwiseAccByRel}
 \end{figure}
  
 \begin{figure}[h!]
     \centering
     \includegraphics[scale=0.6]{Eval/AvgPairwiseAcc.png}
-    \caption{The average accuracy differences of the two test datasets and relationship for each training dataset}
+    \caption[Average differences in accuracy when a the test dataset is different from the training set]{The average accuracy differences of the two test datasets and relationship for each training dataset}
     \label{fig:AvgPairwiseAcc}
 \end{figure}
 
@@ -1110,7 +1108,7 @@ However, as you increase the number of face descriptors, there are diminishing r
 \begin{figure}[h!]
     \centering
     \includegraphics[scale=0.6]{Eval/AbStudy.png}
-    \caption{The plot of accuracy versus number of face descriptors used for each unrestricted dataset}
+    \caption[Accuracy versus the number of face descriptors used]{The plot of accuracy versus number of face descriptors used for each unrestricted dataset}
     \label{fig:AbStudy}
 \end{figure}
 
@@ -1119,19 +1117,19 @@ face descriptor increases the accuracy quite a bit but the third doesn't increas
 increases it more, as seen in figure \ref{fig:AbStudy}.
 
 However, this is mainly due to two outliers, for the FD relationship, 
-increasing from 2 to 3 face descriptors only increased the accuracy by 0.2\%, and for the MS relationship, 
-going from 3 to 4 increased accuracy by 3\%.  % Would showing the raw numbers be good here?
+increasing from $2$ to $3$ face descriptors only increased the accuracy by $0.2\%$, and for the MS relationship, 
+going from $3$ to $4$ increased accuracy by $3\%$.  % Would showing the raw numbers be good here?
  
 At a high level, as more face descriptors are added, the features 
 that each face descriptor capture are more likely to overlap with each other, compared to when 
 there's only one face descriptor, in which case another one could add a lot more information. 
-However, if there are already 3 face descriptors, another face descriptor might share a lot of 
+However, if there are already $3$ face descriptors, another face descriptor might share a lot of 
 the same information the others already have captured and only be able to add, relatively, 
 a small amount of information.
 
 I then looked at which individual configurations of face descriptors used, and relationship resulted in a 
 better accuracy than if all of the face descriptors were used.
-One thing I saw was that, out of the 22 instances this happened among all of the datasets, 
+One thing I saw was that, out of the $22$ instances this happened among all of the datasets, 
 all of them used the VGG face descriptor.
 This led me to believe that the VGG descriptor is quite useful when used in conjunction 
 with at least one other face descriptor since we also had that the configurations that 
@@ -1139,18 +1137,16 @@ used VGG tended to do better in accuracy than the ones that didn't.
 This makes sense since VGG is a deep feature detector whereas the other face descriptors use the texture only.
  
 Furthermore, the KinFaceW-I restricted configuration had by far the 
-highest number of configurations which did better than using all 4 face descriptors for that 
-relationship, with 11 of the 22 configurations. The other datasets had about 3 or 4 instances where 
+highest number of configurations which did better than using all $4$ face descriptors for that 
+relationship, with $11$ of the $22$ configurations. The other datasets had about $3$ or $4$ instances where 
 this occurred. 
 
 
 \section{CifarNet Extension} \label{sec:CFNResults}
 
-When I replaced VGG with CifarNet (CFN), I found that it does worse in the KinFaceW-I dataset, 
+When I replaced VGG with CifarNet (CFN), it does worse in the KinFaceW-I dataset, 
 it does better in the KinFaceW-II dataset, and it doesn't have a huge effect on the TSKinFace dataset 
-(with the biggest difference being a 1\% difference in accuracy). When grouped by relationship, I 
-found that the FS relationship had the least change in accuracy with an average 0.092\% 
-accuracy difference. This is shown in figure \ref{fig:CFNRelationshipGrouping} where a positive number implies that the original face descriptors did better. There is more variation in the other relationships than there is in the father-son relationship, 
+(with the largest difference being a $1\%$ difference in accuracy). When grouped by relationship, the FS relationship had the least change in accuracy with an average $0.092\%$ difference. This is shown in figure \ref{fig:CFNRelationshipGrouping} where a positive number implies that the original face descriptors did better. There is more variation in the other relationships than there is in the father-son relationship, 
 and this is reflected in the standard deviations for each relationship, ignoring the tri-kin relationships as there is only one dataset for this. 
 
 The differences grouped by dataset are shown in figure \ref{fig:CFNDatasetGrouping}.
@@ -1170,9 +1166,9 @@ The differences grouped by dataset are shown in figure \ref{fig:CFNDatasetGroupi
 \end{figure}
 
 In general, VGG did better than CFN for KinFaceW-I and did worse for KinFaceW-II. 
-The maximum difference in accuracies was 5.4\% which occurred in the KinFaceW-II unrestricted setting with 
-the MD relationship in which CFN made the accuracy increase by 5.4\%. The maximum decrease 
-in accuracy was 4.7\% with the KinFaceW-I Restricted dataset for the MS relationship. The KinFaceW-II 
+The maximum difference in accuracies was $5.4\%$ which occurred in the KinFaceW-II unrestricted setting with 
+the MD relationship in which CFN made the accuracy increase by $5.4\%$. The maximum decrease 
+in accuracy was $4.7\%$ with the KinFaceW-I Restricted dataset for the MS relationship. The KinFaceW-II 
 Unrestricted setting with the MS relationship had no difference whatsoever in accuracies between the 
 face descriptors. 
 
@@ -1185,7 +1181,7 @@ This means that using the CFN model can be useful in mobile and embedded systems
 \section{Unit Tests} \label{sec:UnitTests}
 
 To make sure the project was doing everything that it was supposed to be doing, unit tests were created for each file except the scripts. This is since the scripts were for integrating the modules together and thus didn't require unit testing.
-The statement coverage for each file and overall is shown in figure \ref{fig:Coverage}. In general, most of the files had 100\% statement coverage and the main reason that CifarNet doesn't have a higher coverage is due to a function that trains the model and another function that packages up the creation of the model and training the model into one function. This is fairly difficult to unit test from my knowledge, which is what makes up most of the untested code.
+The statement coverage for each file and overall is shown in figure \ref{fig:Coverage}. In general, most of the files had $100\%$ statement coverage and the main reason that CifarNet doesn't have a higher coverage is due to a function that trains the model and another function that packages up the creation of the model and training the model into one function. This is fairly difficult to unit test from my knowledge, which is what makes up most of the untested code.
 
 \begin{figure}[h!]
     \centering
@@ -1200,25 +1196,27 @@ The statement coverage for each file and overall is shown in figure \ref{fig:Cov
 
 \chapter{Conclusion}
 
-Overall, the project was successful since I was able to implement each of the core components, as specified in section \ref{sec:ReqAnal} and, this allowed me to replicate the findings of the WGEML paper within a 15\% error range. 
+% Overall, the project was successful since I was able to implement each of the core components specified in section \ref{sec:ReqAnal} and I was able to replicate the findings of the WGEML paper \cite{WGEML}. 
+Overall, the project successfully reproduced the implementation and results presented in the WGEML paper within a $15\%$ error range.
 Furthermore, I was able to further explore the intricacies of the algorithm and how it reacts to variations in the input. By doing ablation studies, 
 I was able to discover that adding face descriptors to the algorithm has diminishing returns in section \ref{sec:FDAbStudies}. Furthermore, sources of bias in the datasets were found in section \ref{sec:Biases}.
 
 \section{Lessons Learned}
 
 One of the main lessons I learned was with respect to how important testing is. By writing these unit tests, even for seemingly simple functions, I saved myself a lot of potential future problems as I was able to catch many of the bugs while I was writing the code instead of at the integration stage. Of course, there were still bugs when I tried running the project end-to-end, but these were much simpler to solve knowing that each function I wrote and used is correct. 
-For example, solving the eigenvalue problem and getting the top $d$ vectors for WGEML is a fairly simple function to write. However, had I not created some non-trivial matrices to test that function with, I wouldn't have realized that the function was only returning $d$ elements of each eigenvector instead of $d$ eigenvectors. 
+For example, solving the eigenvalue problem and getting the top $d$ vectors for WGEML is a fairly simple function to write. However, had I not created some non-trivial matrices to test that function with, I wouldn't have realized that the function was only returning $d$ elements of each eigenvector instead of $d$ eigenvectors. This is especially important in machine learning since these bugs could have gone unnoticed without proper testing. 
 
 As I hadn't had much experience with Computer Vision prior to this project, a lot of research had to be done into the intricacies of the original WGEML paper, such as what each face descriptor is and how they work. I was able to learn how to read multiple research papers and consolidate their information into my project. 
 
 Dependencies posed minor problems at points. Although I had a \texttt{requirements.txt} file and a virtual environment, running the testing pipeline on my laptop caused different results to the external GPU I was using for running the project end-to-end. The testing pipeline was the only pipeline I could reasonably run on my laptop due to its simplicity. However, 
 since I had changed some of the dependencies in the \texttt{requirements.txt} file on the external GPU, I had obtained different results. I realized how important maintaining the same dependencies was to a project.
 
-If I were to do the project over again, I think using more sophisticated software engineering tools such as some continuous integration tool such as Jenkins together with a containerization tool such as Docker would help immensely. Sometimes I would forget to run my unit tests before pushing my changes to the feature branch and only afterwards I would realize that the unit tests fail and one time I only noticed after the broken changes had already reached the master branch which continuous integration could help prevent. Docker could have also helped to prevent the dependency issue I had. 
+If I were to do the project over again, using more sophisticated software engineering tools such as Jenkins, which offers continuous integration, and Docker would help immensely. 
+Sometimes I would forget to run my unit tests before pushing my changes to the feature branch and only afterwards I would realize that the unit tests fail and one time I only noticed after the broken changes had already reached the master branch which continuous integration could help prevent. Docker could have also helped to prevent the dependency issue I had. 
 
 \section{Future Work}
 
-In the future, the model can be extended to work on videos. This was an extension at the beginning of the project which ended up not coming to fruition since I couldn't obtain a dataset for it.
+It would be interesting to extend the model to work on videos since videos allow for more information, such as the various angles of a person's face, to be taken into account \cite{Video}. 
 Furthermore, the project can be extended such that the potential relationship doesn't have to be specified in the input, which would answer whether two people are related at all rather than if they are related in a specific way. 
 
 Aside from extensions regarding the implementation, we can also further explore whether, in the ablation studies, the graph of accuracy versus the number of face descriptors continues in the way I'd expect with it leveling off after enough face descriptors or does it go down after a bit since the abundance of information could potentially interfere with each other? Furthermore, how would the different sets of face descriptors that were used affect this?
@@ -1292,7 +1290,7 @@ Where $r$ is the ratio of the eigenvalues. Thus, letting the maximum ratio that 
 \[\frac{\text{Tr}(\mathbf{H})^2}{\text{Det}(\mathbf{H})} < \frac{(r_0+1)^2}{r_0}\]
 If it is, then this is a proper keypoint. If it isn't then this is an edge so we can discard it. 
 
-We now have each of the keypoints which are scale-invariant, so we need to make it rotation-invariant as well. This is done by assigning an orientation to the keypoints. A neighborhood is taken around the keypoint in which the gradient is obtained for each pixel in the area and a histogram of these gradients is created based on the angle, this time in bins of $0$ to $10$, 10 to 20, etc. until 350 to 360. The peak in this histogram is calculated and taken and any other peaks which have a value above 80\% of the original peak is also considered to calculate the orientation. Now, for each keypoint, we have the location, scale, and orientation.
+We now have each of the keypoints which are scale-invariant, so we need to make it rotation-invariant as well. This is done by assigning an orientation to the keypoints. A neighborhood is taken around the keypoint in which the gradient is obtained for each pixel in the area and a histogram of these gradients is created based on the angle, this time in bins of $0$ to $10$, 10 to 20, etc. until 350 to 360. The peak in this histogram is calculated and taken and any other peaks which have a value above $80\%$ of the original peak is also considered to calculate the orientation. Now, for each keypoint, we have the location, scale, and orientation.
 
 \section{Principal Component Analysis} \label{sec:PCA}
 
